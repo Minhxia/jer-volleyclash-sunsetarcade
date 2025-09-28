@@ -1,7 +1,7 @@
 # jer-volleyclash-sunsetarcade
 Práctica para la asignatura de Juegos en Red (URJC). Curso 2025-2026.
 
-##Créditos##
+##Créditos
 - **Título:** Volley Clash
 - **Número de grupo:** 5
 - **Nombre de grupo:** Sunset Arcade
