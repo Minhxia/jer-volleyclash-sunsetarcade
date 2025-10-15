@@ -1,15 +1,14 @@
 # Volley Clash
-**Volley Clash** es un juego multijugador de **voleibol arcade** en 2D desarrollado para navegador web.  
-Dos jugadores se enfrentan en partidos rápidos y competitivos, combinando **físicas realistas**, **power-ups aleatorios** y una estética **pixel-art minimalista**.  
+## Descripción de la Temática
+**Volley Clash** es un juego multijugador de **voleibol arcade** en 2D desarrollado para navegador web.  En él, dos jugadores se enfrentan en partidos rápidos y competitivos, combinando **físicas realistas**, **power-ups aleatorios** y una estética **pixel-art minimalista**.  
 
 El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 2 de ventaja para ganar el set, en un partido a **3 sets**, controlando el salto, golpeo y posición del personaje con una jugabilidad sencilla pero desafiante.  
 
-## Créditos
+## Información del Equipo
 
-**Grupo:** 05   
-**Repositorio GitHub:** [URL del repositorio](https://github.com/Minhxia/jer-volleyclash-sunsetarcade)  
-**Licencia:** Apache 2.0  
-**Equipo de desarrollo:**
+**Número de Grupo:** 5   
+**Repositorio de GitHub:** [URL del repositorio](https://github.com/Minhxia/jer-volleyclash-sunsetarcade)  
+**Equipo de Desarrollo:**
 
 | Nombre | Correo Oficial | Cuenta de GitHub |
 |--------------|--------------|--------------|
@@ -75,8 +74,8 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
  11.1 [Estrategia de difusión](#111-estrategia-de-difusión)  
  11.2 [Público objetivo y canales](#112-público-objetivo-y-canales)  
  11.3 [Referencias e inspiración en otros juegos](#113-referencias-e-inspiración-en-otros-juegos)
-12. [Referencias](#12-referencias)
-13. [Diagrama de Flujo del Juego](#13-diagrama-de-flujo-del-juego)
+12. [Diagrama de Flujo del Juego](#12-diagrama-de-flujo-del-juego)
+13. [Referencias](#13-referencias)
 14. [Licencia](#14-licencia)
 
 ---
@@ -269,15 +268,15 @@ Aquí
 
 ---
 
-# 12. Referencias
-- Fuentes de inspiración
-- Juegos similares
-- Recursos gráficos o sonoros utilizados
+# 12. Diagrama de Flujo del Juego
+Imagen o esquema con el flujo de menús, gameplay, etc.
 
 ---
 
-# 13. Diagrama de Flujo del Juego
-Imagen o esquema con el flujo de menús, gameplay, etc.
+# 13. Referencias
+- Fuentes de inspiración
+- Juegos similares
+- Recursos gráficos o sonoros utilizados
 
 ---
 
