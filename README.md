@@ -30,13 +30,16 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
  1.4 [Plataforma](#14-plataforma)  
  1.5 [Categoría](#15-categoría)  
  1.6 [Alcance](#16-alcance)
+
 2. [Características Principales](#2-características-principales)
+
 3. [Aspectos Técnicos](#3-aspectos-técnicos)  
  3.1 [Motor de Juego](#31-motor-de-juego)  
  3.2 [Lenguajes y Frameworks](#32-lenguajes-y-frameworks)  
  3.3 [Arquitectura Cliente-Servidor](#33-arquitectura-cliente-servidor)  
  3.4 [Requisitos del Sistema](#34-requisitos-del-sistema)  
  3.5 [Control de Versiones y Gestión](#35-control-de-versiones-y-gestión)
+
 4. [Jugabilidad](#4-jugabilidad)  
  4.1 [Objetivo del juego](#41-objetivo-del-juego)  
  4.2 [Controles](#42-controles)  
@@ -47,36 +50,42 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
   4.3.4 [Dificultad progresiva](#434-dificultad-progresiva)  
   4.3.5 [Condiciones de victoria y derrota](#435-condiciones-de-victoria-y-derrota)  
  4.4 [Reglas del juego](#44-reglas-del-juego)  
- 4.5 [Escenarios y niveles](#45-escenarios-y-niveles)
-5. [Niveles](#5-niveles)  
- 5.1 [Estructura de niveles](#51-estructura-de-niveles)  
- 5.2 [Fin de nivel y recompensas](#52-fin-de-nivel-y-recompensas)  
-6. [Personajes e Ítems](#6-personajes-e-ítems)  
- 6.1 [Personajes](#61-personajes)  
- 6.2 [Ítems](#62-ítems)
-7. [Estados e Interfaces](#7-estados-e-interfaces)  
- 7.1 [Diagrama de Estados](#71-diagrama-de-estados)  
- 7.2 [Interfaces de Usuario](#72-interfaces-de-usuario)
-8. [Imagen y Diseño Visual](#8-imagen-y-diseño-visual)  
- 8.1 [Estilo visual](#81-estilo-visual)  
- 8.2 [Inspiración artística y cultural](#82-inspiración-artística-y-cultural)  
- 8.3 [Uso de colores](#83-uso-de-colores)  
- 8.4 [Logotipo](#84-logotipo)  
- 8.5 [Bocetos de interfaz y personajes](#85-bocetos-de-interfaz-y-personajes)
-9. [Sonido](#9-sonido)  
- 9.1 [Música](#91-música)  
- 9.2 [Efectos de sonido](#92-efectos-de-sonido)
-10. [Narrativa](#10-narrativa)  
- 10.1 [Historia general del juego](#101-historia-general-del-juego)  
- 10.2 [Desarrollo de personajes](#102-desarrollo-de-personajes)  
- 10.3 [Contexto y ambientación](#103-contexto-y-ambientación)
-11. [Comunicación y Marketing](#11-comunicación-y-marketing)  
- 11.1 [Estrategia de difusión](#111-estrategia-de-difusión)  
- 11.2 [Público objetivo y canales](#112-público-objetivo-y-canales)  
- 11.3 [Referencias e inspiración en otros juegos](#113-referencias-e-inspiración-en-otros-juegos)
-12. [Diagrama de Flujo del Juego](#12-diagrama-de-flujo-del-juego)
-13. [Referencias](#13-referencias)
-14. [Licencia](#14-licencia)
+ 4.5 [Escenarios y ambientación](#45-escenarios-y-ambientación)
+
+5. [Personajes e Ítems](#5-personajes-e-ítems)  
+ 5.1 [Personajes](#51-personajes)  
+ 5.2 [Ítems](#52-ítems)
+
+6. [Estados e Interfaces](#6-estados-e-interfaces)  
+ 6.1 [Diagrama de Estados](#61-diagrama-de-estados)  
+ 6.2 [Interfaces de Usuario](#62-interfaces-de-usuario)
+
+7. [Imagen y Diseño Visual](#7-imagen-y-diseño-visual)  
+ 7.1 [Estilo visual](#71-estilo-visual)  
+ 7.2 [Inspiración artística y cultural](#72-inspiración-artística-y-cultural)  
+ 7.3 [Uso de colores](#73-uso-de-colores)  
+ 7.4 [Logotipo](#74-logotipo)  
+ 7.5 [Bocetos de interfaz y personajes](#75-bocetos-de-interfaz-y-personajes)
+
+8. [Sonido](#8-sonido)  
+ 8.1 [Música](#81-música)  
+ 8.2 [Efectos de sonido](#82-efectos-de-sonido)
+
+9. [Narrativa](#9-narrativa)  
+ 9.1 [Historia general del juego](#91-historia-general-del-juego)  
+ 9.2 [Desarrollo de personajes](#92-desarrollo-de-personajes)  
+ 9.3 [Contexto y ambientación](#93-contexto-y-ambientación)
+
+10. [Comunicación y Marketing](#10-comunicación-y-marketing)  
+ 10.1 [Estrategia de difusión](#101-estrategia-de-difusión)  
+ 10.2 [Público objetivo y canales](#102-público-objetivo-y-canales)  
+ 10.3 [Referencias e inspiración en otros juegos](#103-referencias-e-inspiración-en-otros-juegos)
+
+11. [Diagrama de Flujo del Juego](#11-diagrama-de-flujo-del-juego)
+
+12. [Referencias](#12-referencias)
+
+13. [Licencia](#13-licencia)
 
 ---
 
@@ -170,116 +179,104 @@ Aquí
 
 ---
 
-# 5. Niveles
+# 5. Personajes e Ítems
 Aquí
 
-## 5.1 Estructura de niveles
-Aquí
-
-## 5.2 Fin de nivel y recompensas
-Aquí
-
-
----
-
-# 6. Personajes e Ítems
-Aquí
-
-## 6.1 Personajes
+## 5.1 Personajes
 Descripción de cada personaje
 
-## 6.2 Ítems
+## 5.2 Ítems
 Lista de objetos y su función
 
 
 ---
 
-# 7. Estados e Interfaces
+# 6. Estados e Interfaces
 Aquí
 
-## 7.1 Diagrama de Estados
+## 6.1 Diagrama de Estados
 Aquí
 
-## 7.2 Interfaces de Usuario
+## 6.2 Interfaces de Usuario
 Bocetos de menús, HUD, pantallas de carga, selección de nivel, etc.
 
 ---
 
-# 8. Imagen y Diseño Visual
+# 7. Imagen y Diseño Visual
 Aquí
 
-## 8.1 Estilo visual 
+## 7.1 Estilo visual 
 Pixel art, cartoon, realista, etc.
 
-## 8.2 Inspiración artística y cultural
+## 7.2 Inspiración artística y cultural
 Aquí
 
-## 8.3 Uso de colores
+## 7.3 Uso de colores
 Aquí
 
-## 8.4 Logotipo
+## 7.4 Logotipo
 Aquí
 
-## 8.5 Bocetos de interfaz y personajes
-Aquí
-
-
----
-
-# 9. Sonido
-Aquí
-
-## 9.1 Música
-Aquí
-
-## 9.2 Efectos de sonido
+## 7.5 Bocetos de interfaz y personajes
 Aquí
 
 
 ---
 
-# 10. Narrativa
+# 8. Sonido
 Aquí
 
-## 10.1 Historia general del juego
+## 8.1 Música
 Aquí
 
-## 10.2 Desarrollo de personajes
-Aquí
-
-## 10.3 Contexto y ambientación
+## 8.2 Efectos de sonido
 Aquí
 
 
 ---
 
-# 11. Comunicación y Marketing
+# 9. Narrativa
 Aquí
 
-## 11.1 Estrategia de difusión
+## 9.1 Historia general del juego
 Aquí
 
-## 11.2 Público objetivo y canales
+## 9.2 Desarrollo de personajes
 Aquí
 
-## 11.3 Referencias e inspiración en otros juegos
+## 9.3 Contexto y ambientación
 Aquí
 
 
 ---
 
-# 12. Diagrama de Flujo del Juego
+# 10. Comunicación y Marketing
+Aquí
+
+## 10.1 Estrategia de difusión
+Aquí
+
+## 10.2 Público objetivo y canales
+Aquí
+
+## 10.3 Referencias e inspiración en otros juegos
+Aquí
+
+
+---
+
+# 11. Diagrama de Flujo del Juego
 Imagen o esquema con el flujo de menús, gameplay, etc.
 
 ---
 
-# 13. Referencias
+# 12. Referencias
 - Fuentes de inspiración
 - Juegos similares
 - Recursos gráficos o sonoros utilizados
 
 ---
 
-# 14. Licencia
+# 13. Licencia
 **Licencia Apache 2.0**  
 Este proyecto está bajo la licencia Apache 2.0. Consulta el archivo LICENSE para más información.
