@@ -50,7 +50,7 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
   4.3.4 [Dificultad progresiva](#434-dificultad-progresiva)  
   4.3.5 [Condiciones de victoria y derrota](#435-condiciones-de-victoria-y-derrota)  
  4.4 [Reglas del juego](#44-reglas-del-juego)  
- 4.5 [Escenarios y ambientación](#45-escenarios-y-ambientación)
+ 4.5 [Escenarios](#45-escenarios)
 
 5. [Personajes e Ítems](#5-personajes-e-ítems)  
  5.1 [Personajes](#51-personajes)  
@@ -77,9 +77,8 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
  9.3 [Contexto y ambientación](#93-contexto-y-ambientación)
 
 10. [Comunicación y Marketing](#10-comunicación-y-marketing)  
- 10.1 [Estrategia de difusión](#101-estrategia-de-difusión)  
- 10.2 [Público objetivo y canales](#102-público-objetivo-y-canales)  
- 10.3 [Referencias e inspiración en otros juegos](#103-referencias-e-inspiración-en-otros-juegos)
+ 10.1 [Estrategia de difusión y canales](#101-estrategia-de-difusión-y-canales)  
+ 10.2 [Público objetivo](#102-público-objetivo)  
 
 11. [Diagrama de Flujo del Juego](#11-diagrama-de-flujo-del-juego)
 
@@ -92,20 +91,26 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
 # 1. Introducción
 Aquí
 
+
 ## 1.1 Concepto del juego
 Aquí
+
 
 ## 1.2 Género
 Aquí
 
+
 ## 1.3 Propósito y público objetivo
 Aquí
+
 
 ## 1.4 Plataforma
 Aquí
 
+
 ## 1.5 Categoría
 Aquí (Tipo de juego, PEGI, online/offline)
+
 
 ## 1.6 Alcance
 Aquí
@@ -125,17 +130,22 @@ Aquí
 # 3. Aspectos Técnicos
 Aquí
 
+
 ## 3.1 Motor de Juego
 Aquí
+
 
 ## 3.2 Lenguajes y Frameworks
 Aquí
 
+
 ## 3.3 Arquitectura Cliente-Servidor
 Aquí
 
+
 ## 3.4 Requisitos del Sistema
 Aquí
+
 
 ## 3.5 Control de Versiones y Gestión
 Aquí (GitHub, Issues, Projects)
@@ -146,34 +156,44 @@ Aquí (GitHub, Issues, Projects)
 # 4. Jugabilidad
 Aquí
 
+
 ## 4.1 Objetivo del juego
 Aquí
+
 
 ## 4.2 Controles
 Aquí
 
+
 ## 4.3 Mecánicas
 Aquí
+
 
 ### 4.3.1 Movimiento
 Aquí
 
+
 ### 4.3.2 Interacción entre jugadores
 Aquí
+
 
 ### 4.3.3 Físicas
 Aquí
 
+
 ### 4.3.4 Dificultad progresiva
 Aquí
+
 
 ### 4.3.5 Condiciones de victoria y derrota
 Aquí
 
+
 ## 4.4 Reglas del juego
 Aquí
 
-## 4.5 Escenarios y niveles
+
+## 4.5 Escenarios
 Aquí
 
 
@@ -182,8 +202,10 @@ Aquí
 # 5. Personajes e Ítems
 Aquí
 
+
 ## 5.1 Personajes
 Descripción de cada personaje
+
 
 ## 5.2 Ítems
 Lista de objetos y su función
@@ -194,8 +216,10 @@ Lista de objetos y su función
 # 6. Estados e Interfaces
 Aquí
 
+
 ## 6.1 Diagrama de Estados
 Aquí
+
 
 ## 6.2 Interfaces de Usuario
 Bocetos de menús, HUD, pantallas de carga, selección de nivel, etc.
@@ -205,17 +229,22 @@ Bocetos de menús, HUD, pantallas de carga, selección de nivel, etc.
 # 7. Imagen y Diseño Visual
 Aquí
 
+
 ## 7.1 Estilo visual 
 Pixel art, cartoon, realista, etc.
+
 
 ## 7.2 Inspiración artística y cultural
 Aquí
 
+
 ## 7.3 Uso de colores
 Aquí
 
+
 ## 7.4 Logotipo
 Aquí
+
 
 ## 7.5 Bocetos de interfaz y personajes
 Aquí
@@ -224,44 +253,80 @@ Aquí
 ---
 
 # 8. Sonido
-Aquí
-
 ## 8.1 Música
-Aquí
+El juego tiene una música alegre y veraniega que acompaña los partidos y transmite energía positiva.  
+La canción principal es esta. Se han buscado canciones que se pudiesen repetir en bucle, para asegurarnos de que no haya cortes en partidas largas, y el tema principal del *Pou* encajaba perfectamente.  
+[Enlace a la música principal](https://www.youtube.com/watch?v=XprZqZk87xE&list=RDXprZqZk87xE&start_radio=1https://www.youtube.com/watch?v=XprZqZk87xE&list=RDXprZqZk87xE&start_radio=1)
+
 
 ## 8.2 Efectos de sonido
-Aquí
-
+Los efectos sonoros son simples y dinámicos, pensados para reforzar la acción del juego.  
+Incluyen sonidos de:
+- Menu principal  ->  [Efecto de Menú Principal](https://freesound.org/people/Sunsai/sounds/415805/)  
+- Golpes de pelota  ->  [Efecto de Golpes de Pelota](https://freesound.org/people/16HPanskaResatko_Matej/sounds/497968/)  
+- Salto  ->  [Efecto de Salto](https://freesound.org/people/vibritherabjit123/sounds/644410/)  
+- Punto ganado  ->  [Efecto Conseguir un Punto](https://freesound.org/people/Scrampunk/sounds/345297/)  
+- Partida ganada o perdida  -> [Efecto de Victoria](https://freesound.org/people/shinephoenixstormcrow/sounds/337049/) - [Efecto de Victoria 2](https://freesound.org/people/FunWithSound/sounds/456965/) - [Efecto de Derrota](https://freesound.org/people/martcraft/sounds/651626/)  
 
 ---
 
 # 9. Narrativa
-Aquí
-
 ## 9.1 Historia general del juego
-Aquí
+Cada verano se celebra un campeonato de voleibol, donde los jugadores se enfrentan en duelos 1 contra 1 para demostrar quién es el mejor en la arena.  
+El juego no tiene una narrativa compleja, su enfoque está en la diversión, la competición y la habilidad.  
+El objetivo es ganar puntos, avanzar entre los partidos y coronarse campeón del verano demostrando quien es el mejor del campeonato.
+
 
 ## 9.2 Desarrollo de personajes
-Aquí
+Hay varios personajes jugables, cada uno con un estilo visual y personalidad propias:
+
+- **Jugador A:** personaje equilibrado y simpático.  
+- **Jugador B:** rápido y competitivo.  
+- **Jugador C:** divertido y algo distraído.  
+
+No tienen historia individual, pero cada uno aporta variedad visual y un toque de personalidad al juego. Lo importante en este juego es que el jugador se divierta y le guste el diseño visual de los personajes.
+
 
 ## 9.3 Contexto y ambientación
-Aquí
-
+El juego se desarrolla principalmente en una playa soleada, aunque pueden existir otros escenarios como gimnasios o pistas exteriores.  
+La atmósfera general es veraniega, alegre y competitiva, con un estilo pixel-art colorido y una banda sonora ligera que evoca diversión y vacaciones.  
+La ambientación busca transmitir la sensación de un torneo de verano casual, donde el espíritu deportivo y la diversión son los protagonistas.
 
 ---
 
 # 10. Comunicación y Marketing
-Aquí
+El objetivo de nuestra campaña de marketing es conseguir que **Volley Clash** se vuelva popular en portales de juegos gratuitos, aprovechando la viralidad de las redes sociales y la sencillez de acceso para crear una comunidad activa de jugadores que compitan y compartan sus partidas. Se busca atraer a jugadores casuales que disfrutan de los clásicos juegos de navegador, ofreciendo partidas rápidas, competitivas y divertidas de voleibol 1 contra 1, con una estética colorida y dinámica inspirada en el modo voley del juego *Pou*.  
 
-## 10.1 Estrategia de difusión
-Aquí
 
-## 10.2 Público objetivo y canales
-Aquí
+## 10.1 Estrategia de difusión y canales
 
-## 10.3 Referencias e inspiración en otros juegos
-Aquí
+### Difusión en portales de juegos online
+- Publicar el juego en distintas plataformas web de juegos gratuitos.  
+- Optimizar el título, las etiquetas y la descripción para que destaque (por ejemplo: *“Juego de voley 1v1”*, *“Multijugador divertido”*, *“Juego rápido de playa”*).
 
+### Redes sociales
+- Crear clips cortos mostrando jugadas divertidas o momentos competitivos.  
+- Compartir memes o gifs del juego en comunidades de **Discord**, **Reddit** o redes sociales centradas en juegos casuales.
+
+### Colaboraciones y comunidad
+- Contactar con streamers o creadores de contenido que jueguen a títulos de navegador.  
+- Fomentar la participación mediante desafíos y torneos informales entre jugadores.
+
+### Identidad visual y marca
+- Nombre corto, fácil de recordar y relacionado con la acción del juego: **Volley Clash**.  
+- Estilo visual colorido, alegre y con temática veraniega o de playa.  
+- Logotipo simple y reconocible, con personajes divertidos y animaciones ligeras.
+
+### Campaña de lanzamiento
+- Publicación gratuita en varias plataformas de juegos online.  
+- Promoción inicial con mini eventos o desafíos (*“Gana 5 partidos seguidos”*, *“Vence a tu amigo”*).  
+- Uso de comentarios y valoraciones de los usuarios para mejorar la visibilidad en las plataformas.  
+
+
+## 10.2 Público objetivo
+- Jugadores casuales entre 8 y 25 años.  
+- Personas que frecuentan páginas de juegos gratuitos como *Friv*, *Minijuegos*, *1001Juegos*, etc.  
+- Usuarios que buscan diversión rápida sin necesidad de descargas ni registros.  
 
 ---
 
