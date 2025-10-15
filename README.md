@@ -34,11 +34,9 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
 2. [Características Principales](#2-características-principales)
 
 3. [Aspectos Técnicos](#3-aspectos-técnicos)  
- 3.1 [Motor de Juego](#31-motor-de-juego)  
- 3.2 [Lenguajes y Frameworks](#32-lenguajes-y-frameworks)  
- 3.3 [Arquitectura Cliente-Servidor](#33-arquitectura-cliente-servidor)  
- 3.4 [Requisitos del Sistema](#34-requisitos-del-sistema)  
- 3.5 [Control de Versiones y Gestión](#35-control-de-versiones-y-gestión)
+ 3.1 [Lenguajes y Frameworks](#31-lenguajes-y-frameworks)  
+ 3.2 [Arquitectura Cliente-Servidor](#32-arquitectura-cliente-servidor)  
+ 3.3 [Control de Versiones y Gestión](#33-control-de-versiones-y-gestión)
 
 4. [Jugabilidad](#4-jugabilidad)  
  4.1 [Objetivo del juego](#41-objetivo-del-juego)  
@@ -89,67 +87,79 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
 ---
 
 # 1. Introducción
-Aquí
-
-
 ## 1.1 Concepto del juego
-Aquí
+**Volley Clash** es un juego multijugador de **voleibol arcade** en 2D desarrollado para navegador web.  En él, dos jugadores se enfrentan en partidos rápidos y competitivos, combinando **físicas realistas**, **power-ups aleatorios** y una estética **pixel-art minimalista**.  
+
+El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 2 de ventaja para ganar el set, en un partido a **3 sets**, controlando el salto, golpeo y posición del personaje con una jugabilidad sencilla pero desafiante.  
 
 
 ## 1.2 Género
-Aquí
+El juego es un arcade multijugador casual de deportes, competitivo, rápido y accesible. Se busca ofrecer partidas cortas y rápidas con cierto desafñio, fomentando el pique amistoso y la rejugabilidad inmediata.
 
 
 ## 1.3 Propósito y público objetivo
-Aquí
+El propósito del juego es entretener y ofrecer una experiencia deportiva ligera, accesible y directa.  
+Está dirigido a toda clase de jugadores jóvenes de entre 8 y 25 años, personas que disfruten de los juegos de web clásicos y rápidos del 2000, sin necesidad de registrarse ni instalar nada.  
 
 
 ## 1.4 Plataforma
-Aquí
+El juego está diseñado para ejecutarse en navegadores web, siendo accesible desde PC, portátil o dispositivos móviles compatibles.  
+Se publicará en portales como Itch.io o Newgrounds, aprovechando su facilidad de acceso y difusión.
 
 
 ## 1.5 Categoría
-Aquí (Tipo de juego, PEGI, online/offline)
+Es un juego de entretenimiento casual, multijugador de hasta 2 jugadores tanto en local como online, competitivo en tiempo real, con representación en 2D.
 
 
 ## 1.6 Alcance
-Aquí
-
+La versión inicial se centra en:
+- Implementar las físicas del balón y personajes.  
+- Integrar mecánicas de red.  
+- Crear 3 escenarios (playa, gimnasio y exterior).  
+- Añadir 3 personajes jugables con diferencias estéticas.  
+- Desarrollar un sistema básico de power-ups.  
 
 ---
 
 # 2. Características Principales
-- Modo de juego (multijugador, cooperativo, competitivo, etc.)
-- Representación
-- Comunicación cliente-servidor (API REST + comunicación asíncrona)
-- Herramientas de desarrollo (motor, librerías, control de versiones)
-- Licencia
+- **Multijugador en tiempo real** (2 jugadores).  
+- **Juego rápido y competitivo** con duración de partidas de 5 a 10 minutos.  
+- **Power-ups aleatorios** que alteran la dinámica del juego (velocidad, parálisis, puntos extra).  
+- **Estética pixel-art** minimalista y colorida.  
+- **Controles simples y responsivos**:  
+  - Jugador 1 → *A/D/W/J*  
+  - Jugador 2 → *←/→/↑/N*  
+- **Mecánica física realista**: gravedad constante y rebotes realistas.  
+- **Interfaz intuitiva**: menú principal, lobby, partida y pantalla de fin de juego.  
+- **Modo local y online**, con sincronización en red mediante **API REST + WebSockets**.  
 
 ---
 
 # 3. Aspectos Técnicos
-Aquí
+## 3.1 Lenguajes y Frameworks
+- **Lenguaje principal:** JavaScript.  
+- **Backend:** Node.js o framework REST (Express u otro).  
+- **Comunicación en tiempo real:** WebSockets.  
+- **API REST:** para login, registro de resultados y gestión de lobby.  
+- **Control de versiones:** Git + GitHub.
 
 
-## 3.1 Motor de Juego
-Aquí
+## 3.2 Arquitectura Cliente-Servidor
+El sistema está dividido en dos capas:
+1. **Cliente (juego):**  
+   - Renderiza el juego en el navegador.  
+   - Envía movimientos y acciones al servidor.  
+2. **Servidor:**  
+   - Gestiona las partidas y sincroniza los estados de los jugadores.  
+   - Proporciona endpoints REST para lobby, login y resultados.  
+   - Mantiene conexión asíncrona mediante WebSockets para las partidas en tiempo real.  
 
 
-## 3.2 Lenguajes y Frameworks
-Aquí
-
-
-## 3.3 Arquitectura Cliente-Servidor
-Aquí
-
-
-## 3.4 Requisitos del Sistema
-Aquí
-
-
-## 3.5 Control de Versiones y Gestión
-Aquí (GitHub, Issues, Projects)
-
+## 3.3 Control de Versiones y Gestión
+- **Repositorio público en GitHub:** Usado para el control de versiones, issues y coordinación del equipo.  
+- **Gestión del proyecto:**  
+  - Ramas separadas por funcionalidad.  
+  - Commits frecuentes con mensajes descriptivos.  
 
 ---
 
