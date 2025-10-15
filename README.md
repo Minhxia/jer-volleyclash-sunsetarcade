@@ -1,17 +1,23 @@
 # Volley Clash
-Breve descripción del concepto general del juego.
+**Volley Clash** es un juego multijugador de **voleibol arcade** en 2D desarrollado para navegador web.  
+Dos jugadores se enfrentan en partidos rápidos y competitivos, combinando **físicas realistas**, **power-ups aleatorios** y una estética **pixel-art minimalista**.  
+
+El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 2 de ventaja para ganar el set, en un partido a **3 sets**, controlando el salto, golpeo y posición del personaje con una jugabilidad sencilla pero desafiante.  
 
 ## Créditos
-**Equipo de desarrollo:**
-  - Sara Bueno Esteban — s.buenoe.2018@alumnos.urjc.es — https://github.com/Minhxia
-  - Antonio Morán Barrera — a.moranb.2022@alumnos.urjc.es — https://github.com/Splatboy32
-  - Cristine Nioka Tewo — c.nioka.2022@alumnos.urjc.es —
-  - Álvaro Ibáñez Montero — a.ibanezm.2023@alumnos.urjc.es —
 
 **Grupo:** 05   
-**Repositorio GitHub:** [URL del repositorio](https://github.com/Minhxia/jer-volleyclash-sunsetarcade)
+**Repositorio GitHub:** [URL del repositorio](https://github.com/Minhxia/jer-volleyclash-sunsetarcade)  
+**Licencia:** Apache 2.0  
+**Equipo de desarrollo:**
 
----
+| Nombre | Correo Oficial | Cuenta de GitHub |
+|--------------|--------------|--------------|
+| Sara Bueno Esteban      | s.buenoe.2018@alumnos.urjc.es   | [GitHub - Minhxia](https://github.com/Minhxia)            |
+| Antonio Morán Barrera   | a.moranb.2022@alumnos.urjc.es   | [GitHub - Splatboy32](https://github.com/Splatboy32)      |
+| Cristine Nioka Tewo     | c.nioka.2022@alumnos.urjc.es    | [GitHub - cchrusta](https://github.com/cchrusta)          |
+| Álvaro Ibáñez Montero   | a.ibanezm.2023@alumnos.urjc.es  | [GitHub - Alvaro-Ibanez](https://github.com/Alvaro-Ibanez)|
+
 ---
 
 # Game Design Document: Volley Clash
