@@ -96,13 +96,13 @@ Para los escenarios, se han recreado **lugares típicos donde se suelen desarrol
 ### 7.4.4 Elementos del juego
 
 #### Power-ups
-![Velocidad](SRC/ITEMS/POWER%20UPS/VELOCIDAD.png)  
-![Ralentizar](SRC/ITEMS/POWER%20UPS/RELENTIZAR.png)  
-![Paralizado](SRC/ITEMS/POWER%20UPS/PARALIZADO.png)  
-![Multiplicador x3](SRC/ITEMS/POWER%20UPS/MULTIPLICADOR%203.png)  
-![Multiplicador x2](SRC/ITEMS/POWER%20UPS/MULTIPLICADOR%202.png)
+![Velocidad](SRC/ITEMS/POWER%20UPS/VELOCIDAD.png)  ![Ralentizar](SRC/ITEMS/POWER%20UPS/RELENTIZAR.png)  ![Paralizado](SRC/ITEMS/POWER%20UPS/PARALIZADO.png)  ![Multiplicador x3](SRC/ITEMS/POWER%20UPS/MULTIPLICADOR%203.png)  ![Multiplicador x2](SRC/ITEMS/POWER%20UPS/MULTIPLICADOR%202.png)
+
+
+
+
 
 #### Pelotas de voleibol
-![Normal](SRC/ITEMS/PELOTAS/P_NORMAL.png)  
-![Plus](SRC/ITEMS/PELOTAS/P_PLUS.png)  
-![Playa](SRC/ITEMS/PELOTAS/P_PLAYA.png)
+![Normal](SRC/ITEMS/PELOTAS/P_NORMAL.png)  ![Plus](SRC/ITEMS/PELOTAS/P_PLUS.png) ![Playa](SRC/ITEMS/PELOTAS/P_PLAYA.png)
+
+ 
