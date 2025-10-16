@@ -272,7 +272,9 @@ Además, habrá dos botones: uno para **buscar una nueva partida** y otro para *
 
 
 ### 5.4.2 Diagrama de Estados
-Aquí
+Este es el diagrama de estados del juego, con todas las interfaces y las diferentes interacciones entre ellas.
+
+![Diagrama de Estados](Assets/DIAGRAMAS/Diagrama de Estados.jpg)
 
 
 ### 5.4.3 Personajes
