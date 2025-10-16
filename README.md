@@ -48,41 +48,35 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
   4.3.4 [Dificultad progresiva](#434-dificultad-progresiva)  
   4.3.5 [Condiciones de victoria y derrota](#435-condiciones-de-victoria-y-derrota)  
  4.4 [Reglas del juego](#44-reglas-del-juego)  
- 4.5 [Escenarios](#45-escenarios)
+ 4.5 [Diagrama de Flujo](#45-diagrama-de-flujo)  
 
-5. [Personajes e Ítems](#5-personajes-e-ítems)  
- 5.1 [Personajes](#51-personajes)  
- 5.2 [Ítems](#52-ítems)
+5. [Imagen y Diseño Visual](#5-imagen-y-diseño-visual)  
+ 5.1 [Estilo visual](#51-estilo-visual)  
+ 5.2 [Uso de colores](#52-uso-de-colores)  
+ 5.3 [Logotipo](#53-logotipo)  
+ 5.4 [Bocetos](#54-bocetos)  
+  5.4.1 [Interfaces](#541-interfaces)  
+  5.4.2 [Diagrama de Estados](#542-diagrama-de-estados)  
+  5.4.3 [Personajes](#543-personajes)  
+  5.4.4 [Escenarios](#544-escenarios)  
+  5.4.5 [Elementos del juego](#545-elementos-del-juego)  
 
-6. [Estados e Interfaces](#6-estados-e-interfaces)  
- 6.1 [Diagrama de Estados](#61-diagrama-de-estados)  
- 6.2 [Interfaces de Usuario](#62-interfaces-de-usuario)
+6. [Sonido](#6-sonido)  
+ 6.1 [Música](#61-música)  
+ 6.2 [Efectos de sonido](#62-efectos-de-sonido)
 
-7. [Imagen y Diseño Visual](#7-imagen-y-diseño-visual)  
- 7.1 [Estilo visual](#71-estilo-visual)  
- 7.2 [Inspiración artística y cultural](#72-inspiración-artística-y-cultural)  
- 7.3 [Uso de colores](#73-uso-de-colores)  
- 7.4 [Logotipo](#74-logotipo)  
- 7.5 [Bocetos de interfaz y personajes](#75-bocetos-de-interfaz-y-personajes)
+7. [Narrativa](#7-narrativa)  
+ 7.1 [Historia general del juego](#71-historia-general-del-juego)  
+ 7.2 [Desarrollo de personajes](#72-desarrollo-de-personajes)  
+ 7.3 [Contexto y ambientación](#73-contexto-y-ambientación)
 
-8. [Sonido](#8-sonido)  
- 8.1 [Música](#81-música)  
- 8.2 [Efectos de sonido](#82-efectos-de-sonido)
+8. [Comunicación y Marketing](#8-comunicación-y-marketing)  
+ 8.1 [Estrategia de difusión y canales](#81-estrategia-de-difusión-y-canales)  
+ 8.2 [Público objetivo](#82-público-objetivo)
 
-9. [Narrativa](#9-narrativa)  
- 9.1 [Historia general del juego](#91-historia-general-del-juego)  
- 9.2 [Desarrollo de personajes](#92-desarrollo-de-personajes)  
- 9.3 [Contexto y ambientación](#93-contexto-y-ambientación)
+9. [Referencias](#9-referencias)
 
-10. [Comunicación y Marketing](#10-comunicación-y-marketing)  
- 10.1 [Estrategia de difusión y canales](#101-estrategia-de-difusión-y-canales)  
- 10.2 [Público objetivo](#102-público-objetivo)  
-
-11. [Diagrama de Flujo del Juego](#11-diagrama-de-flujo-del-juego)
-
-12. [Referencias](#12-referencias)
-
-13. [Licencia](#13-licencia)
+10. [Licencia](#10-licencia)
 
 ---
 
@@ -203,73 +197,122 @@ Aquí
 Aquí
 
 
-## 4.5 Escenarios
+## 4.5 Diagrama de Flujo
 Aquí
-
 
 ---
 
-# 5. Personajes e Ítems
+# 5. Imagen y Diseño Visual
+## 5.1 Estilo visual 
+El estilo visual del juego es **pixel art**, debido al nombre de nuestro equipo *Sunset Arcade*, representado con una máquina arcade retro.  
+Por ello, todo el juego está diseñado en pixel art para aportarle esa apariencia nostálgica y retro.
+
+
+## 5.2 Uso de colores
+Se ha utilizado una **gama de colores llamativos y cálidos** para atraer la atención de los jugadores.
+
+
+## 5.3 Logotipo
+El logotipo elegido es un **balón de voleibol en llamas**, que refleja la intensidad y la competencia entre los jugadores.  
+
+![Logo del juego](Assets/LOGO/Logo.png)
+
+
+## 5.4 Bocetos
+### 5.4.1 Interfaces
+Se han realizado bocetos de distintas interfaces para ofrecer al usuario una experiencia **fácil, agradable e intuitiva** al jugar.  
+Para ello, se han creado las siguientes pantallas: **menú inicial**, **configuración**, **créditos**, **modo de juego**, **personalización de personaje**, **selección de escenario**, **pantalla de juego** y **fin de partida**.
+
+#### Menú inicial
+En esta interfaz, el jugador podrá **comenzar una partida**, acceder a la **pantalla de configuración** o a los **créditos** del juego.  
+
+![Menú principal](Assets/INTERFACES/Pantalla_de_inicio.png)
+
+#### Configuración
+En esta pantalla, el jugador puede **cambiar el volumen del sonido** del juego y **modificar los controles** de la partida.  
+Además, en el modo de juego se añadirá un botón para **abandonar la partida**.  
+
+![Pantalla de configuración](Assets/INTERFACES/Configuracion_inicial.png)  
+![Pantalla de configuración en partida](Assets/INTERFACES/Configuracion_partida.png)
+
+#### Créditos
+En esta interfaz se incluirán **únicamente los miembros del equipo y sus tareas**, con la opción de volver a la pantalla de inicio.  
+
+![Pantalla de créditos](Assets/INTERFACES/Creditos.png)
+
+#### Modo de juego
+En esta pantalla se presentan dos botones para elegir entre los modos de **juego local o en red**, según prefiera el jugador.  
+
+![Pantalla de modo de juego](Assets/INTERFACES/Modo_de_juego.png)
+
+#### Personalizar personaje del jugador
+En esta interfaz, el jugador podrá **elegir su nombre, el color de la equipación y el personaje** que desee utilizar.  
+
+![Pantalla de selección de personaje](Assets/INTERFACES/Seleccion_de_personaje.png)
+
+#### Selección de escenario
+En esta pantalla, el jugador podrá **elegir el escenario** en el que desea jugar la partida.  
+
+![Pantalla de selección de escenario](Assets/INTERFACES/Seleccion_de_escenario.png)
+
+#### Pantalla de juego
+En la pantalla de juego se pueden encontrar los siguientes elementos:
+- Contador de puntos (uno para cada jugador, ubicado en su lado del campo)
+- Power-ups atrapados en el campo de cada jugador
+- Tiempo restante de la partida
+- Botón de configuración
+
+![Pantalla de juego](Assets/INTERFACES/Partida.png)  
+
+#### Fin de partida
+En esta interfaz aparecerá el **nombre del jugador ganador**.  
+Además, habrá dos botones: uno para **buscar una nueva partida** y otro para **volver al menú inicial**.
+
+![Pantalla de fin de juego](Assets/INTERFACES/Fin_de_partida.png)  
+
+
+### 5.4.2 Diagrama de Estados
 Aquí
 
 
-## 5.1 Personajes
-Descripción de cada personaje
+### 5.4.3 Personajes
+Aquí
 
 
-## 5.2 Ítems
-Lista de objetos y su función
+### 5.4.4 Escenarios
+Para los escenarios, se han recreado **lugares típicos donde se suelen desarrollar los partidos de voleibol**.
 
+| Gimnasio | Playa | Patio trasero |
+|-----------|--------|---------------|
+| ![Gimnasio](Assets/FONDOS/GIMNASIO.png) | ![Playa](Assets/FONDOS/PLAYA.png) | ![Patio trasero](Assets/FONDOS/JARDIN.png) |
+
+
+### 5.4.5 Elementos del juego
+
+#### Power-ups
+
+| **Velocidad** | **Ralentizar** | **Paralizado** | **Multiplicador x3** | **Multiplicador x2** |
+|:-------------:|:--------------:|:--------------:|:--------------------:|:--------------------:|
+| ![Velocidad](Assets/ITEMS/POWER%20UPS/VELOCIDAD.png) | ![Ralentizar](Assets/ITEMS/POWER%20UPS/RELENTIZAR.png) | ![Paralizado](Assets/ITEMS/POWER%20UPS/PARALIZADO.png) | ![Multiplicador x3](Assets/ITEMS/POWER%20UPS/MULTIPLICADOR%203.png) | ![Multiplicador x2](Assets/ITEMS/POWER%20UPS/MULTIPLICADOR%202.png) |
+| Aumenta la velocidad del jugador temporalmente. | Ralentiza al oponente durante unos segundos. | Paraliza al oponente brevemente, impidiéndole moverse. | Triplica los puntos obtenidos durante un corto tiempo. | Duplica los puntos obtenidos durante un corto tiempo. |
+
+
+#### Pelotas de voleibol
+
+| **Pelota Normal** | **Pelota Plus** | **Pelota de Playa** |
+|:-----------------:|:---------------:|:-------------------:|
+| ![Normal](Assets/ITEMS/PELOTAS/P_NORMAL.png) | ![Plus](Assets/ITEMS/PELOTAS/P_PLUS.png) | ![Playa](Assets/ITEMS/PELOTAS/P_PLAYA.png) |
 
 ---
 
-# 6. Estados e Interfaces
-Aquí
-
-
-## 6.1 Diagrama de Estados
-Aquí
-
-
-## 6.2 Interfaces de Usuario
-Bocetos de menús, HUD, pantallas de carga, selección de nivel, etc.
-
----
-
-# 7. Imagen y Diseño Visual
-Aquí
-
-
-## 7.1 Estilo visual 
-Pixel art, cartoon, realista, etc.
-
-
-## 7.2 Inspiración artística y cultural
-Aquí
-
-
-## 7.3 Uso de colores
-Aquí
-
-
-## 7.4 Logotipo
-Aquí
-
-
-## 7.5 Bocetos de interfaz y personajes
-Aquí
-
-
----
-
-# 8. Sonido
-## 8.1 Música
+# 6. Sonido
+## 6.1 Música
 El juego tiene una música alegre y veraniega que acompaña los partidos y transmite energía positiva.  
 La canción principal es esta. Se han buscado canciones que se pudiesen repetir en bucle, para asegurarnos de que no haya cortes en partidas largas, y el tema principal del *Pou* encajaba perfectamente.  
 [Enlace a la música principal](https://www.youtube.com/watch?v=XprZqZk87xE&list=RDXprZqZk87xE&start_radio=1https://www.youtube.com/watch?v=XprZqZk87xE&list=RDXprZqZk87xE&start_radio=1)
 
 
-## 8.2 Efectos de sonido
+## 6.2 Efectos de sonido
 Los efectos sonoros son simples y dinámicos, pensados para reforzar la acción del juego.  
 Incluyen sonidos de:
 - Menu principal  ->  [Efecto de Menú Principal](https://freesound.org/people/Sunsai/sounds/415805/)  
@@ -280,14 +323,14 @@ Incluyen sonidos de:
 
 ---
 
-# 9. Narrativa
-## 9.1 Historia general del juego
+# 7. Narrativa
+## 7.1 Historia general del juego
 Cada verano se celebra un campeonato de voleibol, donde los jugadores se enfrentan en duelos 1 contra 1 para demostrar quién es el mejor en la arena.  
 El juego no tiene una narrativa compleja, su enfoque está en la diversión, la competición y la habilidad.  
 El objetivo es ganar puntos, avanzar entre los partidos y coronarse campeón del verano demostrando quien es el mejor del campeonato.
 
 
-## 9.2 Desarrollo de personajes
+## 7.2 Desarrollo de personajes
 Hay varios personajes jugables, cada uno con un estilo visual y personalidad propias:
 
 - **Jugador A:** personaje equilibrado y simpático.  
@@ -297,18 +340,18 @@ Hay varios personajes jugables, cada uno con un estilo visual y personalidad pro
 No tienen historia individual, pero cada uno aporta variedad visual y un toque de personalidad al juego. Lo importante en este juego es que el jugador se divierta y le guste el diseño visual de los personajes.
 
 
-## 9.3 Contexto y ambientación
+## 7.3 Contexto y ambientación
 El juego se desarrolla principalmente en una playa soleada, aunque pueden existir otros escenarios como gimnasios o pistas exteriores.  
 La atmósfera general es veraniega, alegre y competitiva, con un estilo pixel-art colorido y una banda sonora ligera que evoca diversión y vacaciones.  
 La ambientación busca transmitir la sensación de un torneo de verano casual, donde el espíritu deportivo y la diversión son los protagonistas.
 
 ---
 
-# 10. Comunicación y Marketing
+# 8. Comunicación y Marketing
 El objetivo de nuestra campaña de marketing es conseguir que **Volley Clash** se vuelva popular en portales de juegos gratuitos, aprovechando la viralidad de las redes sociales y la sencillez de acceso para crear una comunidad activa de jugadores que compitan y compartan sus partidas. Se busca atraer a jugadores casuales que disfrutan de los clásicos juegos de navegador, ofreciendo partidas rápidas, competitivas y divertidas de voleibol 1 contra 1, con una estética colorida y dinámica inspirada en el modo voley del juego *Pou*.  
 
 
-## 10.1 Estrategia de difusión y canales
+## 8.1 Estrategia de difusión y canales
 
 ### Difusión en portales de juegos online
 - Publicar el juego en distintas plataformas web de juegos gratuitos.  
@@ -333,25 +376,20 @@ El objetivo de nuestra campaña de marketing es conseguir que **Volley Clash** s
 - Uso de comentarios y valoraciones de los usuarios para mejorar la visibilidad en las plataformas.  
 
 
-## 10.2 Público objetivo
+## 8.2 Público objetivo
 - Jugadores casuales entre 8 y 25 años.  
 - Personas que frecuentan páginas de juegos gratuitos como *Friv*, *Minijuegos*, *1001Juegos*, etc.  
 - Usuarios que buscan diversión rápida sin necesidad de descargas ni registros.  
 
 ---
 
-# 11. Diagrama de Flujo del Juego
-Imagen o esquema con el flujo de menús, gameplay, etc.
-
----
-
-# 12. Referencias
+# 9. Referencias
 - Fuentes de inspiración
 - Juegos similares
 - Recursos gráficos o sonoros utilizados
 
 ---
 
-# 13. Licencia
+# 10. Licencia
 **Licencia Apache 2.0**  
 Este proyecto está bajo la licencia Apache 2.0. Consulta el archivo LICENSE para más información.
