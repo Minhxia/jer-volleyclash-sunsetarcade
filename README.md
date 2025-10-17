@@ -42,13 +42,14 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
  4.1 [Objetivo del juego](#41-objetivo-del-juego)  
  4.2 [Controles](#42-controles)  
  4.3 [Mecánicas](#43-mecánicas)  
-  4.3.1 [Movimiento](#431-movimiento)  
-  4.3.2 [Interacción entre jugadores](#432-interacción-entre-jugadores)  
-  4.3.3 [Físicas](#433-físicas)  
-  4.3.4 [Dificultad progresiva](#434-dificultad-progresiva)  
-  4.3.5 [Condiciones de victoria y derrota](#435-condiciones-de-victoria-y-derrota)  
- 4.4 [Reglas del juego](#44-reglas-del-juego)  
- 4.5 [Diagrama de Flujo](#45-diagrama-de-flujo)  
+  4.3.1 [Puntuación](#431-puntuación)  
+  4.3.2 [Rally Point](#432-rally-point)  
+  4.3.3 [Saque](#433-saque)  
+  4.3.4 [Faltas](#434-faltas)  
+  4.3.5 [Límites y Rebotes](#435-límites-y-rebotes)  
+  4.3.6 [Power-Ups](#436-power-ups)  
+  4.3.7 [Recogida de Power-Ups e Inventario](#437-recogida-de-power-ups-e-inventario)  
+ 4.4 [Diagrama de Flujo](#44-diagrama-de-flujo)  
 
 5. [Imagen y Diseño Visual](#5-imagen-y-diseño-visual)  
  5.1 [Estilo visual](#51-estilo-visual)  
@@ -121,11 +122,11 @@ La versión inicial se centra en:
 - **Power-ups aleatorios** que alteran la dinámica del juego (velocidad, parálisis, puntos extra).  
 - **Estética pixel-art** minimalista y colorida.  
 - **Controles simples y responsivos**:  
-  - Jugador 1 → *A/D/W/J*  
-  - Jugador 2 → *←/→/↑/N*  
+  - Jugador 1 → *<kbd>A</kbd>/<kbd>D</kbd>/<kbd>W</kbd>/<kbd>S</kbd>/<kbd>Q</kbd>*  
+  - Jugador 2 → *<kbd>J</kbd>/<kbd>L</kbd>/<kbd>I</kbd>/<kbd>K</kbd>/<kbd>O</kbd>*  
 - **Mecánica física realista**: gravedad constante y rebotes realistas.  
 - **Interfaz intuitiva**: menú principal, lobby, partida y pantalla de fin de juego.  
-- **Modo local y online**, con sincronización en red mediante **API REST + WebSockets**.  
+- **Modo local y online**, con sincronización en red mediante **API REST + WebSockets**.
 
 ---
 
@@ -158,46 +159,70 @@ El sistema está dividido en dos capas:
 ---
 
 # 4. Jugabilidad
-Aquí
+**Volley Clash** consiste en partidos rápidos (**2-5 minutos**) y competitivos de **voleibol arcade** en **1vs1** local. Cada jugador mueve a su personaje en un **entorno 2D**, y tiene que golpear la pelota en el momento adecuado para devolverla al campo rival. Además, durante el partido aparecen ***power-ups*** en la pista, que los jugadores pueden usar para ganar ventaja.
 
 
 ## 4.1 Objetivo del juego
-Aquí
+Gana el partido el jugador que marque antes **20 puntos**, o quien más tenga cuando termine el tiempo. Si hay empate al final, se juega un **punto de oro** en el que el siguiente punto decide el ganador.
 
 
 ## 4.2 Controles
-Aquí
+- **Jugador 1:** corresponde al jugador situado a la izquierda de la red.
+    - <kbd>A</kbd>/<kbd>D</kbd> para moverse hacia la izquierda y hacia la derecha, respectivamente.
+    - <kbd>W</kbd> para saltar.
+    - <kbd>S</kbd> para golpear la pelota.
+    - <kbd>Q</kbd> para activar un *power up*.
+- **Jugador 2:** corresponde al jugador situado a la derecha de la red.
+    - <kbd>J</kbd>/<kbd>L</kbd> para moverse hacia la izquierda y hacia la derecha, respectivamente.
+    - <kbd>I</kbd> para saltar.
+    - <kbd>K</kbd> para golpear la pelota.
+    - <kbd>O</kbd> para activar un *power up*.
 
 
 ## 4.3 Mecánicas
-Aquí
+### 4.3.1 Puntuación
+Se anota un punto cuando la **pelota toca el suelo** del campo del rival o cuando el rival comete una **falta**, y se actualiza el marcador.  
 
 
-### 4.3.1 Movimiento
-Aquí
+### 4.3.2 Rally Point
+Cuando un jugador anota un punto, el juego pasa a **estado de saque**.  
 
 
-### 4.3.2 Interacción entre jugadores
-Aquí
+### 4.3.3 Saque
+El saque lo realiza el jugador que haya anotado el último punto, desde la **zona marcada** al fondo de su campo. Para realizar el **saque inicial**, se elige a un jugador **aleatoriamente**.
 
 
-### 4.3.3 Físicas
-Aquí
+### 4.3.4 Faltas
+Un jugador comete una falta si toca la pelota **tres veces consecutivas** en su campo antes de devolverla, o si realiza un saque **fuera de la zona marcada**.
 
 
-### 4.3.4 Dificultad progresiva
-Aquí
+### 4.3.5 Límites y Rebotes
+La pelota **no sale fuera** por los laterales o la parte superior, sino que **rebota** en los **límites de la pantalla** y en la **red**. Aunque la pelota rebote en el campo del jugador, **no** se reinicia su conteo de toques.
 
 
-### 4.3.5 Condiciones de victoria y derrota
-Aquí
+### 4.3.6 Power-Ups
+Durante el partido, los *power-ups* aparecen de forma **aleatoria** en zonas válidas de la pista (nunca sobre la red). Permanecen visibles un tiempo corto (**5 segundos**) y si no se recogen, a partir de los 3 segundos empiezan a **desvanecerse** poco a poco hasta desaparecer.
+
+- **Efectos disponibles:**
+  - **Aumentar velocidad** del jugador.
+  - **Ralentizar** al rival.
+  - **Paralizar** al rival durante un breve intervalo.
+  - **Multiplicar** la puntuación (**x2/x3**).
+
+- **Frecuencia de aparición:** el primer *spawn* ocurre entre **5–8 segundos** tras empezar el partido. Luego, **cada 8–12 segundos**, siempre que haya **menos de 2** *power-ups* activos en la pista.
+
+- **Duración y aplicación:** 
+    - Cada efecto dura **10 segundos** desde su activación
+    - Los **efectos del mismo tipo no se acumulan**, si activas el mismo efecto mientras está activo, **se refresca su duración**.
+    - Los **efectos de distinto tipo sí se acumulan**, por ejemplo, paralizar al rival y multiplicar x2 a la vez.
+    - El multiplicador (**x2/x3**) se aplica a **todos los puntos que anote** el jugador mientras el efecto esté activo.
 
 
-## 4.4 Reglas del juego
-Aquí
+### 4.3.7 Recogida de Power-Ups e Inventario
+Cuando un jugador pasa por encima de un *power-up*, lo recoge **automáticamente** si tiene espacio en su **inventario**. Cada jugador puede guardar como **máximo 2** *power-ups*.
 
 
-## 4.5 Diagrama de Flujo
+## 4.4 Diagrama de Flujo
 Aquí
 
 ---
