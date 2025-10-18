@@ -42,42 +42,47 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
  4.1 [Objetivo del juego](#41-objetivo-del-juego)  
  4.2 [Controles](#42-controles)  
  4.3 [Mecánicas](#43-mecánicas)  
-  4.3.1 [Puntuación](#431-puntuación)  
-  4.3.2 [Rally Point](#432-rally-point)  
-  4.3.3 [Saque](#433-saque)  
-  4.3.4 [Faltas](#434-faltas)  
-  4.3.5 [Límites y Rebotes](#435-límites-y-rebotes)  
-  4.3.6 [Power-Ups](#436-power-ups)  
-  4.3.7 [Recogida de Power-Ups e Inventario](#437-recogida-de-power-ups-e-inventario)  
- 4.4 [Diagrama de Flujo](#44-diagrama-de-flujo)  
+  4.3.1 [Golpeo](#431-golpeo)  
+  4.3.2 [Puntuación](#432-puntuación)  
+  4.3.3 [Rally Point](#433-rally-point)  
+  4.3.4 [Saque](#434-saque)  
+  4.3.5 [Faltas](#435-faltas)  
+  4.3.6 [Límites de la Pantalla](#436-límites-de-la-pantalla)  
+  4.3.7 [Power-Ups](#437-power-ups)  
+  4.3.8 [Recogida de Power-Ups e Inventario](#438-recogida-de-power-ups-e-inventario)  
+ 4.4 [Físicas](#44-físicas)  
+  4.4.1 [Gravedad](#441-gravedad)  
+  4.4.2 [Rebotes](#442-rebotes)  
+ 4.5 [Calidad del Escenario](#45-calidad-del-escenario)
 
 5. [Imagen y Diseño Visual](#5-imagen-y-diseño-visual)  
  5.1 [Estilo visual](#51-estilo-visual)  
- 5.2 [Uso de colores](#52-uso-de-colores)  
- 5.3 [Logotipo](#53-logotipo)  
- 5.4 [Bocetos](#54-bocetos)  
-  5.4.1 [Interfaces](#541-interfaces)  
-  5.4.2 [Diagrama de Estados](#542-diagrama-de-estados)  
-  5.4.3 [Personajes](#543-personajes)  
-  5.4.4 [Escenarios](#544-escenarios)  
-  5.4.5 [Elementos del juego](#545-elementos-del-juego)  
+ 5.2 [Aspectos Técnicos](#52-aspectos-técnicos)  
+ 5.3 [Uso de colores](#53-uso-de-colores)  
+ 5.4 [Logotipo](#54-logotipo)  
+ 5.5 [Bocetos](#55-bocetos)  
+  5.5.1 [Interfaces](#551-interfaces)  
+  5.5.2 [Diagrama de Estados](#552-diagrama-de-estados)  
+  5.5.3 [Personajes](#553-personajes)  
+  5.5.4 [Escenarios](#554-escenarios)  
+  5.5.5 [Elementos del juego](#555-elementos-del-juego)
 
-6. [Sonido](#6-sonido)  
+7. [Sonido](#6-sonido)  
  6.1 [Música](#61-música)  
  6.2 [Efectos de sonido](#62-efectos-de-sonido)
 
-7. [Narrativa](#7-narrativa)  
+8. [Narrativa](#7-narrativa)  
  7.1 [Historia general del juego](#71-historia-general-del-juego)  
  7.2 [Desarrollo de personajes](#72-desarrollo-de-personajes)  
  7.3 [Contexto y ambientación](#73-contexto-y-ambientación)
 
-8. [Comunicación y Marketing](#8-comunicación-y-marketing)  
+9. [Comunicación y Marketing](#8-comunicación-y-marketing)  
  8.1 [Estrategia de difusión y canales](#81-estrategia-de-difusión-y-canales)  
  8.2 [Público objetivo](#82-público-objetivo)
 
-9. [Referencias](#9-referencias)
+10. [Referencias](#9-referencias)
 
-10. [Licencia](#10-licencia)
+11. [Licencia](#10-licencia)
 
 ---
 
@@ -122,8 +127,8 @@ La versión inicial se centra en:
 - **Power-ups aleatorios** que alteran la dinámica del juego (velocidad, parálisis, puntos extra).  
 - **Estética pixel-art** minimalista y colorida.  
 - **Controles simples y responsivos**:  
-  - Jugador 1 → *<kbd>A</kbd>/<kbd>D</kbd>/<kbd>W</kbd>/<kbd>S</kbd>/<kbd>Q</kbd>*  
-  - Jugador 2 → *<kbd>J</kbd>/<kbd>L</kbd>/<kbd>I</kbd>/<kbd>K</kbd>/<kbd>O</kbd>*  
+  - Jugador 1 → *<kbd>A</kbd>/<kbd>D</kbd>/<kbd>W</kbd>/<kbd>S</kbd>*  
+  - Jugador 2 → *<kbd>J</kbd>/<kbd>L</kbd>/<kbd>I</kbd>/<kbd>K</kbd>*  
 - **Mecánica física realista**: gravedad constante y rebotes realistas.  
 - **Interfaz intuitiva**: menú principal, lobby, partida y pantalla de fin de juego.  
 - **Modo local y online**, con sincronización en red mediante **API REST + WebSockets**.
@@ -170,37 +175,40 @@ Gana el partido el jugador que marque antes **20 puntos**, o quien más tenga cu
 - **Jugador 1:** corresponde al jugador situado a la izquierda de la red.
     - <kbd>A</kbd>/<kbd>D</kbd> para moverse hacia la izquierda y hacia la derecha, respectivamente.
     - <kbd>W</kbd> para saltar.
-    - <kbd>S</kbd> para golpear la pelota.
-    - <kbd>Q</kbd> para activar un *power up*.
+    - <kbd>S</kbd> para activar un *power up*.
+    
 - **Jugador 2:** corresponde al jugador situado a la derecha de la red.
     - <kbd>J</kbd>/<kbd>L</kbd> para moverse hacia la izquierda y hacia la derecha, respectivamente.
     - <kbd>I</kbd> para saltar.
-    - <kbd>K</kbd> para golpear la pelota.
-    - <kbd>O</kbd> para activar un *power up*.
+    - <kbd>K</kbd> para activar un *power up*.
 
 
 ## 4.3 Mecánicas
-### 4.3.1 Puntuación
-Se anota un punto cuando la **pelota toca el suelo** del campo del rival o cuando el rival comete una **falta**, y se actualiza el marcador.  
+### 4.3.1 Golpeo
+Cuando la pelota entra en contacto con el jugador, rebota y la dirección se define con el movimiento del jugador (teclas).
 
 
-### 4.3.2 Rally Point
-Cuando un jugador anota un punto, el juego pasa a **estado de saque**.  
+### 4.3.2 Puntuación
+Se anota un punto cuando la **pelota toca el suelo** del campo del rival o cuando el rival comete una **falta**.  
 
 
-### 4.3.3 Saque
+### 4.3.3 Rally Point
+Cuando un jugador anota un punto, se actualiza el marcador y el juego pasa a **estado de saque**.
+
+
+### 4.3.4 Saque
 El saque lo realiza el jugador que haya anotado el último punto, desde la **zona marcada** al fondo de su campo. Para realizar el **saque inicial**, se elige a un jugador **aleatoriamente**.
 
 
-### 4.3.4 Faltas
+### 4.3.5 Faltas
 Un jugador comete una falta si toca la pelota **tres veces consecutivas** en su campo antes de devolverla, o si realiza un saque **fuera de la zona marcada**.
 
 
-### 4.3.5 Límites y Rebotes
+### 4.3.6 Límites de la Pantalla
 La pelota **no sale fuera** por los laterales o la parte superior, sino que **rebota** en los **límites de la pantalla** y en la **red**. Aunque la pelota rebote en el campo del jugador, **no** se reinicia su conteo de toques.
 
 
-### 4.3.6 Power-Ups
+### 4.3.7 Power-Ups
 Durante el partido, los *power-ups* aparecen de forma **aleatoria** en zonas válidas de la pista (nunca sobre la red). Permanecen visibles un tiempo corto (**5 segundos**) y si no se recogen, a partir de los 3 segundos empiezan a **desvanecerse** poco a poco hasta desaparecer.
 
 - **Efectos disponibles:**
@@ -209,7 +217,7 @@ Durante el partido, los *power-ups* aparecen de forma **aleatoria** en zonas vá
   - **Paralizar** al rival durante un breve intervalo.
   - **Multiplicar** la puntuación (**x2/x3**).
 
-- **Frecuencia de aparición:** el primer *spawn* ocurre entre **5–8 segundos** tras empezar el partido. Luego, **cada 8–12 segundos**, siempre que haya **menos de 2** *power-ups* activos en la pista.
+- **Frecuencia de aparición:** **cada 10–20 segundos** en función de la duración del partido, siempre que haya **menos de 2** *power-ups* en pantalla.
 
 - **Duración y aplicación:** 
     - Cada efecto dura **10 segundos** desde su activación
@@ -218,12 +226,32 @@ Durante el partido, los *power-ups* aparecen de forma **aleatoria** en zonas vá
     - El multiplicador (**x2/x3**) se aplica a **todos los puntos que anote** el jugador mientras el efecto esté activo.
 
 
-### 4.3.7 Recogida de Power-Ups e Inventario
+### 4.3.8 Recogida de Power-Ups e Inventario
 Cuando un jugador pasa por encima de un *power-up*, lo recoge **automáticamente** si tiene espacio en su **inventario**. Cada jugador puede guardar como **máximo 2** *power-ups*.
 
 
-## 4.4 Diagrama de Flujo
-Aquí
+## 4.4 Físicas
+Modelo arcade 2D, basado en gravedad y rebotes.
+
+
+### 4.4.1 Gravedad
+La **gravedad** que se aplica sobre la pelota es de 9.8 m/s², que se mantiene constante.
+
+
+### 4.4.2 Rebotes
+La pelota rebota con el jugador, en la red y en los límites de la pantalla, teniendo en cuenta que cuando toca el suelo termina el *rally*.
+
+
+## 4.5 Calidad del Escenario
+El **escenario** tiene un estilo ***pixel-art***. Los personajes y la pelota tienen una silueta clara y unos colores que contrastan con el fondo. La red también destaca, pero sin desviar la atención de los jugadores.
+
+El **HUD** es claro y limpio. El **marcador** con la puntuación se encuentra centrado en la pantalla y es grande. El **inventario** de cada jugador se coloca en la parte superior de su propio lado de la pantalla, para que resulte más visible.
+
+La **cámara** es estática y se mantiene centrada, de modo que se visualiza todo el escenario.
+
+Durante toda la partida suena **música de fondo** y se producen **efectos de sonido** cuando los jugadores golpean la pelota o al anotar un punto. Al finalizar, cada jugador escucha el tono que le corresponda (de victoria o derrota).
+
+Los ***power-ups*** tienen iconos reconocibles en función de su efecto, y un contorno para contrastar con el fondo. Al agotarse, se van volviendo invisibles gradualmente.
 
 ---
 
@@ -233,18 +261,24 @@ El estilo visual del juego es **pixel art**, debido al nombre de nuestro equipo 
 Por ello, todo el juego está diseñado en pixel art para aportarle esa apariencia nostálgica y retro.
 
 
-## 5.2 Uso de colores
+## 5.2 Aspectos Técnicos
+La dimensión del juego es **2D**, con una vista lateral. La **cámara** es fija y está centrada en la pantalla, sin perspectiva, permitiendo así observar todo el escenario de frente.
+
+El **HUD** es un canvas en ***overlay*** que no afecta al encuadre, y además es responsivo.
+
+
+## 5.3 Uso de colores
 Se ha utilizado una **gama de colores llamativos y cálidos** para atraer la atención de los jugadores.
 
 
-## 5.3 Logotipo
+## 5.4 Logotipo
 El logotipo elegido es un **balón de voleibol en llamas**, que refleja la intensidad y la competencia entre los jugadores.  
 
 ![Logo del juego](Assets/LOGO/Logo.png)
 
 
-## 5.4 Bocetos
-### 5.4.1 Interfaces
+## 5.5 Bocetos
+### 5.5.1 Interfaces
 Se han realizado bocetos de distintas interfaces para ofrecer al usuario una experiencia **fácil, agradable e intuitiva** al jugar.  
 Para ello, se han creado las siguientes pantallas: **menú inicial**, **configuración**, **créditos**, **modo de juego**, **personalización de personaje**, **selección de escenario**, **pantalla de juego** y **fin de partida**.
 
@@ -296,17 +330,17 @@ Además, habrá dos botones: uno para **buscar una nueva partida** y otro para *
 ![Pantalla de fin de juego](Assets/INTERFACES/Fin_de_partida.png)  
 
 
-### 5.4.2 Diagrama de Estados
+### 5.5.2 Diagrama de Estados
 Este es el diagrama de estados del juego, con todas las interfaces y las diferentes interacciones entre ellas.
 
 ![Diagrama de Estados](Assets/DIAGRAMAS/Diagrama%20de%20Estados.jpg)
 
 
-### 5.4.3 Personajes
+### 5.5.3 Personajes
 Aquí
 
 
-### 5.4.4 Escenarios
+### 5.5.4 Escenarios
 Para los escenarios, se han recreado **lugares típicos donde se suelen desarrollar los partidos de voleibol**.
 
 | Gimnasio | Playa | Patio trasero |
@@ -314,7 +348,7 @@ Para los escenarios, se han recreado **lugares típicos donde se suelen desarrol
 | ![Gimnasio](Assets/FONDOS/GIMNASIO.png) | ![Playa](Assets/FONDOS/PLAYA.png) | ![Patio trasero](Assets/FONDOS/JARDIN.png) |
 
 
-### 5.4.5 Elementos del juego
+### 5.5.5 Elementos del juego
 
 #### Power-ups
 
