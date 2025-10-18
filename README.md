@@ -8,6 +8,7 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
 
 **Número de Grupo:** 5   
 **Repositorio de GitHub:** [URL del repositorio](https://github.com/Minhxia/jer-volleyclash-sunsetarcade)  
+**Presentación Fase 1:** [URL de la presentación](https://www.canva.com/design/DAG2J4n1DjQ/evYi3V_Vg3hBeLQZ4EcqLQ/view?utm_content=DAG2J4n1DjQ&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h76898e5bdb)  
 **Equipo de Desarrollo:**
 
 | Nombre | Correo Oficial | Cuenta de GitHub |
@@ -80,9 +81,9 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
  8.1 [Estrategia de difusión y canales](#81-estrategia-de-difusión-y-canales)  
  8.2 [Público objetivo](#82-público-objetivo)
 
-11. [Referencias](#9-referencias)
+9. [Referencias](#9-referencias)
 
-12. [Licencia](#10-licencia)
+10. [Licencia](#10-licencia)
 
 ---
 
