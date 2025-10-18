@@ -67,22 +67,22 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
   5.5.4 [Escenarios](#554-escenarios)  
   5.5.5 [Elementos del juego](#555-elementos-del-juego)
 
-7. [Sonido](#6-sonido)  
+6. [Sonido](#6-sonido)  
  6.1 [Música](#61-música)  
  6.2 [Efectos de sonido](#62-efectos-de-sonido)
 
-8. [Narrativa](#7-narrativa)  
+7. [Narrativa](#7-narrativa)  
  7.1 [Historia general del juego](#71-historia-general-del-juego)  
  7.2 [Desarrollo de personajes](#72-desarrollo-de-personajes)  
  7.3 [Contexto y ambientación](#73-contexto-y-ambientación)
 
-9. [Comunicación y Marketing](#8-comunicación-y-marketing)  
+8. [Comunicación y Marketing](#8-comunicación-y-marketing)  
  8.1 [Estrategia de difusión y canales](#81-estrategia-de-difusión-y-canales)  
  8.2 [Público objetivo](#82-público-objetivo)
 
-10. [Referencias](#9-referencias)
+11. [Referencias](#9-referencias)
 
-11. [Licencia](#10-licencia)
+12. [Licencia](#10-licencia)
 
 ---
 
@@ -94,7 +94,7 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
 
 
 ## 1.2 Género
-El juego es un arcade multijugador casual de deportes, competitivo, rápido y accesible. Se busca ofrecer partidas cortas y rápidas con cierto desafñio, fomentando el pique amistoso y la rejugabilidad inmediata.
+El juego es un arcade multijugador casual de deportes, competitivo, rápido y accesible. Se busca ofrecer partidas cortas y rápidas con cierto desafío, fomentando el pique amistoso y la rejugabilidad inmediata.
 
 
 ## 1.3 Propósito y público objetivo
@@ -168,7 +168,7 @@ El sistema está dividido en dos capas:
 
 
 ## 4.1 Objetivo del juego
-Gana el partido el jugador que marque antes **20 puntos**, o quien más tenga cuando termine el tiempo. Si hay empate al final, se juega un **punto de oro** en el que el siguiente punto decide el ganador.
+Gana el partido el jugador que gane más sets (al mejor de 3). Si hay empate al final, se juega un **punto de oro** en el que el siguiente punto decide el ganador.
 
 
 ## 4.2 Controles
@@ -376,7 +376,7 @@ La canción principal es esta. Se han buscado canciones que se pudiesen repetir 
 ## 6.2 Efectos de sonido
 Los efectos sonoros son simples y dinámicos, pensados para reforzar la acción del juego.  
 Incluyen sonidos de:
-- Menu principal  ->  [Efecto de Menú Principal](https://freesound.org/people/Sunsai/sounds/415805/)  
+- Menú principal  ->  [Efecto de Menú Principal](https://freesound.org/people/Sunsai/sounds/415805/)  
 - Golpes de pelota  ->  [Efecto de Golpes de Pelota](https://freesound.org/people/16HPanskaResatko_Matej/sounds/497968/)  
 - Salto  ->  [Efecto de Salto](https://freesound.org/people/vibritherabjit123/sounds/644410/)  
 - Punto ganado  ->  [Efecto Conseguir un Punto](https://freesound.org/people/Scrampunk/sounds/345297/)  
@@ -386,7 +386,7 @@ Incluyen sonidos de:
 
 # 7. Narrativa
 ## 7.1 Historia general del juego
-Cada verano se celebra un campeonato de voleibol, donde los jugadores se enfrentan en duelos 1 contra 1 para demostrar quién es el mejor en la arena.  
+Cada verano se celebra un campeonato de voleibol, donde los jugadores se enfrentan en duelos 1 contra 1 para demostrar quien es el mejor en la arena.  
 El juego no tiene una narrativa compleja, su enfoque está en la diversión, la competición y la habilidad.  
 El objetivo es ganar puntos, avanzar entre los partidos y coronarse campeón del verano demostrando quien es el mejor del campeonato.
 
