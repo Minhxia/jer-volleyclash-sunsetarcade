@@ -1,6 +1,6 @@
 # Volley Clash
 ## Descripción de la Temática
-**Volley Clash** es un juego multijugador de **voleibol arcade** en 2D desarrollado para navegador web.  En él, dos jugadores se enfrentan en partidos rápidos y competitivos, combinando **físicas realistas**, **power-ups aleatorios** y una estética **pixel-art minimalista**.  
+**Volley Clash** es un juego multijugador de **voleibol arcade** en 2D desarrollado para navegador web. En él, dos jugadores se enfrentan en partidos rápidos y competitivos, combinando **físicas realistas**, **power-ups aleatorios** y una estética **pixel-art minimalista**.  
 
 El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 2 de ventaja para ganar el set, en un partido a **3 sets**, controlando el salto, golpeo y posición del personaje con una jugabilidad sencilla pero desafiante.  
 
@@ -89,7 +89,7 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
 
 # 1. Introducción
 ## 1.1 Concepto del juego
-**Volley Clash** es un juego multijugador de **voleibol arcade** en 2D desarrollado para navegador web.  En él, dos jugadores se enfrentan en partidos rápidos y competitivos, combinando **físicas realistas**, **power-ups aleatorios** y una estética **pixel-art minimalista**.  
+**Volley Clash** es un juego multijugador de **voleibol arcade** en 2D desarrollado para navegador web. En él, dos jugadores se enfrentan en partidos rápidos y competitivos, combinando **físicas realistas**, **power-ups aleatorios** y una estética **pixel-art minimalista**.  
 
 El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 2 de ventaja para ganar el set, en un partido a **3 sets**, controlando el salto, golpeo y posición del personaje con una jugabilidad sencilla pero desafiante.  
 
@@ -387,9 +387,9 @@ Incluyen sonidos de:
 
 # 7. Narrativa
 ## 7.1 Historia general del juego
-Cada verano se celebra un campeonato de voleibol, donde los jugadores se enfrentan en duelos 1 contra 1 para demostrar quien es el mejor en la arena.  
+Cada verano se celebra un campeonato de voleibol, donde los jugadores se enfrentan en duelos 1 contra 1 para demostrar quién es el mejor en la arena.  
 El juego no tiene una narrativa compleja, su enfoque está en la diversión, la competición y la habilidad.  
-El objetivo es ganar puntos, avanzar entre los partidos y coronarse campeón del verano demostrando quien es el mejor del campeonato.
+El objetivo es ganar puntos, avanzar entre los partidos y coronarse campeón del verano demostrando quién es el mejor del campeonato.
 
 
 ## 7.2 Desarrollo de personajes
@@ -410,7 +410,7 @@ La ambientación busca transmitir la sensación de un torneo de verano casual, d
 ---
 
 # 8. Comunicación y Marketing
-El objetivo de nuestra campaña de marketing es conseguir que **Volley Clash** se vuelva popular en portales de juegos gratuitos, aprovechando la viralidad de las redes sociales y la sencillez de acceso para crear una comunidad activa de jugadores que compitan y compartan sus partidas. Se busca atraer a jugadores casuales que disfrutan de los clásicos juegos de navegador, ofreciendo partidas rápidas, competitivas y divertidas de voleibol 1 contra 1, con una estética colorida y dinámica inspirada en el modo voley del juego *Pou*.  
+El objetivo de nuestra campaña de marketing es conseguir que **Volley Clash** se vuelva popular en portales de juegos gratuitos, aprovechando la viralidad de las redes sociales y la sencillez de acceso para crear una comunidad activa de jugadores que compitan y compartan sus partidas. Se busca atraer a jugadores casuales que disfrutan de los clásicos juegos de navegador, ofreciendo partidas rápidas, competitivas y divertidas de voleibol 1 contra 1, con una estética colorida y dinámica inspirada en el modo vóley del juego *Pou*.  
 
 
 ## 8.1 Estrategia de difusión y canales
