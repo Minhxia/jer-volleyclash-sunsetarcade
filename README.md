@@ -275,7 +275,7 @@ Se ha utilizado una **gama de colores llamativos y cálidos** para atraer la ate
 ## 5.4 Logotipo
 Se han diseñado logotipos tanto para la empresa como para el videojuego, con el objetivo de crear una identidad visual clara y fácilmente reconocible por los jugadores.
 **Logo de la empresa**
-![Logo del juego](Assets/LOGO/logo%20empresa.png)
+![Logo del juego](Assets/LOGO/logo_empresa.png)
 **Logo del juego**
 El logotipo seleccionado representa un **balón de voleibol en llamas**, símbolo de la **intensidad, la energía y la competitividad** que caracterizan al juego. Su diseño busca transmitir dinamismo y emoción, reforzando la temática deportiva y el espíritu competitivo del videojuego.
 
@@ -312,7 +312,7 @@ En esta pantalla se presentan dos botones para elegir entre los modos de **juego
 #### Personalizar personaje del jugador
 En esta interfaz, el jugador podrá **elegir su nombre, el color de la equipación y el personaje** que desee utilizar.  
 
-![Pantalla de selección de personaje](Assets/INTERFACES/Seleccion%20de%20personaje.png)
+![Pantalla de selección de personaje](Assets/INTERFACES/Seleccion_de_personaje.png)
 
 #### Selección de escenario
 En esta pantalla, el jugador podrá **elegir el escenario** en el que desea jugar la partida.  
