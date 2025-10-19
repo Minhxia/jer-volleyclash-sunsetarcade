@@ -274,9 +274,12 @@ Se ha utilizado una **gama de colores llamativos y cálidos** para atraer la ate
 
 ## 5.4 Logotipo
 Se han diseñado logotipos tanto para la empresa como para el videojuego, con el objetivo de crear una identidad visual clara y fácilmente reconocible por los jugadores.
-**Logo de la empresa**
-![Logo del juego](ASSETS/LOGO/logo_empresa.png)
-**Logo del juego**
+
+**Logo de la empresa:**
+
+![Logo de la empresa](ASSETS/LOGO/logo_empresa.png)
+
+**Logo del juego:**
 El logotipo seleccionado representa un **balón de voleibol en llamas**, símbolo de la **intensidad, la energía y la competitividad** que caracterizan al juego. Su diseño busca transmitir dinamismo y emoción, reforzando la temática deportiva y el espíritu competitivo del videojuego.
 
 ![Logo del juego](ASSETS/LOGO/Logo.png)
@@ -454,9 +457,29 @@ El objetivo de nuestra campaña de marketing es conseguir que **Volley Clash** s
 ---
 
 # 9. Referencias
-- Fuentes de inspiración
-- Juegos similares
-- Recursos gráficos o sonoros utilizados
+- Fuentes de inspiración:
+    - **Haikyuu!!** — Referente temático y estético de voleibol.
+    - **Pou – Modo vóley** — Referente de ritmo arcade y tono casual. 
+
+- Música y audio utilizados:
+    - Audio de terceros (con copyright):
+        - **Pou – Tema principal**  
+  **Juego:** *Pou*  
+  **Titular de derechos:** Zakeh / Paul Salameh  
+  **Fuente oficial de referencia:** YouTube – “Pou MusiX / Soundtrack” [Enlace](https://www.youtube.com/watch?v=XprZqZk87xE&list=RDXprZqZk87xE&start_radio=1https://www.youtube.com/watch?v=XprZqZk87xE&list=RDXprZqZk87xE&start_radio=1)  
+  **Licencia:** Obra con copyright. Uso en el prototipo con fines académicos internos.
+
+    - Efectos de sonido (Freesound)
+        - **Menú principal** — *Sunsai*. [Enlace](https://freesound.org/people/Sunsai/sounds/415805/) — Licencia: Attribution 4.0  
+        - **Golpe de pelota** — *16HPanskaResatko_Matej*. [Enlace](https://freesound.org/people/16HPanskaResatko_Matej/sounds/497968/) — Licencia: Creative Commons 0  
+        - **Salto** — *vibritherabjit123*. [Enlace](https://freesound.org/people/vibritherabjit123/sounds/644410/) — Creative Commons 0  
+        - **Punto ganado** — *Scrampunk*. [Enlace](https://freesound.org/people/Scrampunk/sounds/345297/) — Licencia: Attribution 4.0  
+        - **Victoria** — *shinephoenixstormcrow*. [Enlace](https://freesound.org/people/shinephoenixstormcrow/sounds/337049/) — Licencia: Attribution 3.0 
+        - **Victoria 2** — *FunWithSound*. [Enlace](https://freesound.org/people/FunWithSound/sounds/456965/) — Licencia: Creative Commons 0  
+        - **Derrota** — *martcraft*. [Enlace](https://freesound.org/people/martcraft/sounds/651626/) — Licencia: Creative Commons 0
+
+- Recursos propios del proyecto: 
+    - **Arte y UI** (logotipo, escenarios, personajes, iconos, *power-ups*): **creación original del equipo**.
 
 ---
 
