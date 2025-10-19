@@ -124,13 +124,13 @@ La versión inicial se centra en:
 
 # 2. Características Principales
 - **Multijugador en tiempo real** (2 jugadores).  
-- **Juego rápido y competitivo** con duración de partidas de 5 a 10 minutos.  
-- **Power-ups aleatorios** que alteran la dinámica del juego (velocidad, parálisis, puntos extra).  
+- **Juego rápido y competitivo** con duración de partidas de 2 a 5 minutos.  
+- ***Power-ups*** **aleatorios** que alteran la dinámica del juego (velocidad, parálisis, puntos extra).  
 - **Estética pixel-art** minimalista y colorida.  
 - **Controles simples y responsivos**:  
   - Jugador 1 → *<kbd>A</kbd>/<kbd>D</kbd>/<kbd>W</kbd>/<kbd>S</kbd>*  
   - Jugador 2 → *<kbd>J</kbd>/<kbd>L</kbd>/<kbd>I</kbd>/<kbd>K</kbd>*  
-- **Mecánica física realista**: gravedad constante y rebotes realistas.  
+- **Mecánica física arcade**: gravedad constante y rebotes en los límites de la pantalla.  
 - **Interfaz intuitiva**: menú principal, lobby, partida y pantalla de fin de juego.  
 - **Modo local y online**, con sincronización en red mediante **API REST + WebSockets**.
 
@@ -165,23 +165,23 @@ El sistema está dividido en dos capas:
 ---
 
 # 4. Jugabilidad
-**Volley Clash** consiste en partidos rápidos (**2-5 minutos**) y competitivos de **voleibol arcade** en **1vs1** local. Cada jugador mueve a su personaje en un **entorno 2D**, y tiene que golpear la pelota en el momento adecuado para devolverla al campo rival. Además, durante el partido aparecen ***power-ups*** en la pista, que los jugadores pueden usar para ganar ventaja.
+**Volley Clash** consiste en partidos rápidos (**2-5 minutos**) y competitivos de **voleibol arcade** en **1vs1** local y *online*. Cada jugador mueve a su personaje en un **entorno 2D**, y tiene que golpear la pelota en el momento adecuado para devolverla al campo rival. Además, durante el partido aparecen ***power-ups*** en la pista, que los jugadores pueden usar para ganar ventaja.
 
 
 ## 4.1 Objetivo del juego
-Gana el partido el jugador que gane más sets (al mejor de 3). Si hay empate al final, se juega un **punto de oro** en el que el siguiente punto decide el ganador.
+Vencer al rival ganando 2 sets (es decir, al mejor de 3). Cada set finaliza cuando un jugador alcanza 11 o más puntos con al menos 2 de ventaja. En el caso de usar los *power-ups* que modifican el valor de un rally (x2, x3), la condición de victoria del set se mantiene: ≥11 y +2. Además, como **objetivo adicional**, el jugador debe gestionar adecuadamente su inventario de *power-ups* y decidir cuándo activarlos para asegurar saques, defender o rematar sets.
 
 
 ## 4.2 Controles
 - **Jugador 1:** corresponde al jugador situado a la izquierda de la red.
     - <kbd>A</kbd>/<kbd>D</kbd> para moverse hacia la izquierda y hacia la derecha, respectivamente.
     - <kbd>W</kbd> para saltar.
-    - <kbd>S</kbd> para activar un *power up*.
+    - <kbd>S</kbd> para activar un *power-up*.
     
 - **Jugador 2:** corresponde al jugador situado a la derecha de la red.
     - <kbd>J</kbd>/<kbd>L</kbd> para moverse hacia la izquierda y hacia la derecha, respectivamente.
     - <kbd>I</kbd> para saltar.
-    - <kbd>K</kbd> para activar un *power up*.
+    - <kbd>K</kbd> para activar un *power-up*.
 
 
 ## 4.3 Mecánicas
@@ -258,8 +258,8 @@ Los ***power-ups*** tienen iconos reconocibles en función de su efecto, y un co
 
 # 5. Imagen y Diseño Visual
 ## 5.1 Estilo visual 
-El estilo visual del juego es **pixel art**, debido al nombre de nuestro equipo *Sunset Arcade*, representado con una máquina arcade retro.  
-Por ello, todo el juego está diseñado en pixel art para aportarle esa apariencia nostálgica y retro.
+El estilo visual del juego es **pixel-art**, debido al nombre de nuestro equipo *Sunset Arcade*, representado con una máquina arcade retro.  
+Por ello, todo el juego está diseñado en pixel-art para aportarle esa apariencia nostálgica y retro.
 
 
 ## 5.2 Aspectos Técnicos
@@ -318,7 +318,7 @@ En esta pantalla, el jugador podrá **elegir el escenario** en el que desea juga
 #### Pantalla de juego
 En la pantalla de juego se pueden encontrar los siguientes elementos:
 - Contador de puntos (uno para cada jugador, ubicado en su lado del campo)
-- Power-ups atrapados en el campo de cada jugador
+- *Power-ups* almacenados en el inventario de cada jugador
 - Tiempo restante de la partida
 - Botón de configuración
 
