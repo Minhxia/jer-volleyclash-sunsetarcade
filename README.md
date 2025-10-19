@@ -275,11 +275,11 @@ Se ha utilizado una **gama de colores llamativos y cálidos** para atraer la ate
 ## 5.4 Logotipo
 Se han diseñado logotipos tanto para la empresa como para el videojuego, con el objetivo de crear una identidad visual clara y fácilmente reconocible por los jugadores.
 **Logo de la empresa**
-![Logo del juego](Assets/LOGO/logo_empresa.png)
+![Logo del juego](ASSETS/LOGO/logo_empresa.png)
 **Logo del juego**
 El logotipo seleccionado representa un **balón de voleibol en llamas**, símbolo de la **intensidad, la energía y la competitividad** que caracterizan al juego. Su diseño busca transmitir dinamismo y emoción, reforzando la temática deportiva y el espíritu competitivo del videojuego.
 
-![Logo del juego](Assets/LOGO/Logo.png)
+![Logo del juego](ASSETS/LOGO/Logo.png)
 
 
 ## 5.5 Bocetos
@@ -290,34 +290,34 @@ Para ello, se han creado las siguientes pantallas: **menú inicial**, **configur
 #### Menú inicial
 En esta interfaz, el jugador podrá **comenzar una partida**, acceder a la **pantalla de configuración** o a los **créditos** del juego.  
 
-![Menú principal](Assets/INTERFACES/Pantalla_de_inicio.png)
+![Menú principal](ASSETS/INTERFACES/Pantalla_de_inicio.png)
 
 #### Configuración
 En esta pantalla, el jugador puede **cambiar el volumen del sonido** del juego y **modificar los controles** de la partida.  
 Además, en el modo de juego se añadirá un botón para **abandonar la partida**.  
 
-![Pantalla de configuración](Assets/INTERFACES/Configuracion_inicial.png)  
-![Pantalla de configuración en partida](Assets/INTERFACES/Configuracion_partida.png)
+![Pantalla de configuración](ASSETS/INTERFACES/Configuracion_inicial.png)  
+![Pantalla de configuración en partida](ASSETS/INTERFACES/Configuracion_partida.png)
 
 #### Créditos
 En esta interfaz se incluirán **únicamente los miembros del equipo y sus tareas**, con la opción de volver a la pantalla de inicio.  
 
-![Pantalla de créditos](Assets/INTERFACES/Creditos.png)
+![Pantalla de créditos](ASSETS/INTERFACES/Creditos.png)
 
 #### Modo de juego
 En esta pantalla se presentan dos botones para elegir entre los modos de **juego local o en red**, según prefiera el jugador.  
 
-![Pantalla de modo de juego](Assets/INTERFACES/Modo_de_juego.png)
+![Pantalla de modo de juego](ASSETS/INTERFACES/Modo_de_juego.png)
 
 #### Personalizar personaje del jugador
 En esta interfaz, el jugador podrá **elegir su nombre, el color de la equipación y el personaje** que desee utilizar.  
 
-![Pantalla de selección de personaje](Assets/INTERFACES/Seleccion_de_personaje.png)
+![Pantalla de selección de personaje](ASSETS/INTERFACES/Seleccion_de_personaje.png)
 
 #### Selección de escenario
 En esta pantalla, el jugador podrá **elegir el escenario** en el que desea jugar la partida.  
 
-![Pantalla de selección de escenario](Assets/INTERFACES/Seleccion_de_escenario.png)
+![Pantalla de selección de escenario](ASSETS/INTERFACES/Seleccion_de_escenario.png)
 
 #### Pantalla de juego
 En la pantalla de juego se pueden encontrar los siguientes elementos:
@@ -326,19 +326,19 @@ En la pantalla de juego se pueden encontrar los siguientes elementos:
 - Tiempo restante de la partida
 - Botón de configuración
 
-![Pantalla de juego](Assets/INTERFACES/Partida.png)  
+![Pantalla de juego](ASSETS/INTERFACES/Partida.png)  
 
 #### Fin de partida
 En esta interfaz aparecerá el **nombre del jugador ganador**.  
 Además, habrá dos botones: uno para **buscar una nueva partida** y otro para **volver al menú inicial**.
 
-![Pantalla de fin de juego](Assets/INTERFACES/Fin_de_partida.png)  
+![Pantalla de fin de juego](ASSETS/INTERFACES/Fin_de_partida.png)  
 
 
 ### 5.5.2 Diagrama de Estados
 Este es el diagrama de estados del juego, con todas las interfaces y las diferentes interacciones entre ellas.
 
-![Diagrama de Estados](Assets/DIAGRAMAS/Diagrama%20de%20Estados.jpg)
+![Diagrama de Estados](ASSETS/DIAGRAMAS/Diagrama%20de%20Estados.jpg)
 
 
 ### 5.5.3 Personajes
@@ -347,14 +347,14 @@ Se han diseñado diversos personajes jugables que el usuario puede seleccionar p
 Cada uno representa un estereotipo distinto presente en la narración del videojuego, tanto en su apariencia como en su comportamiento.
 | equilibrado y simpático | rápido y competitivo | divertido y algo distraído|
 |-----------|--------|---------------|
-| ![Personaje A](Assets/PERSONAJES/personajes_a.png) | ![Personaje B](Assets/PERSONAJES/personajes_b.png) | ![Personaje C](Assets/PERSONAJES/personaje_c.png) |
+| ![Personaje A](ASSETS/PERSONAJES/personajes_a.png) | ![Personaje B](ASSETS/PERSONAJES/personajes_b.png) | ![Personaje C](ASSETS/PERSONAJES/personaje_c.png) |
 
 ### 5.5.4 Escenarios
 Para los escenarios, se han recreado **lugares típicos donde se suelen desarrollar los partidos de voleibol**.
 
 | Gimnasio | Playa | Patio trasero |
 |-----------|--------|---------------|
-| ![Gimnasio](Assets/FONDOS/GIMNASIO.png) | ![Playa](Assets/FONDOS/PLAYA.png) | ![Patio trasero](Assets/FONDOS/JARDIN.png) |
+| ![Gimnasio](ASSETS/FONDOS/GIMNASIO.png) | ![Playa](ASSETS/FONDOS/PLAYA.png) | ![Patio trasero](ASSETS/FONDOS/JARDIN.png) |
 
 
 ### 5.5.5 Elementos del juego
@@ -363,7 +363,7 @@ Para los escenarios, se han recreado **lugares típicos donde se suelen desarrol
 
 | **Velocidad** | **Ralentizar** | **Paralizado** | **Multiplicador x3** | **Multiplicador x2** |
 |:-------------:|:--------------:|:--------------:|:--------------------:|:--------------------:|
-| ![Velocidad](Assets/ITEMS/POWER%20UPS/VELOCIDAD.png) | ![Ralentizar](Assets/ITEMS/POWER%20UPS/RELENTIZAR.png) | ![Paralizado](Assets/ITEMS/POWER%20UPS/PARALIZADO.png) | ![Multiplicador x3](Assets/ITEMS/POWER%20UPS/MULTIPLICADOR%203.png) | ![Multiplicador x2](Assets/ITEMS/POWER%20UPS/MULTIPLICADOR%202.png) |
+| ![Velocidad](ASSETS/ITEMS/POWER%20UPS/VELOCIDAD.png) | ![Ralentizar](ASSETS/ITEMS/POWER%20UPS/RELENTIZAR.png) | ![Paralizado](ASSETS/ITEMS/POWER%20UPS/PARALIZADO.png) | ![Multiplicador x3](ASSETS/ITEMS/POWER%20UPS/MULTIPLICADOR%203.png) | ![Multiplicador x2](ASSETS/ITEMS/POWER%20UPS/MULTIPLICADOR%202.png) |
 | Aumenta la velocidad del jugador temporalmente. | Ralentiza al oponente durante unos segundos. | Paraliza al oponente brevemente, impidiéndole moverse. | Triplica los puntos obtenidos durante un corto tiempo. | Duplica los puntos obtenidos durante un corto tiempo. |
 
 
@@ -371,7 +371,7 @@ Para los escenarios, se han recreado **lugares típicos donde se suelen desarrol
 
 | **Pelota Normal** | **Pelota Plus** | **Pelota de Playa** |
 |:-----------------:|:---------------:|:-------------------:|
-| ![Normal](Assets/ITEMS/PELOTAS/P_NORMAL.png) | ![Plus](Assets/ITEMS/PELOTAS/P_PLUS.png) | ![Playa](Assets/ITEMS/PELOTAS/P_PLAYA.png) |
+| ![Normal](ASSETS/ITEMS/PELOTAS/P_NORMAL.png) | ![Plus](ASSETS/ITEMS/PELOTAS/P_PLUS.png) | ![Playa](ASSETS/ITEMS/PELOTAS/P_PLAYA.png) |
 
 ---
 
