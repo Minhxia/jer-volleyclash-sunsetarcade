@@ -348,7 +348,7 @@ Este es el diagrama de estados del juego, con todas las interfaces y las diferen
 
 Se han diseñado diversos personajes jugables que el usuario puede seleccionar para aportar variedad y personalización a la experiencia.
 Cada uno representa un estereotipo distinto presente en la narración del videojuego, tanto en su apariencia como en su comportamiento.
-| equilibrado y simpático | rápido y competitivo | divertido y algo distraído|
+| Equilibrado y Simpático | Rápido y Competitivo | Divertido y algo Distraído|
 |-----------|--------|---------------|
 | ![Personaje A](ASSETS/PERSONAJES/personajes_a.png) | ![Personaje B](ASSETS/PERSONAJES/personajes_b.png) | ![Personaje C](ASSETS/PERSONAJES/personaje_c.png) |
 
