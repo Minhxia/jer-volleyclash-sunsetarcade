@@ -273,7 +273,11 @@ Se ha utilizado una **gama de colores llamativos y cálidos** para atraer la ate
 
 
 ## 5.4 Logotipo
-El logotipo elegido es un **balón de voleibol en llamas**, que refleja la intensidad y la competencia entre los jugadores.  
+Se han diseñado logotipos tanto para la empresa como para el videojuego, con el objetivo de crear una identidad visual clara y fácilmente reconocible por los jugadores.
+**Logo de la empresa**
+![Logo del juego](Assets/LOGO/logo%20empresa.png)
+**Logo del juego**
+El logotipo seleccionado representa un **balón de voleibol en llamas**, símbolo de la **intensidad, la energía y la competitividad** que caracterizan al juego. Su diseño busca transmitir dinamismo y emoción, reforzando la temática deportiva y el espíritu competitivo del videojuego.
 
 ![Logo del juego](Assets/LOGO/Logo.png)
 
@@ -308,7 +312,7 @@ En esta pantalla se presentan dos botones para elegir entre los modos de **juego
 #### Personalizar personaje del jugador
 En esta interfaz, el jugador podrá **elegir su nombre, el color de la equipación y el personaje** que desee utilizar.  
 
-![Pantalla de selección de personaje](Assets/INTERFACES/Seleccion_de_personaje.png)
+![Pantalla de selección de personaje](Assets/INTERFACES/Seleccion%20de%20personaje.png)
 
 #### Selección de escenario
 En esta pantalla, el jugador podrá **elegir el escenario** en el que desea jugar la partida.  
@@ -338,8 +342,12 @@ Este es el diagrama de estados del juego, con todas las interfaces y las diferen
 
 
 ### 5.5.3 Personajes
-Aquí
 
+Se han diseñado diversos personajes jugables que el usuario puede seleccionar para aportar variedad y personalización a la experiencia.
+Cada uno representa un estereotipo distinto presente en la narración del videojuego, tanto en su apariencia como en su comportamiento.
+| equilibrado y simpático | rápido y competitivo | divertido y algo distraído|
+|-----------|--------|---------------|
+| ![Personaje A](Assets/PERSONAJES/personajes_a.png) | ![Personaje B](Assets/PERSONAJES/personajes_b.png) | ![Personaje C](Assets/PERSONAJES/personaje_c.png) |
 
 ### 5.5.4 Escenarios
 Para los escenarios, se han recreado **lugares típicos donde se suelen desarrollar los partidos de voleibol**.
