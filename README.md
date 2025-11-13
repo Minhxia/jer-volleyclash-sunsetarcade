@@ -1,6 +1,6 @@
 # Volley Clash
 ## Descripción de la Temática
-**Volley Clash** es un juego multijugador de **voleibol arcade** en 2D desarrollado para navegador web.  En él, dos jugadores se enfrentan en partidos rápidos y competitivos, combinando **físicas realistas**, **power-ups aleatorios** y una estética **pixel-art minimalista**.  
+**Volley Clash** es un juego multijugador de **voleibol arcade** en 2D desarrollado para navegador web. En él, dos jugadores se enfrentan en partidos rápidos y competitivos, combinando **físicas realistas**, **power-ups aleatorios** y una estética **pixel-art minimalista**.  
 
 El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 2 de ventaja para ganar el set, en un partido a **3 sets**, controlando el salto, golpeo y posición del personaje con una jugabilidad sencilla pero desafiante.  
 
@@ -8,6 +8,7 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
 
 **Número de Grupo:** 5   
 **Repositorio de GitHub:** [URL del repositorio](https://github.com/Minhxia/jer-volleyclash-sunsetarcade)  
+**Presentación Fase 1:** [URL de la presentación](https://www.canva.com/design/DAG2J4n1DjQ/evYi3V_Vg3hBeLQZ4EcqLQ/view?utm_content=DAG2J4n1DjQ&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h76898e5bdb)  
 **Equipo de Desarrollo:**
 
 | Nombre | Correo Oficial | Cuenta de GitHub |
@@ -67,34 +68,34 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
   5.5.4 [Escenarios](#554-escenarios)  
   5.5.5 [Elementos del juego](#555-elementos-del-juego)
 
-7. [Sonido](#6-sonido)  
+6. [Sonido](#6-sonido)  
  6.1 [Música](#61-música)  
  6.2 [Efectos de sonido](#62-efectos-de-sonido)
 
-8. [Narrativa](#7-narrativa)  
+7. [Narrativa](#7-narrativa)  
  7.1 [Historia general del juego](#71-historia-general-del-juego)  
  7.2 [Desarrollo de personajes](#72-desarrollo-de-personajes)  
  7.3 [Contexto y ambientación](#73-contexto-y-ambientación)
 
-9. [Comunicación y Marketing](#8-comunicación-y-marketing)  
+8. [Comunicación y Marketing](#8-comunicación-y-marketing)  
  8.1 [Estrategia de difusión y canales](#81-estrategia-de-difusión-y-canales)  
  8.2 [Público objetivo](#82-público-objetivo)
 
-10. [Referencias](#9-referencias)
+9. [Referencias](#9-referencias)
 
-11. [Licencia](#10-licencia)
+10. [Licencia](#10-licencia)
 
 ---
 
 # 1. Introducción
 ## 1.1 Concepto del juego
-**Volley Clash** es un juego multijugador de **voleibol arcade** en 2D desarrollado para navegador web.  En él, dos jugadores se enfrentan en partidos rápidos y competitivos, combinando **físicas realistas**, **power-ups aleatorios** y una estética **pixel-art minimalista**.  
+**Volley Clash** es un juego multijugador de **voleibol arcade** en 2D desarrollado para navegador web. En él, dos jugadores se enfrentan en partidos rápidos y competitivos, combinando **físicas realistas**, **power-ups aleatorios** y una estética **pixel-art minimalista**.  
 
 El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 2 de ventaja para ganar el set, en un partido a **3 sets**, controlando el salto, golpeo y posición del personaje con una jugabilidad sencilla pero desafiante.  
 
 
 ## 1.2 Género
-El juego es un arcade multijugador casual de deportes, competitivo, rápido y accesible. Se busca ofrecer partidas cortas y rápidas con cierto desafñio, fomentando el pique amistoso y la rejugabilidad inmediata.
+El juego es un arcade multijugador casual de deportes, competitivo, rápido y accesible. Se busca ofrecer partidas cortas y rápidas con cierto desafío, fomentando el pique amistoso y la rejugabilidad inmediata.
 
 
 ## 1.3 Propósito y público objetivo
@@ -123,13 +124,13 @@ La versión inicial se centra en:
 
 # 2. Características Principales
 - **Multijugador en tiempo real** (2 jugadores).  
-- **Juego rápido y competitivo** con duración de partidas de 5 a 10 minutos.  
-- **Power-ups aleatorios** que alteran la dinámica del juego (velocidad, parálisis, puntos extra).  
+- **Juego rápido y competitivo** con duración de partidas de 2 a 5 minutos.  
+- ***Power-ups*** **aleatorios** que alteran la dinámica del juego (velocidad, parálisis, puntos extra).  
 - **Estética pixel-art** minimalista y colorida.  
 - **Controles simples y responsivos**:  
   - Jugador 1 → *<kbd>A</kbd>/<kbd>D</kbd>/<kbd>W</kbd>/<kbd>S</kbd>*  
   - Jugador 2 → *<kbd>J</kbd>/<kbd>L</kbd>/<kbd>I</kbd>/<kbd>K</kbd>*  
-- **Mecánica física realista**: gravedad constante y rebotes realistas.  
+- **Mecánica física arcade**: gravedad constante y rebotes en los límites de la pantalla.  
 - **Interfaz intuitiva**: menú principal, lobby, partida y pantalla de fin de juego.  
 - **Modo local y online**, con sincronización en red mediante **API REST + WebSockets**.
 
@@ -164,23 +165,23 @@ El sistema está dividido en dos capas:
 ---
 
 # 4. Jugabilidad
-**Volley Clash** consiste en partidos rápidos (**2-5 minutos**) y competitivos de **voleibol arcade** en **1vs1** local. Cada jugador mueve a su personaje en un **entorno 2D**, y tiene que golpear la pelota en el momento adecuado para devolverla al campo rival. Además, durante el partido aparecen ***power-ups*** en la pista, que los jugadores pueden usar para ganar ventaja.
+**Volley Clash** consiste en partidos rápidos (**2-5 minutos**) y competitivos de **voleibol arcade** en **1vs1** local y *online*. Cada jugador mueve a su personaje en un **entorno 2D**, y tiene que golpear la pelota en el momento adecuado para devolverla al campo rival. Además, durante el partido aparecen ***power-ups*** en la pista, que los jugadores pueden usar para ganar ventaja.
 
 
 ## 4.1 Objetivo del juego
-Gana el partido el jugador que marque antes **20 puntos**, o quien más tenga cuando termine el tiempo. Si hay empate al final, se juega un **punto de oro** en el que el siguiente punto decide el ganador.
+Vencer al rival ganando 2 sets (es decir, al mejor de 3). Cada set finaliza cuando un jugador alcanza 11 o más puntos con al menos 2 de ventaja. En el caso de usar los *power-ups* que modifican el valor de un rally (x2, x3), la condición de victoria del set se mantiene: ≥11 y +2. Además, como **objetivo adicional**, el jugador debe gestionar adecuadamente su inventario de *power-ups* y decidir cuándo activarlos para asegurar saques, defender o rematar sets.
 
 
 ## 4.2 Controles
 - **Jugador 1:** corresponde al jugador situado a la izquierda de la red.
     - <kbd>A</kbd>/<kbd>D</kbd> para moverse hacia la izquierda y hacia la derecha, respectivamente.
     - <kbd>W</kbd> para saltar.
-    - <kbd>S</kbd> para activar un *power up*.
+    - <kbd>S</kbd> para activar un *power-up*.
     
 - **Jugador 2:** corresponde al jugador situado a la derecha de la red.
     - <kbd>J</kbd>/<kbd>L</kbd> para moverse hacia la izquierda y hacia la derecha, respectivamente.
     - <kbd>I</kbd> para saltar.
-    - <kbd>K</kbd> para activar un *power up*.
+    - <kbd>K</kbd> para activar un *power-up*.
 
 
 ## 4.3 Mecánicas
@@ -257,8 +258,8 @@ Los ***power-ups*** tienen iconos reconocibles en función de su efecto, y un co
 
 # 5. Imagen y Diseño Visual
 ## 5.1 Estilo visual 
-El estilo visual del juego es **pixel art**, debido al nombre de nuestro equipo *Sunset Arcade*, representado con una máquina arcade retro.  
-Por ello, todo el juego está diseñado en pixel art para aportarle esa apariencia nostálgica y retro.
+El estilo visual del juego es **pixel-art**, debido al nombre de nuestro equipo *Sunset Arcade*, representado con una máquina arcade retro.  
+Por ello, todo el juego está diseñado en pixel-art para aportarle esa apariencia nostálgica y retro.
 
 
 ## 5.2 Aspectos Técnicos
@@ -272,9 +273,16 @@ Se ha utilizado una **gama de colores llamativos y cálidos** para atraer la ate
 
 
 ## 5.4 Logotipo
-El logotipo elegido es un **balón de voleibol en llamas**, que refleja la intensidad y la competencia entre los jugadores.  
+Se han diseñado logotipos tanto para la empresa como para el videojuego, con el objetivo de crear una identidad visual clara y fácilmente reconocible por los jugadores.
 
-![Logo del juego](Assets/LOGO/Logo.png)
+**Logo de la empresa:**
+
+![Logo de la empresa](ASSETS/LOGO/logo_empresa.png)
+
+**Logo del juego:**
+El logotipo seleccionado representa un **balón de voleibol en llamas**, símbolo de la **intensidad, la energía y la competitividad** que caracterizan al juego. Su diseño busca transmitir dinamismo y emoción, reforzando la temática deportiva y el espíritu competitivo del videojuego.
+
+![Logo del juego](ASSETS/LOGO/Logo.png)
 
 
 ## 5.5 Bocetos
@@ -285,67 +293,71 @@ Para ello, se han creado las siguientes pantallas: **menú inicial**, **configur
 #### Menú inicial
 En esta interfaz, el jugador podrá **comenzar una partida**, acceder a la **pantalla de configuración** o a los **créditos** del juego.  
 
-![Menú principal](Assets/INTERFACES/Pantalla_de_inicio.png)
+![Menú principal](ASSETS/INTERFACES/Pantalla_de_inicio.png)
 
 #### Configuración
 En esta pantalla, el jugador puede **cambiar el volumen del sonido** del juego y **modificar los controles** de la partida.  
 Además, en el modo de juego se añadirá un botón para **abandonar la partida**.  
 
-![Pantalla de configuración](Assets/INTERFACES/Configuracion_inicial.png)  
-![Pantalla de configuración en partida](Assets/INTERFACES/Configuracion_partida.png)
+![Pantalla de configuración](ASSETS/INTERFACES/Configuracion_inicial.png)  
+![Pantalla de configuración en partida](ASSETS/INTERFACES/Configuracion_partida.png)
 
 #### Créditos
 En esta interfaz se incluirán **únicamente los miembros del equipo y sus tareas**, con la opción de volver a la pantalla de inicio.  
 
-![Pantalla de créditos](Assets/INTERFACES/Creditos.png)
+![Pantalla de créditos](ASSETS/INTERFACES/Creditos.png)
 
 #### Modo de juego
 En esta pantalla se presentan dos botones para elegir entre los modos de **juego local o en red**, según prefiera el jugador.  
 
-![Pantalla de modo de juego](Assets/INTERFACES/Modo_de_juego.png)
+![Pantalla de modo de juego](ASSETS/INTERFACES/Modo_de_juego.png)
 
 #### Personalizar personaje del jugador
 En esta interfaz, el jugador podrá **elegir su nombre, el color de la equipación y el personaje** que desee utilizar.  
 
-![Pantalla de selección de personaje](Assets/INTERFACES/Seleccion_de_personaje.png)
+![Pantalla de selección de personaje](ASSETS/INTERFACES/Seleccion_de_personaje.png)
 
 #### Selección de escenario
 En esta pantalla, el jugador podrá **elegir el escenario** en el que desea jugar la partida.  
 
-![Pantalla de selección de escenario](Assets/INTERFACES/Seleccion_de_escenario.png)
+![Pantalla de selección de escenario](ASSETS/INTERFACES/Seleccion_de_escenario.png)
 
 #### Pantalla de juego
 En la pantalla de juego se pueden encontrar los siguientes elementos:
 - Contador de puntos (uno para cada jugador, ubicado en su lado del campo)
-- Power-ups atrapados en el campo de cada jugador
+- *Power-ups* almacenados en el inventario de cada jugador
 - Tiempo restante de la partida
 - Botón de configuración
 
-![Pantalla de juego](Assets/INTERFACES/Partida.png)  
+![Pantalla de juego](ASSETS/INTERFACES/Partida.png)  
 
 #### Fin de partida
 En esta interfaz aparecerá el **nombre del jugador ganador**.  
 Además, habrá dos botones: uno para **buscar una nueva partida** y otro para **volver al menú inicial**.
 
-![Pantalla de fin de juego](Assets/INTERFACES/Fin_de_partida.png)  
+![Pantalla de fin de juego](ASSETS/INTERFACES/Fin_de_partida.png)  
 
 
 ### 5.5.2 Diagrama de Estados
 Este es el diagrama de estados del juego, con todas las interfaces y las diferentes interacciones entre ellas.
 
-![Diagrama de Estados](Assets/DIAGRAMAS/Diagrama%20de%20Estados.jpg)
+![Diagrama de Estados](ASSETS/DIAGRAMAS/Diagrama%20de%20Estados.jpg)
 
 
 ### 5.5.3 Personajes
-Aquí
 
+Se han diseñado diversos personajes jugables que el usuario puede seleccionar para aportar variedad y personalización a la experiencia.
+Cada uno representa un estereotipo distinto presente en la narración del videojuego, tanto en su apariencia como en su comportamiento.
+| Equilibrado y Simpático | Rápido y Competitivo | Divertido y algo Distraído|
+|-----------|--------|---------------|
+| ![Personaje A](ASSETS/PERSONAJES/personajes_a.png) | ![Personaje B](ASSETS/PERSONAJES/personajes_b.png) | ![Personaje C](ASSETS/PERSONAJES/personaje_c.png) |
 
 ### 5.5.4 Escenarios
 Para los escenarios, se han recreado **lugares típicos donde se suelen desarrollar los partidos de voleibol**.
 
 | Gimnasio | Playa | Patio trasero |
 |-----------|--------|---------------|
-| ![Gimnasio](Assets/FONDOS/GIMNASIO.png) | ![Playa](Assets/FONDOS/PLAYA.png) | ![Patio trasero](Assets/FONDOS/JARDIN.png) |
+| ![Gimnasio](ASSETS/FONDOS/GIMNASIO.png) | ![Playa](ASSETS/FONDOS/PLAYA.png) | ![Patio trasero](ASSETS/FONDOS/JARDIN.png) |
 
 
 ### 5.5.5 Elementos del juego
@@ -354,7 +366,7 @@ Para los escenarios, se han recreado **lugares típicos donde se suelen desarrol
 
 | **Velocidad** | **Ralentizar** | **Paralizado** | **Multiplicador x3** | **Multiplicador x2** |
 |:-------------:|:--------------:|:--------------:|:--------------------:|:--------------------:|
-| ![Velocidad](Assets/ITEMS/POWER%20UPS/VELOCIDAD.png) | ![Ralentizar](Assets/ITEMS/POWER%20UPS/RELENTIZAR.png) | ![Paralizado](Assets/ITEMS/POWER%20UPS/PARALIZADO.png) | ![Multiplicador x3](Assets/ITEMS/POWER%20UPS/MULTIPLICADOR%203.png) | ![Multiplicador x2](Assets/ITEMS/POWER%20UPS/MULTIPLICADOR%202.png) |
+| ![Velocidad](ASSETS/ITEMS/POWER%20UPS/VELOCIDAD.png) | ![Ralentizar](ASSETS/ITEMS/POWER%20UPS/RELENTIZAR.png) | ![Paralizado](ASSETS/ITEMS/POWER%20UPS/PARALIZADO.png) | ![Multiplicador x3](ASSETS/ITEMS/POWER%20UPS/MULTIPLICADOR%203.png) | ![Multiplicador x2](ASSETS/ITEMS/POWER%20UPS/MULTIPLICADOR%202.png) |
 | Aumenta la velocidad del jugador temporalmente. | Ralentiza al oponente durante unos segundos. | Paraliza al oponente brevemente, impidiéndole moverse. | Triplica los puntos obtenidos durante un corto tiempo. | Duplica los puntos obtenidos durante un corto tiempo. |
 
 
@@ -362,7 +374,7 @@ Para los escenarios, se han recreado **lugares típicos donde se suelen desarrol
 
 | **Pelota Normal** | **Pelota Plus** | **Pelota de Playa** |
 |:-----------------:|:---------------:|:-------------------:|
-| ![Normal](Assets/ITEMS/PELOTAS/P_NORMAL.png) | ![Plus](Assets/ITEMS/PELOTAS/P_PLUS.png) | ![Playa](Assets/ITEMS/PELOTAS/P_PLAYA.png) |
+| ![Normal](ASSETS/ITEMS/PELOTAS/P_NORMAL.png) | ![Plus](ASSETS/ITEMS/PELOTAS/P_PLUS.png) | ![Playa](ASSETS/ITEMS/PELOTAS/P_PLAYA.png) |
 
 ---
 
@@ -376,7 +388,7 @@ La canción principal es esta. Se han buscado canciones que se pudiesen repetir 
 ## 6.2 Efectos de sonido
 Los efectos sonoros son simples y dinámicos, pensados para reforzar la acción del juego.  
 Incluyen sonidos de:
-- Menu principal  ->  [Efecto de Menú Principal](https://freesound.org/people/Sunsai/sounds/415805/)  
+- Menú principal  ->  [Efecto de Menú Principal](https://freesound.org/people/Sunsai/sounds/415805/)  
 - Golpes de pelota  ->  [Efecto de Golpes de Pelota](https://freesound.org/people/16HPanskaResatko_Matej/sounds/497968/)  
 - Salto  ->  [Efecto de Salto](https://freesound.org/people/vibritherabjit123/sounds/644410/)  
 - Punto ganado  ->  [Efecto Conseguir un Punto](https://freesound.org/people/Scrampunk/sounds/345297/)  
@@ -388,7 +400,7 @@ Incluyen sonidos de:
 ## 7.1 Historia general del juego
 Cada verano se celebra un campeonato de voleibol, donde los jugadores se enfrentan en duelos 1 contra 1 para demostrar quién es el mejor en la arena.  
 El juego no tiene una narrativa compleja, su enfoque está en la diversión, la competición y la habilidad.  
-El objetivo es ganar puntos, avanzar entre los partidos y coronarse campeón del verano demostrando quien es el mejor del campeonato.
+El objetivo es ganar puntos, avanzar entre los partidos y coronarse campeón del verano demostrando quién es el mejor del campeonato.
 
 
 ## 7.2 Desarrollo de personajes
@@ -409,7 +421,7 @@ La ambientación busca transmitir la sensación de un torneo de verano casual, d
 ---
 
 # 8. Comunicación y Marketing
-El objetivo de nuestra campaña de marketing es conseguir que **Volley Clash** se vuelva popular en portales de juegos gratuitos, aprovechando la viralidad de las redes sociales y la sencillez de acceso para crear una comunidad activa de jugadores que compitan y compartan sus partidas. Se busca atraer a jugadores casuales que disfrutan de los clásicos juegos de navegador, ofreciendo partidas rápidas, competitivas y divertidas de voleibol 1 contra 1, con una estética colorida y dinámica inspirada en el modo voley del juego *Pou*.  
+El objetivo de nuestra campaña de marketing es conseguir que **Volley Clash** se vuelva popular en portales de juegos gratuitos, aprovechando la viralidad de las redes sociales y la sencillez de acceso para crear una comunidad activa de jugadores que compitan y compartan sus partidas. Se busca atraer a jugadores casuales que disfrutan de los clásicos juegos de navegador, ofreciendo partidas rápidas, competitivas y divertidas de voleibol 1 contra 1, con una estética colorida y dinámica inspirada en el modo vóley del juego *Pou*.  
 
 
 ## 8.1 Estrategia de difusión y canales
@@ -445,9 +457,29 @@ El objetivo de nuestra campaña de marketing es conseguir que **Volley Clash** s
 ---
 
 # 9. Referencias
-- Fuentes de inspiración
-- Juegos similares
-- Recursos gráficos o sonoros utilizados
+- Fuentes de inspiración:
+    - **Haikyuu!!** — Referente temático y estético de voleibol.
+    - **Pou – Modo vóley** — Referente de ritmo arcade y tono casual. 
+
+- Música y audio utilizados:
+    - Audio de terceros (con copyright):
+        - **Pou – Tema principal**  
+  **Juego:** *Pou*  
+  **Titular de derechos:** Zakeh / Paul Salameh  
+  **Fuente oficial de referencia:** YouTube – “Pou MusiX / Soundtrack” [Enlace](https://www.youtube.com/watch?v=XprZqZk87xE&list=RDXprZqZk87xE&start_radio=1https://www.youtube.com/watch?v=XprZqZk87xE&list=RDXprZqZk87xE&start_radio=1)  
+  **Licencia:** Obra con copyright. Uso en el prototipo con fines académicos internos.
+
+    - Efectos de sonido (Freesound)
+        - **Menú principal** — *Sunsai*. [Enlace](https://freesound.org/people/Sunsai/sounds/415805/) — Licencia: Attribution 4.0  
+        - **Golpe de pelota** — *16HPanskaResatko_Matej*. [Enlace](https://freesound.org/people/16HPanskaResatko_Matej/sounds/497968/) — Licencia: Creative Commons 0  
+        - **Salto** — *vibritherabjit123*. [Enlace](https://freesound.org/people/vibritherabjit123/sounds/644410/) — Creative Commons 0  
+        - **Punto ganado** — *Scrampunk*. [Enlace](https://freesound.org/people/Scrampunk/sounds/345297/) — Licencia: Attribution 4.0  
+        - **Victoria** — *shinephoenixstormcrow*. [Enlace](https://freesound.org/people/shinephoenixstormcrow/sounds/337049/) — Licencia: Attribution 3.0 
+        - **Victoria 2** — *FunWithSound*. [Enlace](https://freesound.org/people/FunWithSound/sounds/456965/) — Licencia: Creative Commons 0  
+        - **Derrota** — *martcraft*. [Enlace](https://freesound.org/people/martcraft/sounds/651626/) — Licencia: Creative Commons 0
+
+- Recursos propios del proyecto: 
+    - **Arte y UI** (logotipo, escenarios, personajes, iconos, *power-ups*): **creación original del equipo**.
 
 ---
 
