@@ -13,7 +13,7 @@ import { SelectScenario_Scene } from "./Scenes/SelectScenario_Scene.js";
 const config = {
     type: Phaser.AUTO,
     width: 800,
-    height: 600,
+    height: 450,
     parent: 'game-cointainer',
     physics: {
         default: 'arcade',
@@ -22,7 +22,7 @@ const config = {
             debug: true
         }
     },
-    scene: [Menu_Scene, Game_Scene, Configuration_Scene, Credits_Scene, EndGame_Scene, ModeGame_Scene, Pause_Scene, SelectPlayer_Scene, SelectScenario_Scene],
+    scene: [/*Menu_Scene, Game_Scene, Configuration_Scene, Credits_Scene, EndGame_Scene, Pause_Scene,*/ ModeGame_Scene, SelectPlayer_Scene, SelectScenario_Scene],
     backgroundColor:'#8675f1',
 }
 
