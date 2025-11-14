@@ -17,17 +17,16 @@ export class SelectScenario_Scene extends Phaser.Scene {
     }
 
     create() {
-        this.add.text(250, 50, 'Selecciona Escenario', { fontSize: '28px'});
+        this.add.text(230, 10, 'Selecciona Escenario', { fontSize: '28px'});
 
         // Imagen del escenario seleccionado
-        this.selectedImage = this.add.image(300, 120, 'gym').setScale(0.5);
+        this.selectedImage = this.add.image(400, 180, 'gym').setScale(1.2);
 
         // Escenarios
         const escenarios = ['gym', 'playa', 'jardin'];
-        this.selectedScenario = 'gym';
 
         escenarios.forEach((nombre, i) => {
-            const boton = this.add.sprite(150 + i * 150, 250, 'botonSinSeleccionar').setInteractive().setScale(0.8);
+            const boton = this.add.image(190 + i * 200, 330, 'botonSinSeleccionar').setInteractive().setScale(0.6);
             const texto = this.add.text(0, 0, `Escenario ${i + 1}`, { fontSize: '16px', color: '#000' });
             Phaser.Display.Align.In.Center(texto, boton);
 
@@ -37,26 +36,26 @@ export class SelectScenario_Scene extends Phaser.Scene {
                     boton.setTexture('botonSinSeleccionar');
                 }
             });
-
             boton.on('pointerdown', () => {
                 this.selectedScenario = nombre;
                 this.selectedImage.setTexture(nombre);
             });
-
+            boton.on('pointerup', () => boton.setTexture('botonSinSeleccionar'));
             boton.setName(`boton${i}`);
         });
 
         // Boton Siguiente
-        const nextButton = this.add.sprite(300, 400, 'botonSinSeleccionar').setInteractive().setScale(0.8);
-        const nextText = this.add.text(0, 0, 'Siguiente', { fontSize: '20px', color: '#000' });
+        const nextButton = this.add.image(700, 420, 'botonSinSeleccionar').setInteractive().setScale(0.4);
+        const nextText = this.add.text(0, 0, 'Siguiente', { fontSize: '10px', color: '#000' });
         Phaser.Display.Align.In.Center(nextText, nextButton);
 
         nextButton.on('pointerover', () => nextButton.setTexture('botonSeleccionado'));
         nextButton.on('pointerout', () => nextButton.setTexture('botonSinSeleccionar'));
-        nextButton.on('pointerdown', () => this.scene.start('ModeGame_Scene'));
-
+        nextButton.on('pointerdown', () => nextButton.setTexture('botonSeleccionado'));
+        nextButton.on('pointerup', () => this.scene.start('ModeGame_Scene'));
+        
         // Boton Volver
-        const backButton = this.add.sprite(50, 550, 'botonVolver').setInteractive().setScale(0.5);
+        const backButton = this.add.image(30, 420, 'botonVolver').setInteractive().setScale(0.1);
         backButton.on('pointerdown', () => this.scene.start('SelecPlayer_Scene'));
     }
 }

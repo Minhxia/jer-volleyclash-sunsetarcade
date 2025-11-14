@@ -17,22 +17,18 @@ export class SelectPlayer_Scene extends Phaser.Scene {
     }
 
     create() {
-        this.add.text(100, 50, 'Personaje', { fontSize: '24px', color: '#ffffff' });
+        this.add.text(120, 60, 'Personaje', { fontSize: '24px'});
 
         // Imagen del personaje
         this.selectedCharacter = 'personajeA';
-        this.characterImage = this.add.image(400, 100, this.selectedCharacter).setScale(1.5);
-
-        // Entrada de nombre
-        this.add.text(100, 120, 'Intruduce tu Nombre de Usuario:', { fontSize: '18px', color: '#ffffff' });
-        const nameInput = this.add.dom(100, 150).createFromHTML('<input type="text" name="nombre" placeholder="Nombre jugador" style="font-size:16px; padding:5px;">');
+        this.characterImage = this.add.image(180, 240, this.selectedCharacter).setScale(1.2);
 
         // Seleccion de personaje pequeño
-        this.add.text(100, 250, 'Selecciona Personaje:', { fontSize: '16px', color: '#ffffff' });
+        this.add.text(500, 150, 'Selecciona Personaje:', { fontSize: '16px', color: '#ffffff' });
 
         const personajes = ['personajeA', 'personajeB', 'personajeC'];
         personajes.forEach((nombre, i) => {
-            const boton = this.add.sprite(150 + i * 150, 300, nombre).setInteractive().setScale(0.5);
+            const boton = this.add.image(500 + i * 100, 250, nombre).setInteractive().setScale(0.5);
 
             boton.on('pointerdown', () => {
                 this.selectedCharacter = nombre;
@@ -41,16 +37,17 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         });
 
         // Boton Siguiente
-        const nextButton = this.add.sprite(600, 400, 'botonSinSeleccionar').setInteractive().setScale(0.8);
-        const nextText = this.add.text(0, 0, 'Siguiente', { fontSize: '20px', color: '#000' });
+        const nextButton = this.add.image(700, 420, 'botonSinSeleccionar').setInteractive().setScale(0.4);
+        const nextText = this.add.text(0, 0, 'Siguiente', { fontSize: '10px', color: '#000' });
         Phaser.Display.Align.In.Center(nextText, nextButton);
 
         nextButton.on('pointerover', () => nextButton.setTexture('botonSeleccionado'));
         nextButton.on('pointerout', () => nextButton.setTexture('botonSinSeleccionar'));
-        nextButton.on('pointerdown', () => this.scene.start('SelectScenario_Scene'));
+        nextButton.on('pointerdown', () => nextButton.setTexture('botonSeleccionado'));
+        nextButton.on('pointerup', () => this.scene.start('SelectScenario_Scene'));
 
         // Boton Volver
-        const backButton = this.add.sprite(50, 550, 'botonVolver').setInteractive().setScale(0.5);
+        const backButton = this.add.image(30, 420, 'botonVolver').setInteractive().setScale(0.1);
         backButton.on('pointerdown', () => this.scene.start('ModeGame_Scene'));
     }
 }
