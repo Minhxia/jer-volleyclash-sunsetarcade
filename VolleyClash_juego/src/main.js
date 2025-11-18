@@ -1,4 +1,4 @@
-// Aqui va la base del juego para la estructura y tener acceso a todos los archivos
+// Base del juego para la estructura y tener acceso a todos los archivos
 import Phaser from "phaser";
 import { Menu_Scene } from "./Scenes/Menu_Scene.js";
 import { Game_Scene } from "./Scenes/Game_Scene.js";
@@ -22,6 +22,7 @@ const config = {
             debug: true
         }
     },
+    // Phaser arranca automáticamente la primera escena en el array (menú de inicio)
     scene: [Menu_Scene, Game_Scene,Configuration_Scene, Credits_Scene, EndGame_Scene, ModeGame_Scene,Pause_Scene, SelectPlayer_Scene, SelectScenario_Scene],
     backgroundColor:'#8675f1',
 }
