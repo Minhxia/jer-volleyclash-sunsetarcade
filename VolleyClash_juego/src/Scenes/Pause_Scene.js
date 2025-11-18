@@ -2,11 +2,11 @@
 import Phaser from 'phaser';
 
 export class Pause_Scene extends Phaser.Scene {
-    constructor (){
+    constructor() {
         super('Pause_Scene');
     }
 
-    create(){ 
+    create() { 
 
     }
 }

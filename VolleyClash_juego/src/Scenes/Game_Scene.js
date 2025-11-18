@@ -2,11 +2,11 @@
 import Phaser from 'phaser';
 
 export class Game_Scene extends Phaser.Scene {
-    constructor (){
+    constructor() {
         super('Game_Scene');
     }
 
-    create(){ 
+    create() { 
 
     }
 }

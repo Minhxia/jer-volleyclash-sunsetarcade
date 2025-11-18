@@ -2,14 +2,13 @@
 import Phaser from 'phaser';
 
 export class Menu_Scene extends Phaser.Scene {
-    constructor (){
+    constructor() {
         super('Menu_Scene');
     }
 
     preload() {
         // sprite del botón (de momento, se usa el mismo para todos)
-        this.load.image('baseButton', 'assets_temp/ui/boton_generico.png')
-
+        this.load.image('baseButton', 'assets_temp/ui/boton_generico.png');
     }
 
     create() {

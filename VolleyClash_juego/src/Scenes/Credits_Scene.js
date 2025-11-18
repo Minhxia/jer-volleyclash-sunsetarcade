@@ -2,11 +2,11 @@
 import Phaser from 'phaser';
 
 export class Credits_Scene extends Phaser.Scene {
-    constructor (){
+    constructor() {
         super('MenuScene');
     }
 
-    create(){ 
+    create() { 
 
     }
 }

@@ -11,9 +11,17 @@ module.exports = {
   mode: 'development',
   devtool: 'inline-source-map',
   devServer: {
-    static: './dist',
+    static: { directory: path.join(__dirname, 'public') },
     hot: true,
-    port: 8080
+    port: 8080,
+
+    proxy: [
+      {
+        context: ['/api', '/socket.io'],
+        target: 'http://localhost:3000',
+        ws: true
+      }
+    ]
   },
   externals: {
     phaser: 'Phaser'
