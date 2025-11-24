@@ -22,6 +22,9 @@ const config = {
             debug: true
         }
     },
+    dom: {
+        createContainer: true
+    },
     scene: [/*Menu_Scene, Game_Scene, Configuration_Scene, Credits_Scene, EndGame_Scene, Pause_Scene,*/ ModeGame_Scene, SelectPlayer_Scene, SelectScenario_Scene],
     backgroundColor:'#8675f1',
 }

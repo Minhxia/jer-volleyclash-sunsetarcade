@@ -13,7 +13,8 @@ module.exports = {
   devServer: {
     static: { directory: path.join(__dirname, 'public') },
     hot: true,
-    port: 8080,
+    open: true,
+    port: 3000,
 
     proxy: [
       {
