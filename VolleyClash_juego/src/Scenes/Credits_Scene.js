@@ -1,12 +1,61 @@
-//Pantalla de Creditos
+// Pantalla de Créditos
 import Phaser from 'phaser';
 
 export class Credits_Scene extends Phaser.Scene {
     constructor() {
-        super('MenuScene');
+        super('Credits_Scene');
     }
 
-    create() { 
+    preload() {
+        this.load.image('botonVolver', 'ASSETS/UI/BOTONES/VOLVER.png');
+    }
 
+    create() {
+        // posiciones base para los botones del menú
+        // (así se puede cambiar el tamaño sin problemas)
+        const { width, height } = this.scale;
+        const centerX = width / 2;
+
+        // TODO: cambiar por una imagen?
+        // título de la escena de créditos
+        this.add.text(centerX, 80, 'Créditos', {
+            fontSize: '32px',
+            color: '#ffffff'
+        }).setOrigin(0.5);
+
+        // TODO: ponerlo más bonito
+        // miembros del equipo
+        const nombresEquipo = [
+            'GRUPO 5 - SUNSET ARCADE',
+            'Sara Bueno Esteban',
+            'Antonio Morán Barrera',
+            'Cristine Nioka Tewo',
+            'Álvaro Ibáñez Montero'
+        ];
+        // se muestran los nombres centrados
+        const inicioY = 150;
+        const separacion = 30;
+
+        nombresEquipo.forEach((nombre, index) => {
+            this.add.text(centerX, inicioY + index * separacion, nombre, {
+                fontSize: '20px',
+                color: '#ffffff'
+            }).setOrigin(0.5);
+        });
+
+        //// BOTÓN VOLVER ////
+        // arriba a la izquierda
+        const backX = width * 0.06;
+        const backY = height * 0.08;
+
+        const backButton = this.add
+            .sprite(backX, backY, 'botonVolver')
+            .setScale(0.1)
+            .setInteractive({ useHandCursor: true });
+
+        backButton.on('pointerdown', () => {
+            // vuelve al menú principal
+            this.scene.start('Menu_Scene');
+        });
     }
 }
