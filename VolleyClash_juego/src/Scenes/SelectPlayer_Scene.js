@@ -11,9 +11,9 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_SIN_SELECCIONAR.png');
         this.load.image('botonVolver', 'ASSETS/UI/BOTONES/VOLVER.png');
 
-        this.load.image('personajeA', '/ASSETS/PERSONAJES/personajes_a.png');
-        this.load.image('personajeB', '/ASSETS/PERSONAJES/personajes_b.png');
-        this.load.image('personajeC', 'ASSETS/PERSONAJES/personaje_c.png');
+        this.load.image('personajeA', 'ASSETS/PERSONAJES/PERSONAJES_POSE/personajes_a.png');
+        this.load.image('personajeB', '/ASSETS/PERSONAJES/PERSONAJES_POSE/personajes_b.png');
+        this.load.image('personajeC', 'ASSETS/PERSONAJES/PERSONAJES_POSE/personaje_c.png');
     }
 
     create() {
