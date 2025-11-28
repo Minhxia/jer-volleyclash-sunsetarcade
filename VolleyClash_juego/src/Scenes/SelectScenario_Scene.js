@@ -16,6 +16,11 @@ export class SelectScenario_Scene extends Phaser.Scene {
         this.load.image('jardin', 'ASSETS/FONDOS/JARDIN.png')
     }
 
+    init(data) {
+        this.playerName = data.playerName;
+        this.selectedCharacter = data.character;
+    }
+
     create() {
         this.add.text(230, 10, 'Selecciona Escenario', { fontSize: '28px'});
 

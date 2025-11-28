@@ -11,30 +11,41 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_SIN_SELECCIONAR.png');
         this.load.image('botonVolver', 'ASSETS/UI/BOTONES/VOLVER.png');
 
-        this.load.image('personajeA', '/ASSETS/PERSONAJES/personajes_a.png');
-        this.load.image('personajeB', '/ASSETS/PERSONAJES/personajes_b.png');
-        this.load.image('personajeC', 'ASSETS/PERSONAJES/personaje_c.png');
+        this.load.image('personajeA', 'ASSETS/PERSONAJES/PERSONAJES_POSE/personajes_a.png');
+        this.load.image('personajeB', '/ASSETS/PERSONAJES/PERSONAJES_POSE/personajes_b.png');
+        this.load.image('personajeC', 'ASSETS/PERSONAJES/PERSONAJES_POSE/personaje_c.png');
     }
 
     create() {
-        this.add.text(120, 60, 'Personaje', { fontSize: '24px'});
+        // Texto del personaje
+        this.add.text(160, 60, 'Personaje', { fontSize: '24px'});
 
         // Imagen del personaje
         this.selectedCharacter = 'personajeA';
-        this.characterImage = this.add.image(180, 240, this.selectedCharacter).setScale(1.2);
+        this.characterImage = this.add.image(220, 240, this.selectedCharacter).setScale(1.2);
 
         // Seleccion de personaje pequeño
-        this.add.text(500, 150, 'Selecciona Personaje:', { fontSize: '16px', color: '#ffffff' });
+        this.add.text(480, 210, 'Selecciona Personaje:', { fontSize: '16px', color: '#ffffff' });
 
         const personajes = ['personajeA', 'personajeB', 'personajeC'];
         personajes.forEach((nombre, i) => {
-            const boton = this.add.image(500 + i * 100, 250, nombre).setInteractive().setScale(0.5);
+            const boton = this.add.image(480 + i * 100, 310, nombre).setInteractive().setScale(0.5);
 
             boton.on('pointerdown', () => {
                 this.selectedCharacter = nombre;
                 this.characterImage.setTexture(nombre);
             });
         });
+
+        // Texto de usuario
+        this.add.text(480, 60, 'Introduce tu Nombre:', { fontSize: '16px'});
+
+        // Nombre de usuario
+        this.nameInput = this.add.dom(575, 120).createFromHTML(`
+            <input type="text" id="playerName" 
+                placeholder="Introduce tu nombre" 
+                style="width: 180px; padding: 5px; font-size: 16px; border-radius: 5px;">
+        `);
 
         // Boton Siguiente
         const nextButton = this.add.image(700, 420, 'botonSinSeleccionar').setInteractive().setScale(0.4);
@@ -44,7 +55,15 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         nextButton.on('pointerover', () => nextButton.setTexture('botonSeleccionado'));
         nextButton.on('pointerout', () => nextButton.setTexture('botonSinSeleccionar'));
         nextButton.on('pointerdown', () => nextButton.setTexture('botonSeleccionado'));
-        nextButton.on('pointerup', () => this.scene.start('SelectScenario_Scene'));
+        nextButton.on('pointerup', () => {
+            const nombre = this.nameInput.node.querySelector('input').value;
+            console.log("Nombre de usuario:", nombre);
+
+            this.scene.start('SelectScenario_Scene', { 
+                playerName: nombre,
+                character: this.selectedCharacter
+            });
+        });
 
         // Boton Volver
         const backButton = this.add.image(30, 420, 'botonVolver').setInteractive().setScale(0.1);
