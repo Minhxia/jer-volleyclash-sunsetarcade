@@ -11,28 +11,42 @@ export class SelectScenario_Scene extends Phaser.Scene {
         this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_SIN_SELECCIONAR.png');
         this.load.image('botonVolver', 'ASSETS/UI/BOTONES/VOLVER.png');
 
-        this.load.image('gym', 'ASSETS/FONDOS/GIMNASIO.png');
-        this.load.image('playa', 'ASSETS/FONDOS/PLAYA.png')
-        this.load.image('jardin', 'ASSETS/FONDOS/JARDIN.png')
+        this.load.image('Gym', 'ASSETS/FONDOS/GIMNASIO.png');
+        this.load.image('Playa', 'ASSETS/FONDOS/PLAYA.png')
+        this.load.image('Jardin', 'ASSETS/FONDOS/JARDIN.png')
     }
 
     init(data) {
-        this.playerName = data.playerName;
-        this.selectedCharacter = data.character;
+        this.player1 = data.player1;
+        this.player2 = data.player2;
     }
 
     create() {
-        this.add.text(230, 10, 'Selecciona Escenario', { fontSize: '28px'});
+        const { width, height } = this.scale;
+
+        // Titulo
+        this.add.text(width/2, 50, 'Selecciona Escenario', {
+            fontSize: '40px',
+            color: '#000',
+            fontStyle: 'bold'
+        }).setOrigin(0.5);
 
         // Imagen del escenario seleccionado
-        this.selectedImage = this.add.image(400, 180, 'gym').setScale(1.2);
+        this.selectedScenario = 'Gym'; // Gym por defecto
+        this.selectedImage = this.add.image(width/2, 240, this.selectedScenario).setScale(0.5);
 
         // Escenarios
-        const escenarios = ['gym', 'playa', 'jardin'];
+        const escenarios = ['Gym', 'Playa', 'Jardin'];
+        const spacing = 200; // espacio entre botones
+        const startX = width / 2 - spacing;
 
         escenarios.forEach((nombre, i) => {
-            const boton = this.add.image(190 + i * 200, 330, 'botonSinSeleccionar').setInteractive().setScale(0.6);
-            const texto = this.add.text(0, 0, `Escenario ${i + 1}`, { fontSize: '16px', color: '#000' });
+            const boton = this.add.image(startX + i * spacing, 440, 'botonSinSeleccionar')
+                .setInteractive()
+                .setScale(0.6);
+
+            // Texto con el nombre del escenario
+            const texto = this.add.text(0, 0, nombre, { fontSize: '24px', color: '#000' });
             Phaser.Display.Align.In.Center(texto, boton);
 
             boton.on('pointerover', () => boton.setTexture('botonSeleccionado'));
@@ -43,24 +57,41 @@ export class SelectScenario_Scene extends Phaser.Scene {
             });
             boton.on('pointerdown', () => {
                 this.selectedScenario = nombre;
-                this.selectedImage.setTexture(nombre);
+                this.selectedImage.setTexture(nombre).setScale(0.5);
             });
             boton.on('pointerup', () => boton.setTexture('botonSinSeleccionar'));
-            boton.setName(`boton${i}`);
         });
 
         // Boton Siguiente
-        const nextButton = this.add.image(700, 420, 'botonSinSeleccionar').setInteractive().setScale(0.4);
-        const nextText = this.add.text(0, 0, 'Siguiente', { fontSize: '10px', color: '#000' });
+        const nextButton = this.add.image(width/2, 500, 'botonSinSeleccionar')
+            .setInteractive()
+            .setScale(0.4);
+        const nextText = this.add.text(0, 0, 'Siguiente', { fontSize: '12px', color: '#000' });
         Phaser.Display.Align.In.Center(nextText, nextButton);
 
         nextButton.on('pointerover', () => nextButton.setTexture('botonSeleccionado'));
         nextButton.on('pointerout', () => nextButton.setTexture('botonSinSeleccionar'));
         nextButton.on('pointerdown', () => nextButton.setTexture('botonSeleccionado'));
-        nextButton.on('pointerup', () => this.scene.start('ModeGame_Scene'));
+        nextButton.on('pointerup', () => {
+            // Pasar todos los datos a la siguiente escena
+            this.scene.start('Game_Scene', {
+                player1: this.player1,
+                player2: this.player2,
+                selectedScenario: this.selectedScenario
+            });
+        });
         
         // Boton Volver
-        const backButton = this.add.image(30, 420, 'botonVolver').setInteractive().setScale(0.1);
-        backButton.on('pointerdown', () => this.scene.start('SelecPlayer_Scene'));
+        const backX = width * 0.06;
+        const backY = height * 0.08;
+
+        const backButton = this.add
+            .sprite(backX, backY, 'botonVolver')
+            .setScale(0.1)
+            .setInteractive({ useHandCursor: true });
+
+        backButton.on('pointerdown', () => {
+            this.scene.start('SelecPlayer_Scene');
+        });
     }
 }
