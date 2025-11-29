@@ -12,8 +12,8 @@ import { SelectScenario_Scene } from "./Scenes/SelectScenario_Scene.js";
 
 const config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 450,
+    width: 960,
+    height: 540,
     parent: 'game-cointainer',
     physics: {
         default: 'arcade',
