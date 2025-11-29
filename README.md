@@ -4,6 +4,7 @@
 
 El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 2 de ventaja para ganar el set, en un partido a **3 sets**, controlando el salto, golpeo y posición del personaje con una jugabilidad sencilla pero desafiante.  
 
+
 ## Información del Equipo
 
 **Número de Grupo:** 5   
