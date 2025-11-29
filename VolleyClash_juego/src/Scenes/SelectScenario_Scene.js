@@ -57,7 +57,7 @@ export class SelectScenario_Scene extends Phaser.Scene {
         nextButton.on('pointerover', () => nextButton.setTexture('botonSeleccionado'));
         nextButton.on('pointerout', () => nextButton.setTexture('botonSinSeleccionar'));
         nextButton.on('pointerdown', () => nextButton.setTexture('botonSeleccionado'));
-        nextButton.on('pointerup', () => this.scene.start('ModeGame_Scene'));
+        nextButton.on('pointerup', () => this.scene.start('Game_Scene'));
         
         // Boton Volver
         const backButton = this.add.image(30, 420, 'botonVolver').setInteractive().setScale(0.1);
