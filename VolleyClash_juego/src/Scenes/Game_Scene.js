@@ -21,7 +21,7 @@ export class Game_Scene extends Phaser.Scene {
         this.player1 = data.player1;
         this.player2 = data.player2;
         this.selectedScenario = data.selectedScenario;
-        this.ball = null; // Will be initialized in create()
+        this.ball = null;
     }
 
     preload() {
@@ -157,11 +157,11 @@ export class Game_Scene extends Phaser.Scene {
             }
         });
 
-        // Ball initialization
+        // inicialización de la pelota
         this._createBall();
-        // Ball collision handlers
+        // colliders de la pelota
         this._setupBallCollisions();
-        // Ball event listeners
+        // eventos de la pelota
         this._setupBallEvents();
     }
 
@@ -173,11 +173,11 @@ export class Game_Scene extends Phaser.Scene {
         // se actualiza el estado de la pelota
         if (this.ball) {
             this.ball.update();
-            // Check if ball hits ground (near bottom of screen)
+            // Verificar si la pelota golpea el suelo (cerca del fondo de la pantalla)
             if (this.ball.isBallLive && this.ball.sprite.y > this.worldHeight - 30) {
                 this.ball.onGrounded();
             }
-            // Check if ball crosses net (net is at x = 480)
+            // Verificar si la pelota cruza la red (red está en x = 480)
             if (this.ball.sprite.x < 475 && this.ball.courtSide === 'right') {
                 this.ball.crossNet();
             } else if (this.ball.sprite.x > 485 && this.ball.courtSide === 'left') {
@@ -522,7 +522,7 @@ export class Game_Scene extends Phaser.Scene {
 
     // Configura las colisiones de la pelota
     _setupBallCollisions() {
-        // Ball collisions with players
+        // colisiones de la pelota con los jugadores
         this.players.forEach(player => {
             this.physics.add.overlap(
                 this.ball.sprite,
@@ -533,19 +533,17 @@ export class Game_Scene extends Phaser.Scene {
             );
         });
 
-        // Ball collision with ground (triggers scoring)
+        // colisión de la pelota con el suelo (dispara puntuación)
         const groundY = this.worldHeight - 10;
         this.ball.sprite.setCollideWorldBounds(true);
         this.ball.sprite.setBounce(0.8);
-
-        // Check ground collision in update loop (see below)
     }
 
     // Configura los event listeners de la pelota
     _setupBallEvents() {
         this.events.on('rallyConcluded', (data) => {
             console.log(`Rally concluded: ${data.scoringPlayerId} scores!`);
-            // TODO: Update score, trigger serve, play sound effects
+            // TODO: Actualizar puntuación, disparar saque, reproducir efectos de sonido
         });
     }
 

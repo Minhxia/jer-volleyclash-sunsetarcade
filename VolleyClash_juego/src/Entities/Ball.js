@@ -1,37 +1,30 @@
 export class Ball {
     constructor(scene, x, y) {
         this.scene = scene;
-        this.players = null; // Set by Game_Scene
-        this.commandProcessor = null; // Set by Game_Scene
+        this.players = null;
+        this.commandProcessor = null;
 
-        // Phaser physics sprite
         this.sprite = scene.physics.add.sprite(x, y, 'ball');
         this.sprite.setScale(0.5);
         this.sprite.setBounce(0.8);
         this.sprite.setCollideWorldBounds(true);
         this.sprite.setData('ball', this);
 
-        // Rally state tracking
-        this.lastTouchedBy = null; // player ID: 'player1' or 'player2'
-        this.touchCount = 0; // touches in current rally for current court side
-        this.courtSide = 'left'; // which side the ball is currently on
+        // seguimiento del estado del rally
+        this.lastTouchedBy = null;      // id del jugador ('player1' o 'player2')
+        this.touchCount = 0;            // toques en el rally actual por lado de la cancha
+        this.courtSide = 'left';        // lado de la cancha donde está la pelota
         this.isBallLive = true;
 
-        // Net position (hardcoded for 960px width)
+        // posición de la red (hardcodeado para ancho de 960px)
         this.netX = 480;
     }
 
-    /**
-     * Called when a player hits the ball
-     * @param {Object} player - The player who hit the ball
-     * @param {string} playerFacingDirection - 'left' or 'right'
-     * @param {boolean} isJumping - Whether player was airborne
-     * @param {boolean} isReceiving - Whether player is in receiving state
-     */
+    // Se llama cuando un jugador golpea la pelota
     hit(player, playerFacingDirection, isJumping, isReceiving = false) {
         if (!this.isBallLive) return;
 
-        // Increment touch count if same player continues, reset if different player
+        // se incrementa el contador de toques si el mismo jugador continúa, se reinicia si es el otro
         if (this.lastTouchedBy === player.id) {
             this.touchCount++;
         } else {
@@ -39,21 +32,21 @@ export class Ball {
             this.lastTouchedBy = player.id;
         }
 
-        // Check if touch count exceeded (3 touches per court side)
+        // se verifica si se ha excedido el límite de toques (3 toques por lado de cancha)
         if (this.touchCount > 3) {
-            // Falta: too many touches
+            // Falta: demasiados toques
             this.onFalta('toqueExcedido', player);
             return;
         }
 
-        // Calculate ball velocity based on player direction and jump/receive state
+        // se calcula velocidad de la pelota según la dirección del jugador y si está saltando/recibiendo
         let velocityX, velocityY;
 
         if (isReceiving) {
-            // Receiving: long and wide parabola (defensive trajectory)
-            // Lower horizontal speed, higher vertical speed for arc
+            // Recepción: parábola larga y ancha (trayectoria defensiva)
+            // Menor velocidad horizontal, mayor velocidad vertical para el arco
             const baseSpeedX = 180;
-            const verticalStrength = -350; // Higher vertical component for arc
+            const verticalStrength = -350; // componente vertical mayor para el arco
 
             if (playerFacingDirection === 'left') {
                 velocityX = -baseSpeedX;
@@ -62,10 +55,10 @@ export class Ball {
             }
             velocityY = verticalStrength;
         } else if (isJumping) {
-            // Jumping/Attack: strong horizontal, weak vertical (spike/smash)
-            // High horizontal speed, low vertical speed for flat trajectory
+            // Salto/Ataque: horizontal fuerte, vertical débil (remate/smash)
+            // Alta velocidad horizontal, baja velocidad vertical para trayectoria plana
             const baseSpeedX = 300;
-            const verticalStrength = -150; // Low vertical component for flat attack
+            const verticalStrength = -150; // componente vertical bajo para ataque plano
 
             if (playerFacingDirection === 'left') {
                 velocityX = -baseSpeedX;
@@ -74,7 +67,7 @@ export class Ball {
             }
             velocityY = verticalStrength;
         } else {
-            // Regular ground hit
+            // golpe regular desde el suelo
             const baseSpeedX = 200;
 
             if (playerFacingDirection === 'left') {
@@ -87,7 +80,7 @@ export class Ball {
 
         this.sprite.setVelocity(velocityX, velocityY);
 
-        // Update court side based on velocity direction
+        // se actualizar el lado de la cancha según la dirección de la velocidad
         if (velocityX > 0) {
             this.courtSide = 'right';
         } else if (velocityX < 0) {
@@ -95,61 +88,50 @@ export class Ball {
         }
     }
 
-    /**
-     * Called when ball crosses the net
-     */
+    // Se llama cuando la pelota cruza la red
     crossNet() {
-        // Reset touch count for new court side
+        // se reinicia el contador de toques para el nuevo lado de cancha
         this.touchCount = 0;
         this.lastTouchedBy = null;
 
-        // Swap court side
+        // se cambia de lado de cancha
         this.courtSide = this.courtSide === 'left' ? 'right' : 'left';
     }
 
-    /**
-     * Called when ball touches the ground
-     */
+    // Se llama cuando la pelota toca el suelo
     onGrounded() {
         if (!this.isBallLive) return;
 
-        // Determine which court side the ball is on
+        // se determina en qué lado de la cancha está la pelota
         const ballOnLeft = this.sprite.x < this.netX;
         const ballOnRight = this.sprite.x > this.netX;
 
-        // If ball is on court, that player loses the rally
+        // si la pelota está en la cancha, ese jugador pierde el rally
         if (ballOnLeft) {
-            this.onRallyEnd('player2'); // player2 scores
+            this.onRallyEnd('player2'); // player2 anota
         } else if (ballOnRight) {
-            this.onRallyEnd('player1'); // player1 scores
+            this.onRallyEnd('player1'); // player1 anota
         }
 
         this.resetRally();
     }
 
-    /**
-     * Called when a falta occurs (too many touches, ball out of bounds, etc.)
-     * @param {string} faltaType - Type of fault ('toqueExcedido', 'outOfBounds', etc.)
-     * @param {Object} faltingPlayer - The player who committed the falta
-     */
+    // Se llama cuando ocurre una falta (demasiados toques, pelota fuera de límites, etc.)
     onFalta(faltaType, faltingPlayer) {
         if (!this.isBallLive) return;
 
-        // Determine scoring player (opposite of faulting player)
+        // se determinar el jugador que anota (opuesto al que cometió falta)
         const scoringPlayerId = faltingPlayer.id === 'player1' ? 'player2' : 'player1';
 
         this.onRallyEnd(scoringPlayerId);
         this.resetRally();
     }
 
-    /**
-     * Called when a rally ends (someone scores)
-     * @param {string} scoringPlayerId - ID of player who scores
-     */
+    // Se llama cuando finaliza un rally (alguien anota)
     onRallyEnd(scoringPlayerId) {
         this.isBallLive = false;
 
-        // Emit event for Game_Scene to handle scoring
+        // se lanza un evento para que Game_Scene maneje la puntuación
         this.scene.events.emit('rallyConcluded', {
             scoringPlayerId: scoringPlayerId,
             touchCount: this.touchCount,
@@ -157,27 +139,23 @@ export class Ball {
         });
     }
 
-    /**
-     * Reset rally state and reposition ball for serve
-     */
+    // Reinicia el estado del rally y reposiciona la pelota para el saque
     resetRally() {
         this.isBallLive = true;
         this.lastTouchedBy = null;
         this.touchCount = 0;
-        this.courtSide = 'left'; // Default to left for next serve
+        this.courtSide = 'left'; // por defecto, a la izquierda para el próximo saque
 
-        // Reposition ball to center court, slightly above ground
+        // se reposiciona la pelota al centro de la cancha, ligeramente sobre el suelo
         this.sprite.setPosition(this.netX, 100);
         this.sprite.setVelocity(0, 0);
     }
 
-    /**
-     * Update ball state each frame (track court side based on position)
-     */
+    // Actualiza el estado de la pelota cada frame (se rastrea el lado de la cancha según la posición)
     update() {
         if (!this.isBallLive) return;
 
-        // Update court side based on current position
+        // se actualiza el lado de cancha según posición actual
         if (this.sprite.x < this.netX - 20) {
             this.courtSide = 'left';
         } else if (this.sprite.x > this.netX + 20) {
