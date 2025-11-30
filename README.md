@@ -129,8 +129,8 @@ La versión inicial se centra en:
 - ***Power-ups*** **aleatorios** que alteran la dinámica del juego (velocidad, parálisis, puntos extra).  
 - **Estética pixel-art** minimalista y colorida.  
 - **Controles simples y responsivos**:  
-  - Jugador 1 → *<kbd>A</kbd>/<kbd>D</kbd>/<kbd>W</kbd>/<kbd>S</kbd>*  
-  - Jugador 2 → *<kbd>J</kbd>/<kbd>L</kbd>/<kbd>I</kbd>/<kbd>K</kbd>*  
+  - Jugador 1 → *<kbd>A</kbd>/<kbd>D</kbd>/<kbd>W</kbd>/<kbd>S</kbd>/<kbd>E</kbd>*  
+  - Jugador 2 → *<kbd>J</kbd>/<kbd>L</kbd>/<kbd>I</kbd>/<kbd>K</kbd>/<kbd>O</kbd>*  
 - **Mecánica física arcade**: gravedad constante y rebotes en los límites de la pantalla.  
 - **Interfaz intuitiva**: menú principal, lobby, partida y pantalla de fin de juego.  
 - **Modo local y online**, con sincronización en red mediante **API REST + WebSockets**.
@@ -177,12 +177,14 @@ Vencer al rival ganando 2 sets (es decir, al mejor de 3). Cada set finaliza cuan
 - **Jugador 1:** corresponde al jugador situado a la izquierda de la red.
     - <kbd>A</kbd>/<kbd>D</kbd> para moverse hacia la izquierda y hacia la derecha, respectivamente.
     - <kbd>W</kbd> para saltar.
-    - <kbd>S</kbd> para activar un *power-up*.
+    - <kbd>S</kbd> para recibir la pelota.
+    - <kbd>E</kbd> para activar un *power-up*.
     
 - **Jugador 2:** corresponde al jugador situado a la derecha de la red.
     - <kbd>J</kbd>/<kbd>L</kbd> para moverse hacia la izquierda y hacia la derecha, respectivamente.
     - <kbd>I</kbd> para saltar.
-    - <kbd>K</kbd> para activar un *power-up*.
+    - <kbd>K</kbd> para recibir la pelota.
+    - <kbd>O</kbd> para activar un *power-up*.
 
 
 ## 4.3 Mecánicas
@@ -219,7 +221,7 @@ Durante el partido, los *power-ups* aparecen de forma **aleatoria** en zonas vá
   - **Paralizar** al rival durante un breve intervalo.
   - **Multiplicar** la puntuación (**x2/x3**).
 
-- **Frecuencia de aparición:** **cada 10–20 segundos** en función de la duración del partido, siempre que haya **menos de 2** *power-ups* en pantalla.
+- **Frecuencia de aparición:** **cada 2–5 segundos** en función de la duración del partido, siempre que haya **menos de 2** *power-ups* en pantalla.
 
 - **Duración y aplicación:** 
     - Cada efecto dura **10 segundos** desde su activación
