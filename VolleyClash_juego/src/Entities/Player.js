@@ -8,8 +8,8 @@ export class Player {
         this.characterType = characterType; // indica qué personaje se ha elegido
 
         // TODO: ajustar los valores
-        this.moveSpeed = 300;   // velocidad de movimiento (horizontal)
-        this.jumpSpeed = 550;   // fuerza de salto
+        this.moveSpeed = 150;   // velocidad de movimiento (horizontal)
+        this.jumpSpeed = 150;   // fuerza de salto
 
         this.activePowerUps = {};   // PowerUps activos
 
@@ -17,10 +17,11 @@ export class Player {
         // configuración de los sprites y las animaciones según el personaje elegido
         const CHARACTER_CONFIG = {
             // equilibrado y simpático
-            personajeA: {
+            characterA: {
                 textureKey: 'charA_move',
                 startFrame: 0,
-                idleAnim: 'charA_idle',
+                idleLeftAnim: 'charA_idleLeft',
+                idleRightAnim: 'charA_idleRight',
                 runLeftAnim: 'charA_runLeft',
                 runRightAnim: 'charA_runRight',
                 jumpLeftAnim: 'charA_jumpLeft',
@@ -29,10 +30,11 @@ export class Player {
                 receiveRightAnim: 'charA_receiveRight'
             },
             // rápido y competitivo
-            personajeB: {
+            characterB: {
                 textureKey: 'charB_move',
                 startFrame: 0,
-                idleAnim: 'charB_idle',
+                idleLeftAnim: 'charB_idleLeft',
+                idleRightAnim: 'charB_idleRight',
                 runLeftAnim: 'charB_runLeft',
                 runRightAnim: 'charB_runRight',
                 jumpLeftAnim: 'charB_jumpLeft',
@@ -41,10 +43,11 @@ export class Player {
                 receiveRightAnim: 'charB_receiveRight'
             },
             // divertido y algo distraído
-            personajeC: {
+            characterC: {
                 textureKey: 'charC_move',
                 startFrame: 0,
-                idleAnim: 'charC_idle',
+                idleLeftAnim: 'charC_idleLeft',
+                idleRightAnim: 'charC_idleRight',
                 runLeftAnim: 'charC_runLeft',
                 runRightAnim: 'charC_runRight',
                 jumpLeftAnim: 'charC_jumpLeft',
@@ -53,6 +56,8 @@ export class Player {
                 receiveRightAnim: 'charC_receiveRight'
             }
         };
+
+        this.isReceiving = false;
 
         // si viene un tipo de personaje inválido, se usa characterA por defecto
         this.config = CHARACTER_CONFIG[characterType] || CHARACTER_CONFIG.characterA;
@@ -64,6 +69,18 @@ export class Player {
             this.config.textureKey,
             this.config.startFrame
         );
+        // se hace un poco más grande
+        this.sprite.setScale(2);
+        // se ajusta la hitbox al nuevo tamaño para las colisiones  
+        this.sprite.body.setSize(this.sprite.width, this.sprite.height, true);
+
+        // cuando termine la animación de recepción, se desactiva el flag
+        this.sprite.on('animationcomplete', (anim) => {
+            if (anim.key === this.config.receiveLeftAnim ||
+                anim.key === this.config.receiveRightAnim) {
+                this.isReceiving = false;
+            }
+        });
 
         // Collider
         this.sprite.setCollideWorldBounds(true);
@@ -118,7 +135,9 @@ export class Player {
     receiveLeft() {
         // si está tocando el suelo, recibe la pelota
         if (this.sprite.body && this.sprite.body.blocked.down) {
+            this.sprite.setVelocityX(0);
             this.facing = 'left';
+            this.isReceiving = true;
             this.playAnimation(this.config.receiveLeftAnim);
         }
     }
@@ -128,16 +147,33 @@ export class Player {
         if (this.sprite.body && this.sprite.body.blocked.down) {
             this.sprite.setVelocityX(0);
             this.facing = 'right';
+            this.isReceiving = true;
             this.playAnimation(this.config.receiveRightAnim);
         }
     }
 
-    // Personaje idle
-    stop() {
-        this.sprite.setVelocityX(0);
+    // Personaje idle izda
+    idleLeft() {   
+        // no interrumpir la recepción a mitad
+        if (this.isReceiving) return;
+
         // si está tocando el suelo, parado, se muestra idle
         if (this.sprite.body && this.sprite.body.blocked.down) {
-            this.playAnimation(this.config.idleAnim);
+            this.sprite.setVelocityX(0);
+            this.facing = 'left';
+            this.playAnimation(this.config.idleLeftAnim);
+        }
+    }
+    // Personaje idle dcha
+    idleRight() {
+        // no interrumpir la recepción a mitad
+        if (this.isReceiving) return;
+        
+        // si está tocando el suelo, parado, se muestra idle
+        if (this.sprite.body && this.sprite.body.blocked.down) {
+            this.sprite.setVelocityX(0);
+            this.facing = 'right';
+            this.playAnimation(this.config.idleRightAnim);
         }
     }
     ////////

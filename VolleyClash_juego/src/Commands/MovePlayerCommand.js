@@ -35,9 +35,13 @@ export class MovePlayerCommand extends Command {
             case 'receiveRight':
                 this.player.receiveRight();
                 break;
-            // parado, idle
+            // parado, idle izda
+            case 'idleLeft':
+                this.player.idleLeft();
+                break;
+            // parado, idle dcha
             default:
-                this.player.stop();
+                this.player.idleRight();
                 break;
         }
     }
