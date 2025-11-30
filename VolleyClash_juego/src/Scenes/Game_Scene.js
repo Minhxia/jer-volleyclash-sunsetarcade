@@ -8,6 +8,10 @@ import { CommandProcessor } from '../Commands/CommandProcessor.js';
 import { MovePlayerCommand } from '../Commands/MovePlayerCommand.js';
 
 export class Game_Scene extends Phaser.Scene {
+    tiempoTotal = 120;
+    tiempoRestante = this.tiempoTotal;
+    timerText;
+    timerEvent;
     constructor() {
         super('Game_Scene');
     }
@@ -77,6 +81,8 @@ export class Game_Scene extends Phaser.Scene {
 
         // Ball
         this.load.image('ball', 'ASSETS/ITEMS/PELOTAS/P_NORMAL.png')
+        //Cronometro
+        this.load.image('reloj', 'ASSETS/JUEGO/TIMER.png')
     }
 
     create() {
@@ -84,7 +90,32 @@ export class Game_Scene extends Phaser.Scene {
         const { width, height } = this.scale;
         this.worldWidth = width;
         this.worldHeight = height;
+        const style = this.game.globals.defaultTextStyle;
 
+
+        //Cronometro
+        this.timerText = this.add.text(this.scale.width / 2, 30, "", {
+            ...style,
+            fontSize: '32px',
+            color: '#ffffff'
+        })
+        .setOrigin(0.5, 0)
+        .setScrollFactor(0)
+        .setDepth(9999);
+        this.timerIcon = this.add.image(this.scale.width / 2, 45, 'reloj')
+        .setOrigin(0.5)
+        .setScale(2)
+        .setScrollFactor(0)
+        .setDepth(9000); // debajo del texto
+        // iniciar el contador
+        this.timerEvent = this.time.addEvent({
+            delay: 1000,
+            callback: this.updateTimer,
+            callbackScope: this,
+            loop: true
+        });
+
+        this.updateTimer();
         // FONDO DEL ESCENARIO SELECCIONADO
         this.add.image(width / 2, height / 2, this.selectedScenario)
             .setOrigin(0.5)
@@ -165,6 +196,21 @@ export class Game_Scene extends Phaser.Scene {
         this._setupBallCollisions();
         // eventos de la pelota
         this._setupBallEvents();
+    }
+
+    updateTimer() {
+        this.tiempoRestante--;
+        let minutos = Math.floor(this.tiempoRestante / 60);
+        let segundos = this.tiempoRestante % 60;
+        let formato = `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+
+        this.timerText.setText(formato);
+
+
+        if (this.tiempoRestante <= 0) {
+            this.timerEvent.paused = true;
+            console.log("FIN DEL TIEMPO");
+        }
     }
 
     update() {

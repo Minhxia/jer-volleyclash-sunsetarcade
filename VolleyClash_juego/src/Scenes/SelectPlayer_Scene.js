@@ -23,6 +23,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
 
     create() {
         const { width, height } = this.scale;
+        const style = this.game.globals.defaultTextStyle;
 
         const background = this.add.image(0, 0, 'fondo')
         .setOrigin(0)
@@ -37,7 +38,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         this.selectedCharacters = new Set(); // Conjunto con los personajes seleccionados
 
         // Texto superior
-        this.add.text(width / 2, 50, 'Selecciona Personaje', { fontSize: '40px', color: '#000', fontStyle: 'bold' }).setOrigin(0.5);
+        this.add.text(width / 2, 50, 'Selecciona Personaje', { ...style, fontSize: '40px', color: '#000', fontStyle: 'bold' }).setOrigin(0.5);
 
         // Crear áreas de selección
         this.createPlayerArea(0); // Jugador 1
@@ -47,7 +48,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         const nextButton = this.add.image(width/2, 500, 'botonSimple')
             .setInteractive()
             .setScale(1.5);
-        const nextText = this.add.text(0, 0, 'Siguiente', { fontSize: '12px', color: '#000' });
+        const nextText = this.add.text(0, 0, 'Siguiente', { ...style, fontSize: '12px', color: '#000' });
         Phaser.Display.Align.In.Center(nextText, nextButton);
 
         nextButton.on('pointerover', () => nextButton.setTexture('botonSimpleSeleccionado'));

@@ -13,7 +13,8 @@ export class Pause_Scene extends Phaser.Scene {
         this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_BASE_G.png');
     }
 
-    create() { 
+    create() {
+        const style = this.game.globals.defaultTextStyle; 
         const { width, height } = this.scale;
         const centerX = width / 2;
 
@@ -22,7 +23,8 @@ export class Pause_Scene extends Phaser.Scene {
 
         //TÍTULO PRINCIPAL → “PAUSA”
         this.add.text(centerX, height * 0.18, 'PAUSA', {
-           fontSize: '32px',
+            ...style,
+            fontSize: '32px',
             color: '#5f0000ff'
         }).setOrigin(0.5);
 
@@ -33,6 +35,7 @@ export class Pause_Scene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true });
 
         const continuarText = this.add.text(0, 0 * 0.52, "Continuar", {
+            ...style,
            fontSize: '20px',
             color: '#000000'
         });
@@ -58,7 +61,8 @@ export class Pause_Scene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true });
 
         const menuText = this.add.text(0, 0 * 0.52, "Menú Principal", {
-           fontSize: '20px',
+            ...style,
+            fontSize: '20px',
             color: '#000000'
         });
         Phaser.Display.Align.In.Center(menuText, menuBotton);

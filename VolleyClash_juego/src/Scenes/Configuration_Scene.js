@@ -10,32 +10,38 @@ export class Configuration_Scene extends Phaser.Scene {
         // Imágenes
         this.load.image('botonVolver', 'ASSETS/UI/BOTONES/FLECHA_VOLVER.png');
         this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
-
-        // Audio
-        this.load.audio('sonidoGeneral', 'ASSETS/SONIDO/SONIDO1.mp3');
     }
 
     create() {
         const { width, height } = this.scale;
         const centerX = width / 2;
+        const style = this.game.globals.defaultTextStyle;
 
         // Fondo
         this.add.image(0, 0, 'fondo').setOrigin(0).setDepth(-1);
 
         // Título de la escena
         this.add.text(centerX, height * 0.1, 'Configuración', {
+            ...style,
             fontSize: '32px',
             color: '#5f0000ff'
         }).setOrigin(0.5);
 
         // Subtítulo de controles
         this.add.text(centerX, height * 0.25, 'Volumen', {
+            ...style,
             fontSize: '24px',
             color: '#000'
         }).setOrigin(0.5);
 
-        // Volumen inicial guardado o 1
         this.currentVolume = parseFloat(localStorage.getItem('volume')) || 1;
+        this.music = this.game.globals.music ;
+
+        // Ajustar volumen según slider
+        this.music.setVolume(this.currentVolume);
+
+        // Volumen inicial guardado o 1
+
 
         // Barra de volumen HTML
         this.volumeSlider = this.add.dom(centerX, height * 0.3).createFromHTML(`
@@ -53,10 +59,6 @@ export class Configuration_Scene extends Phaser.Scene {
             this.music.setVolume(volume); // Música de fondo
             localStorage.setItem('volume', volume); // Guardar entre escenas
         });
-
-        // Música de fondo
-        this.music = this.sound.add('sonidoGeneral', { loop: true, volume: this.currentVolume });
-        this.music.play();
 
         // Botón Volver arriba a la izquierda
         const backX = width * 0.06;
@@ -78,6 +80,7 @@ export class Configuration_Scene extends Phaser.Scene {
 
         //Controles
         this.add.text(centerX, height * 0.5, 'Controles', {
+        ...style,
         fontSize: '24px',
         color: '#000',
         fontStyle: 'bold'

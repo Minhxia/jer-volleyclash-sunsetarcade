@@ -13,6 +13,8 @@ export class Credits_Scene extends Phaser.Scene {
 
     create() {
         // posiciones base para los botones del menú
+        const style = this.game.globals.defaultTextStyle;
+
         const background = this.add.image(0, 0, 'fondo')
         .setOrigin(0)
         .setDepth(-1);
@@ -23,6 +25,7 @@ export class Credits_Scene extends Phaser.Scene {
         // TODO: cambiar por una imagen?
         // título de la escena de créditos
         this.add.text(centerX, 80, 'Créditos', {
+            ...style,
             fontSize: '32px',
             color: '#5f0000ff'
         }).setOrigin(0.5);
@@ -42,6 +45,7 @@ export class Credits_Scene extends Phaser.Scene {
 
         nombresEquipo.forEach((nombre, index) => {
             this.add.text(centerX, inicioY + index * separacion, nombre, {
+                ...style,
                 fontSize: '20px',
                 color: '#5f0000ff'
             }).setOrigin(0.5);

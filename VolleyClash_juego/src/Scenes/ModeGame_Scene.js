@@ -15,6 +15,7 @@ export class ModeGame_Scene extends Phaser.Scene {
 
     create() {
         const { width, height } = this.scale;
+        const style = this.game.globals.defaultTextStyle;
 
         const background = this.add.image(0, 0, 'fondo')
         .setOrigin(0)
@@ -22,6 +23,7 @@ export class ModeGame_Scene extends Phaser.Scene {
 
         // Título centrado
         this.add.text(width / 2, 100, 'Modo de Juego', {
+            ...style,
             fontSize: '40px',
             color: '#000',
             fontStyle: 'bold'
