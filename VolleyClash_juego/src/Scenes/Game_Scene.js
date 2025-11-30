@@ -28,6 +28,9 @@ export class Game_Scene extends Phaser.Scene {
         this.ball = null;
         this.scoreP1 = 0;
         this.scoreP2 = 0;
+        this.setsP1 = 0;
+        this.setsP2 = 0;
+        this.maxSets = 3; // mejor de 3
     }
 
     preload() {
@@ -205,16 +208,24 @@ export class Game_Scene extends Phaser.Scene {
 
     updateTimer() {
         this.tiempoRestante--;
-        let minutos = Math.floor(this.tiempoRestante / 60);
-        let segundos = this.tiempoRestante % 60;
-        let formato = `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+
+        // Formato
+        const minutos = Math.floor(this.tiempoRestante / 60);
+        const segundos = this.tiempoRestante % 60;
+        const formato = `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
 
         this.timerText.setText(formato);
-
 
         if (this.tiempoRestante <= 0) {
             this.timerEvent.paused = true;
             console.log("FIN DEL TIEMPO");
+
+            if (this.scoreP1 > this.scoreP2) this._endSet("player1");
+            else if (this.scoreP2 > this.scoreP1) this._endSet("player2");
+            else {
+                console.log("Empate en el set");
+                this._resetSet();
+            }
         }
     }
 
@@ -618,27 +629,64 @@ export class Game_Scene extends Phaser.Scene {
 
         ball.hit(player, playerDirection, isJumping, isReceiving);
     }
-    
+
+    _endGame(winner) {
+        this.scene.pause(); 
+        this.scene.start("EndGame_Scene", {
+            winner: winner,
+            player1: this.player1,
+            player2: this.player2,
+        });
+    }
+
     _checkWinCondition() {
-    const maxPoints = 5; // el que sea
+        const scoreDiff = this.scoreP1 - this.scoreP2;
 
-        if (this.scoreP1 >= maxPoints) {
-             this._endMatch("player1");
-        }
-
-        if (this.scoreP2 >= maxPoints) {
-            this._endMatch("player2");
+        if (this.scoreP1 >= 11 && scoreDiff >= 2) {
+            this._endSet("player1");
+        } else if (this.scoreP2 >= 11 && scoreDiff <= -2) {
+            this._endSet("player2");
         }
     }
 
-    _endMatch(winner) {
-    this.scene.pause(); 
-    this.scene.start("EndGame_Scene", {
-        winner: winner,
-        player1: this.player1,
-        player2: this.player2,
-    });
-}
+    _endSet(winner) {
+        if (winner === 'player1') this.setsP1++;
+        else if (winner === 'player2') this.setsP2++;
 
+        console.log(`Set terminado. Score sets: P1=${this.setsP1}, P2=${this.setsP2}`);
 
+        // Revisar si alguien ganó el partido
+        if (this.setsP1 === 2) {
+            this._endGame("player1");
+        } else if (this.setsP2 === 2) {
+            this._endGame("player2");
+        } else {
+            // Reiniciar set
+            this._resetSet();
+        }
+    }
+
+    _resetSet() {
+        // Reiniciar tiempo
+        this.tiempoRestante = this.tiempoTotal;
+        this.timerEvent.paused = false;
+        this.updateTimer();
+
+        // Reiniciar puntuación
+        this.scoreP1 = 0;
+        this.scoreP2 = 0;
+
+        // Reiniciar pelota
+        this.ball.resetRally();
+
+        // Reposicionar jugadores a sus posiciones iniciales
+        const p1 = this.players.get('player1');
+        const p2 = this.players.get('player2');
+
+        p1.setPosition(this.worldWidth * 0.25, this.worldHeight * 0.7);
+        p2.setPosition(this.worldWidth * 0.75, this.worldHeight * 0.7);
+
+        p1.idleRight();
+        p2.idleLeft();
+    }
 }
