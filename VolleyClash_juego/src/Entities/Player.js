@@ -11,11 +11,13 @@ export class Player {
         this.moveSpeed = 300;   // velocidad de movimiento (horizontal)
         this.jumpSpeed = 550;   // fuerza de salto
 
+        this.activePowerUps = {};   // PowerUps activos
+
         // TODO: comprobar que los nombres de las keys son correctos
         // configuración de los sprites y las animaciones según el personaje elegido
         const CHARACTER_CONFIG = {
             // equilibrado y simpático
-            characterA: {
+            personajeA: {
                 textureKey: 'charA_move',
                 startFrame: 0,
                 idleAnim: 'charA_idle',
@@ -27,7 +29,7 @@ export class Player {
                 receiveRightAnim: 'charA_receiveRight'
             },
             // rápido y competitivo
-            characterB: {
+            personajeB: {
                 textureKey: 'charB_move',
                 startFrame: 0,
                 idleAnim: 'charB_idle',
@@ -39,7 +41,7 @@ export class Player {
                 receiveRightAnim: 'charB_receiveRight'
             },
             // divertido y algo distraído
-            characterC: {
+            personajeC: {
                 textureKey: 'charC_move',
                 startFrame: 0,
                 idleAnim: 'charC_idle',
@@ -130,7 +132,6 @@ export class Player {
         }
     }
 
-
     // Personaje idle
     stop() {
         this.sprite.setVelocityX(0);
@@ -156,5 +157,64 @@ export class Player {
         if (this.sprite.body) {
             this.isOnGround = this.sprite.body.blocked.down;
         }
+    }
+
+    applyPowerUp(type) {
+        const now = this.scene.time.now;
+
+        switch(type) {
+            case 'velocidad':
+                this.moveSpeed *= 1.5;
+                break;
+            case 'ralentizar':
+                const opponent = this.getOpponent();
+                if (opponent) opponent.moveSpeed *= 0.5;
+                break;
+            case 'paralizar':
+                const opp = this.getOpponent();
+                if (opp) opp.isParalyzed = true;
+                break;
+            case 'por2':
+                this.scoreMultiplier = 2;
+                break;
+            case 'por3':
+                this.scoreMultiplier = 3;
+                break;
+        }
+
+        // Duración 10 segundos
+        this.activePowerUps[type] = now + 10000;
+    }
+
+    updatePowerUps() {
+        const now = this.scene.time.now;
+        for (const type in this.activePowerUps) {
+            if (now > this.activePowerUps[type]) {
+                // Restaurar efecto
+                switch(type) {
+                    case 'velocidad':
+                        this.moveSpeed /= 1.5;
+                        break;
+                    case 'ralentizar':
+                        const opponent = this.getOpponent();
+                        if (opponent) opponent.moveSpeed /= 0.5;
+                        break;
+                    case 'paralizar':
+                        const opp = this.getOpponent();
+                        if (opp) opp.isParalyzed = false;
+                        break;
+                    case 'por2':
+                    case 'por3':
+                        this.scoreMultiplier = 1;
+                        break;
+                }
+                delete this.activePowerUps[type];
+            }
+        }
+    }
+
+    getOpponent() {
+        if (!this.scene.players) return null;
+        return Array.from(this.scene.players.values()).find(p => p !== this);
     }
 }

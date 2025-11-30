@@ -2,6 +2,7 @@
 
 import Phaser from 'phaser';
 import { Player } from '../Entities/Player.js';
+import { PowerUp } from '../Entities/PowerUp.js';
 import { CommandProcessor } from '../Commands/CommandProcessor.js';
 import { MovePlayerCommand } from '../Commands/MovePlayerCommand.js';
 
@@ -10,10 +11,13 @@ export class Game_Scene extends Phaser.Scene {
         super('Game_Scene');
     }
 
-    init() {
+    init(data) {
         this.players = new Map();
         this.inputMappings = [];
         this.commandProcessor = new CommandProcessor();
+        this.player1 = data.player1;
+        this.player2 = data.player2;
+        this.selectedScenario = data.selectedScenario;
     }
 
     preload() {
@@ -52,6 +56,18 @@ export class Game_Scene extends Phaser.Scene {
             'ASSETS/PERSONAJES/ANIMACIONES/PERSONAJE_C/ANIMACION_REMATE.png',
             { frameWidth: 32, frameHeight: 44 }
         );
+
+        // Escenarios
+        this.load.image('Gym', 'ASSETS/FONDOS/GIMNASIO.png');
+        this.load.image('Playa', 'ASSETS/FONDOS/PLAYA.png');
+        this.load.image('Jardin', 'ASSETS/FONDOS/JARDIN.png');
+
+        // PowerUps
+        this.load.image('por2', 'ASSETS/ITEMS/POWER UPS/MULTIPLICADOR 2.png')
+        this.load.image('por3', 'ASSETS/ITEMS/POWER UPS/MULTIPLICADOR 3.png')
+        this.load.image('paralizar', 'ASSETS/ITEMS/POWER UPS/PARALIZADO.png')
+        this.load.image('ralentizar', 'ASSETS/ITEMS/POWER UPS/RELENTIZAR.png')
+        this.load.image('velocidad', 'ASSETS/ITEMS/POWER UPS/VELOCIDAD.png')
     }
 
     create() {
@@ -59,6 +75,11 @@ export class Game_Scene extends Phaser.Scene {
         const { width, height } = this.scale;
         this.worldWidth = width;
         this.worldHeight = height;
+
+        // FONDO DEL ESCENARIO SELECCIONADO
+        this.add.image(width / 2, height / 2, this.selectedScenario)
+            .setOrigin(0.5)
+            .setDisplaySize(width, height); 
 
         this._createAnimations();
 
@@ -68,7 +89,7 @@ export class Game_Scene extends Phaser.Scene {
             this.worldWidth / 2,
             this.worldHeight - 10,
             'ground'
-        );
+        ).setVisible(false);
         
         // primero se crean los jugadores
         this._createPlayers();
@@ -76,10 +97,40 @@ export class Game_Scene extends Phaser.Scene {
         //this._setupPhysicsWorld(ground);
         // por último, se asignan las teclas
         this._setupInputMappings();
+
+        // PowerUps
+        this.powerUps = [];
+        this.maxPowerUps = 2;
+
+        // Cada 10-20s intentamos generar uno
+        this.time.addEvent({
+            delay: Phaser.Math.Between(10000, 20000),
+            loop: true,
+            callback: () => {
+                if (this.powerUps.length >= this.maxPowerUps) return;
+
+                const x = Phaser.Math.Between(50, this.worldWidth - 50);
+                const y = Phaser.Math.Between(100, this.worldHeight - 150); // evitar la red y suelo
+
+                const types = ['velocidad', 'ralentizar', 'paralizar', 'por2', 'por3'];
+                const type = Phaser.Utils.Array.GetRandom(types);
+
+                const powerUp = new PowerUp(this, x, y, type);
+                this.powerUps.push(powerUp);
+
+                // limpiar de la lista cuando desaparece
+                this.time.delayedCall(powerUp.lifetime, () => {
+                    this.powerUps = this.powerUps.filter(p => p !== powerUp);
+                });
+            }
+        });
+
     }
 
     update() {
         this._handleInputForAllPlayers();
+
+        this.players.forEach(player => player.updatePowerUps());
     }
     
     //// MÉTODOS AUXILIARES ////
@@ -233,18 +284,31 @@ export class Game_Scene extends Phaser.Scene {
     // TODO: esta hardcodeado, habrá que enlazarlo con la escena de selección de personaje
     // Crea los personajes de cada jugador
     _createPlayers() {
-        const p1 = new Player(this, 'player1', this.worldWidth * 0.25, this.worldHeight * 0.7, 'characterA');
-        const p2 = new Player(this, 'player2', this.worldWidth * 0.75, this.worldHeight * 0.7, 'characterB');
+        const charP1 = this.player1;
+        const charP2 = this.player2;
+
+        const p1 = new Player(
+            this,
+            'player1',
+            this.worldWidth * 0.25,   // izquierda
+            this.worldHeight * 0.7,
+            charP1
+        );
+
+        const p2 = new Player(
+            this,
+            'player2',
+            this.worldWidth * 0.75,   // derecha
+            this.worldHeight * 0.7,
+            charP2
+        );
 
         this.players.set('player1', p1);
         this.players.set('player2', p2);
 
-        // para CommandProcessor
         this.commandProcessor.setPlayers(this.players);
         this.commandProcessor.setGameScene(this);
 
-        // TODO: cambiar?
-        // ambos en idle al inicio
         p1.stop();
         p2.stop();
     }    

@@ -59,8 +59,8 @@ export class SelectPlayer_Scene extends Phaser.Scene {
             this.players[1].name = name2;
 
             this.scene.start('SelectScenario_Scene', { 
-                player1: this.players[0],
-                player2: this.players[1]
+                player1: this.players[0].character,
+                player2: this.players[1].character
             });
         });
 

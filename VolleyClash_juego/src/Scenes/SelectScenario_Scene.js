@@ -12,8 +12,8 @@ export class SelectScenario_Scene extends Phaser.Scene {
         this.load.image('botonVolver', 'ASSETS/UI/BOTONES/VOLVER.png');
 
         this.load.image('Gym', 'ASSETS/FONDOS/GIMNASIO.png');
-        this.load.image('Playa', 'ASSETS/FONDOS/PLAYA.png')
-        this.load.image('Jardin', 'ASSETS/FONDOS/JARDIN.png')
+        this.load.image('Playa', 'ASSETS/FONDOS/PLAYA.png');
+        this.load.image('Jardin', 'ASSETS/FONDOS/JARDIN.png');
     }
 
     init(data) {
