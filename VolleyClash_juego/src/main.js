@@ -9,7 +9,7 @@ import { ModeGame_Scene } from "./Scenes/ModeGame_Scene.js";
 import { Pause_Scene } from "./Scenes/Pause_Scene.js";
 import { SelectPlayer_Scene } from "./Scenes/SelectPlayer_Scene.js"
 import { SelectScenario_Scene } from "./Scenes/SelectScenario_Scene.js";
-
+document.fonts.ready.then(() => {
 const config = {
     type: Phaser.AUTO,
     width: 960,
@@ -27,6 +27,16 @@ const config = {
     },
     scene: [Menu_Scene, Game_Scene, Configuration_Scene, Credits_Scene, EndGame_Scene, Pause_Scene, ModeGame_Scene, SelectPlayer_Scene, SelectScenario_Scene],
     backgroundColor:'#8675f1',
-}
+};
+
+Phaser.GameObjects.Text = class extends Phaser.GameObjects.Text {
+    constructor(scene, x, y, text, style = {}) {
+        style.fontFamily = style.fontFamily || 'FuentePixelada';
+        style.fontSize = style.fontSize || '32px';
+        style.color = style.color || '#ffffff';
+        super(scene, x, y, text, style);
+    }
+};
 
 const game = new Phaser.Game(config);
+});

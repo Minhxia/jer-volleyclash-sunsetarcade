@@ -10,14 +10,23 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         this.load.image('botonSeleccionado', 'ASSETS/UI/BOTONES/BOTON_SELECCIONDO.png');
         this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_SIN_SELECCIONAR.png');
         this.load.image('botonVolver', 'ASSETS/UI/BOTONES/VOLVER.png');
+        this.load.image('botonSimple', 'ASSETS/UI/BOTONES/BOTON_BASE_SINSELECCIONAR.png');
+        this.load.image('botonSimpleSeleccionado', 'ASSETS/UI/BOTONES/BOTON_BASE.png');
+        this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
+        this.load.image('marco','ASSETS/UI/MARCOS/VACIOS/MARCO_PERSONAJE_SELECCIONADO.png')
 
         this.load.image('personajeA', 'ASSETS/PERSONAJES/PERSONAJES_POSE/personajes_a.png');
         this.load.image('personajeB', 'ASSETS/PERSONAJES/PERSONAJES_POSE/personajes_b.png');
         this.load.image('personajeC', 'ASSETS/PERSONAJES/PERSONAJES_POSE/personaje_c.png');
+        
     }
 
     create() {
         const { width, height } = this.scale;
+
+        const background = this.add.image(0, 0, 'fondo')
+        .setOrigin(0)
+        .setDepth(-1);
 
         // Datos jugadores
         this.players = [
@@ -37,13 +46,13 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         // Boton Siguiente
         const nextButton = this.add.image(width/2, 500, 'botonSinSeleccionar')
             .setInteractive()
-            .setScale(0.4);
+            .setScale(1.5);
         const nextText = this.add.text(0, 0, 'Siguiente', { fontSize: '12px', color: '#000' });
         Phaser.Display.Align.In.Center(nextText, nextButton);
 
-        nextButton.on('pointerover', () => nextButton.setTexture('botonSeleccionado'));
-        nextButton.on('pointerout', () => nextButton.setTexture('botonSinSeleccionar'));
-        nextButton.on('pointerdown', () => nextButton.setTexture('botonSeleccionado'));
+        nextButton.on('pointerover', () => nextButton.setTexture('botonSimpleSeleccionado'));
+        nextButton.on('pointerout', () => nextButton.setTexture('botonSimple'));
+        nextButton.on('pointerdown', () => nextButton.setTexture('botonSimpleSeleccionado'));
         nextButton.on('pointerup', () => {
             const name1 = this.playerInputs[0].node.querySelector('input').value.trim();
             const name2 = this.playerInputs[1].node.querySelector('input').value.trim();
@@ -70,7 +79,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
 
         const backButton = this.add
             .sprite(backX, backY, 'botonVolver')
-            .setScale(0.1)
+            .setScale(1)
             .setInteractive({ useHandCursor: true });
 
         backButton.on('pointerdown', () => {
@@ -101,6 +110,9 @@ export class SelectPlayer_Scene extends Phaser.Scene {
                 .setScale(1.2)
                 .setVisible(false);
 
+            player.bigFrame = this.add.image(player.bigImage.x, player.bigImage.y, 'marco')
+            .setScale(2.8) 
+            .setVisible(true);
             // Marco sobre miniatura
             player.frame = this.add.rectangle(0, 0, 60, 120)
                 .setStrokeStyle(4, player.color)
