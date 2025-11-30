@@ -39,7 +39,8 @@ export class MovePlayerCommand extends Command {
             case 'idleLeft':
                 this.player.idleLeft();
                 break;
-            // parado, idle dcha
+            // parado, idle dcha (y caso por defecto)
+            //case 'idleRight':
             default:
                 this.player.idleRight();
                 break;

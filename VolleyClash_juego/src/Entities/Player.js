@@ -3,17 +3,19 @@
 export class Player {
 
     constructor(scene, id, x, y, characterType) {
+        // INICIALIZACIÓN
         this.scene = scene;
         this.id = id;                       // identificador del jugador (P1, P2)
         this.characterType = characterType; // indica qué personaje se ha elegido
 
         // TODO: ajustar los valores
-        this.moveSpeed = 150;   // velocidad de movimiento (horizontal)
-        this.jumpSpeed = 150;   // fuerza de salto
+        this.moveSpeed = 200;   // velocidad de movimiento (horizontal)
+        this.jumpSpeed = 200;   // fuerza de salto
 
         this.activePowerUps = {};   // PowerUps activos
+        this.isParalyzed = false;   // para el power up "paralizar"
+        this.scoreMultiplier = 1;   // para por2 / por3
 
-        // TODO: comprobar que los nombres de las keys son correctos
         // configuración de los sprites y las animaciones según el personaje elegido
         const CHARACTER_CONFIG = {
             // equilibrado y simpático
@@ -57,8 +59,6 @@ export class Player {
             }
         };
 
-        this.isReceiving = false;
-
         // si viene un tipo de personaje inválido, se usa characterA por defecto
         this.config = CHARACTER_CONFIG[characterType] || CHARACTER_CONFIG.characterA;
 
@@ -74,18 +74,8 @@ export class Player {
         // se ajusta la hitbox al nuevo tamaño para las colisiones  
         this.sprite.body.setSize(this.sprite.width, this.sprite.height, true);
 
-        // cuando termine la animación de recepción, se desactiva el flag
-        this.sprite.on('animationcomplete', (anim) => {
-            if (anim.key === this.config.receiveLeftAnim ||
-                anim.key === this.config.receiveRightAnim) {
-                this.isReceiving = false;
-            }
-        });
-
         // Collider
         this.sprite.setCollideWorldBounds(true);
-        // si es necesario, se puede ajustar el tamaño del hitbox
-        // this.sprite.body.setSize(ancho, alto, true);
 
         // se guarda una referencia hacia Player dentro del propio sprite
         // (es útil si en colisiones se quiere acceder a la lógica)
@@ -101,12 +91,16 @@ export class Player {
     //// ANIMACIONES ////
     // Movimiento del personaje hacia la izquierda
     moveLeft() {
+        if (this.isParalyzed) return;
+
         this.sprite.setVelocityX(-this.moveSpeed);
         this.facing = 'left';
         this.playAnimation(this.config.runLeftAnim);
     }
     // Movimiento del personaje hacia la derecha
     moveRight() {
+        if (this.isParalyzed) return;
+
         this.sprite.setVelocityX(this.moveSpeed);
         this.facing = 'right';
         this.playAnimation(this.config.runRightAnim);
@@ -114,6 +108,8 @@ export class Player {
 
     // Salto/remate del personaje hacia la izquierda
     jumpLeft() {
+        if (this.isParalyzed) return;
+
         // si está tocando el suelo, salta/remata
         if (this.sprite.body && this.sprite.body.blocked.down) {
             this.sprite.setVelocityY(-this.jumpSpeed);
@@ -123,6 +119,8 @@ export class Player {
     }
     // Salto/remate del personaje hacia la derecha
     jumpRight() {
+        if (this.isParalyzed) return;
+
         // si está tocando el suelo, salta/remata
         if (this.sprite.body && this.sprite.body.blocked.down) {
             this.sprite.setVelocityY(-this.jumpSpeed);
@@ -133,29 +131,30 @@ export class Player {
 
     // Recepción del personaje por la izquierda
     receiveLeft() {
+        if (this.isParalyzed) return;
+
         // si está tocando el suelo, recibe la pelota
         if (this.sprite.body && this.sprite.body.blocked.down) {
             this.sprite.setVelocityX(0);
             this.facing = 'left';
-            this.isReceiving = true;
             this.playAnimation(this.config.receiveLeftAnim);
         }
     }
     // Recepción del personaje por la derecha
     receiveRight() {
+        if (this.isParalyzed) return;
+
         // si está tocando el suelo, recibe la pelota
         if (this.sprite.body && this.sprite.body.blocked.down) {
             this.sprite.setVelocityX(0);
             this.facing = 'right';
-            this.isReceiving = true;
             this.playAnimation(this.config.receiveRightAnim);
         }
     }
 
     // Personaje idle izda
-    idleLeft() {   
-        // no interrumpir la recepción a mitad
-        if (this.isReceiving) return;
+    idleLeft() {
+        if (this.isParalyzed) return;
 
         // si está tocando el suelo, parado, se muestra idle
         if (this.sprite.body && this.sprite.body.blocked.down) {
@@ -166,9 +165,8 @@ export class Player {
     }
     // Personaje idle dcha
     idleRight() {
-        // no interrumpir la recepción a mitad
-        if (this.isReceiving) return;
-        
+        if (this.isParalyzed) return;
+
         // si está tocando el suelo, parado, se muestra idle
         if (this.sprite.body && this.sprite.body.blocked.down) {
             this.sprite.setVelocityX(0);
@@ -184,7 +182,6 @@ export class Player {
         if (!animKey) return;
         if (!this.sprite.anims) return;
 
-        // ignoreIfPlaying evita reiniciar la animación si ya está en curso
         this.sprite.anims.play(animKey, true);
     }
 
@@ -195,6 +192,7 @@ export class Player {
         }
     }
 
+    // Uso de los power-ups
     applyPowerUp(type) {
         const now = this.scene.time.now;
 
@@ -222,6 +220,7 @@ export class Player {
         this.activePowerUps[type] = now + 10000;
     }
 
+    // Actualiza los power-ups
     updatePowerUps() {
         const now = this.scene.time.now;
         for (const type in this.activePowerUps) {
@@ -249,6 +248,7 @@ export class Player {
         }
     }
 
+    // para modo EN RED?
     getOpponent() {
         if (!this.scene.players) return null;
         return Array.from(this.scene.players.values()).find(p => p !== this);
