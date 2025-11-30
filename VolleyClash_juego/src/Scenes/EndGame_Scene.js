@@ -3,66 +3,72 @@ import Phaser from 'phaser';
 
 export class EndGame_Scene extends Phaser.Scene {
     constructor() {
-        super('EndGame_Escene');
+        super('EndGame_Scene');
     }
 
     init(data) {
         this.winner = data.winner; // player1 o player2
+        this.player1 = data.player1;
+        this.player2 = data.player2;
+    }
+    preload() {
+        this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
+        this.load.image('botonSeleccionado', 'ASSETS/UI/BOTONES/BOTON_BASE_G_SELECCIONADO.png');
+        this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_BASE_G.png');
     }
 
     create() { 
         const { width, height } = this.scale;
 
+        const charP1 = this.player1.name;
+        const charP2 = this.player2.name;
+
         // Fondo color crema
-        this.cameras.main.setBackgroundColor("#fae9d6");
+        this.add.image(0, 0, 'fondo').setOrigin(0).setDepth(-1);
 
         // Título principal
         this.add.text(width / 2, height * 0.18, "¡FIN DEL PARTIDO!", {
-            fontSize: "64px",
-            color: "#000000",
-            fontFamily: "Arial",
-            fontStyle: "bold"
+           fontSize: '64px',
+            color: '#5f0000ff'
         }).setOrigin(0.5);
 
         // Texto del ganador
         const winnerText =
             this.winner === "player1"
-                ? "Ganador: Jugador 1"
-                : "Ganador: Jugador 2";
+                ? "Ganador:" + charP1
+                : "Ganador:" + charP2;
 
         this.add.text(width / 2, height * 0.40, winnerText, {
-            fontSize: "32px",
-            color: "#000000",
-            fontFamily: "Arial"
+           fontSize: '32px',
+            color: '#5f0000ff'
         }).setOrigin(0.5);
 
-        // Botón naranja
-        const buttonBG = this.add.rectangle(
-            width / 2,
-            height * 0.60,
-            280,
-            70,
-            0xfbb04d
-        ).setInteractive();
+        // Botón naranja para volver al menú
 
-        const buttonText = this.add.text(width / 2, height * 0.60, "Volver a inicio", {
-            fontSize: "26px",
-            color: "#ffffff",
-            fontFamily: "Arial",
-            fontStyle: "bold"
-        }).setOrigin(0.5);
+        const volverButton = this.add
+            .sprite(width / 2,
+            height * 0.60, 'botonSinSeleccionar')
+            .setScale(3)
+            .setInteractive({ useHandCursor: true });
 
+        const menuText = this.add.text(0, 0 * 0.52, "Volver a inicio", {
+           fontSize: '26px',
+            color: '#000000'
+        });
+
+            Phaser.Display.Align.In.Center(menuText, volverButton);
+            
         // Interacción del botón
-        buttonBG.on("pointerdown", () => {
+        volverButton.on("pointerdown", () => {
             this.scene.start("Menu_Scene");
         });
 
         // Efecto hover
-        buttonBG.on("pointerover", () => {
-            buttonBG.setFillStyle(0xf6a427);
+        volverButton.on("pointerover", () => {
+            volverButton.setTexture('botonSeleccionado');
         });
-        buttonBG.on("pointerout", () => {
-            buttonBG.setFillStyle(0xfbb04d);
+        volverButton.on("pointerout", () => {
+            volverButton.setTexture('botonSinSeleccionar');
         });
 
     }
