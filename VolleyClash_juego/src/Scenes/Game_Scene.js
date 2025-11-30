@@ -521,9 +521,16 @@ export class Game_Scene extends Phaser.Scene {
 
         // se actualiza el estado de los jugadores (suelo, etc.)
         this.players.forEach(player => player.update());
+
         this.input.keyboard.on("keydown-ESC", () => {
             this.scene.pause();               // detiene el game loop
             this.scene.launch("Pause_Scene"); // muestra la escena de pausa
+        });
+
+         this.input.keyboard.on("keydown-ALT", () => {
+            this.scene.pause();               // detiene el game loop
+            this.scene.start("EndGame_Scene", { winner: "player1" , player1: this.player1,
+                player2: this.player2,}); // muestra la escena de pausa
         });
     }
 
