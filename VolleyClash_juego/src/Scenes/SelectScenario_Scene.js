@@ -10,9 +10,9 @@ export class SelectScenario_Scene extends Phaser.Scene {
         this.load.image('botonSeleccionado', 'ASSETS/UI/BOTONES/BOTON_BASE.png');
         this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_BASE_SINSELECCIONAR.png');
         this.load.image('botonVolver', 'ASSETS/UI/BOTONES/FLECHA_VOLVER.png');
-        this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
         this.load.image('botonSimple', 'ASSETS/UI/BOTONES/BOTON_BASE_SINSELECCIONAR.png');
         this.load.image('botonSimpleSeleccionado', 'ASSETS/UI/BOTONES/BOTON_BASE.png');
+        this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
 
         this.load.image('Gym', 'ASSETS/FONDOS/GIMNASIO.png');
         this.load.image('Playa', 'ASSETS/FONDOS/PLAYA.png');

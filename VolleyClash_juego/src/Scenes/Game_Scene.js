@@ -343,8 +343,8 @@ export class Game_Scene extends Phaser.Scene {
 
     // Crea los personajes de cada jugador
     _createPlayers() {
-        const charP1 = this.player1;
-        const charP2 = this.player2;
+        const charP1 = this.player1.character;
+        const charP2 = this.player2.character;
 
         const p1 = new Player(
             this,
