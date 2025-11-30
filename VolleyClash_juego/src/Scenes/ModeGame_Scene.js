@@ -9,11 +9,16 @@ export class ModeGame_Scene extends Phaser.Scene {
     preload() {
         this.load.image('botonSeleccionado', 'ASSETS/UI/BOTONES/BOTON_SELECCIONDO.png');
         this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_SIN_SELECCIONAR.png');
-        this.load.image('botonVolver', 'ASSETS/UI/BOTONES/VOLVER.png');
+        this.load.image('botonVolver', 'ASSETS/UI/BOTONES/FLECHA_VOLVER.png');
+        this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
     }
 
     create() {
         const { width, height } = this.scale;
+
+        const background = this.add.image(0, 0, 'fondo')
+        .setOrigin(0)
+        .setDepth(-1);
 
         // Título centrado
         this.add.text(width / 2, 100, 'Modo de Juego', {
@@ -29,7 +34,7 @@ export class ModeGame_Scene extends Phaser.Scene {
         // Boton Local
         const localButton = this.add.sprite(startX, 250, 'botonSinSeleccionar')
             .setInteractive({ useHandCursor: true })
-            .setScale(0.7);
+            .setScale(2);
 
         const localText = this.add.text(0, 0, 'Local', { fontSize: '24px', color: '#000' });
         Phaser.Display.Align.In.Center(localText, localButton);
@@ -42,7 +47,7 @@ export class ModeGame_Scene extends Phaser.Scene {
         // Boton Red
         const networkButton = this.add.sprite(startX + spacing, 250, 'botonSinSeleccionar')
             .setInteractive({ useHandCursor: true })
-            .setScale(0.7);
+            .setScale(2);
 
         const networkText = this.add.text(0, 0, 'Red', { fontSize: '24px', color: '#000' });
         Phaser.Display.Align.In.Center(networkText, networkButton);
@@ -58,7 +63,7 @@ export class ModeGame_Scene extends Phaser.Scene {
 
         const backButton = this.add
             .sprite(backX, backY, 'botonVolver')
-            .setScale(0.1)
+            .setScale(1)
             .setInteractive({ useHandCursor: true });
 
         backButton.on('pointerdown', () => {

@@ -7,11 +7,15 @@ export class Credits_Scene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('botonVolver', 'ASSETS/UI/BOTONES/VOLVER.png');
+        this.load.image('botonVolver', 'ASSETS/UI/BOTONES/FLECHA_VOLVER.png');
+        this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
     }
 
     create() {
         // posiciones base para los botones del menú
+        const background = this.add.image(0, 0, 'fondo')
+        .setOrigin(0)
+        .setDepth(-1);
         // (así se puede cambiar el tamaño sin problemas)
         const { width, height } = this.scale;
         const centerX = width / 2;
@@ -20,7 +24,7 @@ export class Credits_Scene extends Phaser.Scene {
         // título de la escena de créditos
         this.add.text(centerX, 80, 'Créditos', {
             fontSize: '32px',
-            color: '#ffffff'
+            color: '#5f0000ff'
         }).setOrigin(0.5);
 
         // TODO: ponerlo más bonito
@@ -39,7 +43,7 @@ export class Credits_Scene extends Phaser.Scene {
         nombresEquipo.forEach((nombre, index) => {
             this.add.text(centerX, inicioY + index * separacion, nombre, {
                 fontSize: '20px',
-                color: '#ffffff'
+                color: '#5f0000ff'
             }).setOrigin(0.5);
         });
 
@@ -50,7 +54,7 @@ export class Credits_Scene extends Phaser.Scene {
 
         const backButton = this.add
             .sprite(backX, backY, 'botonVolver')
-            .setScale(0.1)
+            .setScale(1)
             .setInteractive({ useHandCursor: true });
 
         backButton.on('pointerdown', () => {

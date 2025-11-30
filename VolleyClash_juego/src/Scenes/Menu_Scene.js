@@ -8,8 +8,9 @@ export class Menu_Scene extends Phaser.Scene {
 
     preload() {
         // se cargan las imágenes de los botones
-        this.load.image('botonSeleccionado', 'ASSETS/UI/BOTONES/BOTON_SELECCIONDO_prueba.png');
-        this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_SIN_SELECCIONAR_prueba.png');
+        this.load.image('botonSeleccionado', 'ASSETS/UI/BOTONES/BOTON_BASE_G_SELECCIONADO.png');
+        this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_BASE_G.png');
+        this.load.image('fondoMenuPrincipal', 'ASSETS/FONDOS/MENU_PRINCIPAL.png')
     }
 
     create() {        
@@ -19,18 +20,21 @@ export class Menu_Scene extends Phaser.Scene {
         const centerX = width / 2;
         const firstButtonY = height / 2 - 60;
         const buttonSpacing = 70;
-
+        const mitadDerechaX = centerX + (centerX / 2);
+        const background = this.add.image(0, 0, 'fondoMenuPrincipal')
+        .setOrigin(0)
+        .setDepth(-1);
         // TODO: cambiar por una imagen?
         // título del juego
-        this.add.text(width / 2, 100, 'Volley Clash', {
+        this.add.text(mitadDerechaX, 100, 'Volley Clash', {
             fontSize: '32px',
             color: '#ffffff'
         }).setOrigin(0.5);
 
         //// BOTÓN JUGAR ////
         const playButton = this.add
-            .sprite(centerX, firstButtonY, 'botonSinSeleccionar')
-            .setScale(0.7)
+            .sprite(mitadDerechaX, firstButtonY, 'botonSinSeleccionar')
+            .setScale(2)
             .setInteractive({ useHandCursor: true });
 
         const playText = this.add.text(0, 0, 'Jugar', {
@@ -58,8 +62,8 @@ export class Menu_Scene extends Phaser.Scene {
 
         //// BOTÓN CONFIGURACIÓN ////
         const configButton = this.add
-            .sprite(centerX, firstButtonY + buttonSpacing, 'botonSinSeleccionar')
-            .setScale(0.7)
+            .sprite(mitadDerechaX, firstButtonY + buttonSpacing, 'botonSinSeleccionar')
+            .setScale(2)
             .setInteractive({ useHandCursor: true });
 
         const configText = this.add.text(0, 0, 'Configuración', {
@@ -86,8 +90,8 @@ export class Menu_Scene extends Phaser.Scene {
 
         //// BOTÓN CRÉDITOS ////
         const creditsButton = this.add
-            .sprite(centerX, firstButtonY + buttonSpacing * 2, 'botonSinSeleccionar')
-            .setScale(0.7)
+            .sprite(mitadDerechaX, firstButtonY + buttonSpacing * 2, 'botonSinSeleccionar')
+            .setScale(2)
             .setInteractive({ useHandCursor: true });
 
         const creditsText = this.add.text(0, 0, 'Créditos', {
@@ -112,5 +116,6 @@ export class Menu_Scene extends Phaser.Scene {
             this.scene.start('Credits_Scene');
         });
         ////////
+        
     }
 }
