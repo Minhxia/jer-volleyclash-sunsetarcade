@@ -15,6 +15,8 @@ export class Player {
         this.activePowerUps = {};   // PowerUps activos
         this.isParalyzed = false;   // para el power up "paralizar"
         this.scoreMultiplier = 1;   // para por2 / por3
+        
+        this.isReceiving = false;   // estado de recepción
 
         // configuración de los sprites y las animaciones según el personaje elegido
         const CHARACTER_CONFIG = {
@@ -86,6 +88,16 @@ export class Player {
 
         // estado simple: en el aire o no
         this.isOnGround = false;
+
+        // cuando se termine la animación de recibir, se deja de "estar recibiendo"
+        this.sprite.on('animationcomplete', (anim) => {
+            if (
+                anim.key === this.config.receiveLeftAnim ||
+                anim.key === this.config.receiveRightAnim
+            ) {
+                this.isReceiving = false;
+            }
+        });
     }
 
     //// ANIMACIONES ////
@@ -132,9 +144,11 @@ export class Player {
     // Recepción del personaje por la izquierda
     receiveLeft() {
         if (this.isParalyzed) return;
+        if (this.isReceiving) return; // no reiniciar si ya está recibiendo 
 
         // si está tocando el suelo, recibe la pelota
         if (this.sprite.body && this.sprite.body.blocked.down) {
+            this.isReceiving = true;
             this.sprite.setVelocityX(0);
             this.facing = 'left';
             this.playAnimation(this.config.receiveLeftAnim);
@@ -143,9 +157,11 @@ export class Player {
     // Recepción del personaje por la derecha
     receiveRight() {
         if (this.isParalyzed) return;
+        if (this.isReceiving) return; // no reiniciar si ya está recibiendo 
 
         // si está tocando el suelo, recibe la pelota
         if (this.sprite.body && this.sprite.body.blocked.down) {
+            this.isReceiving = true;
             this.sprite.setVelocityX(0);
             this.facing = 'right';
             this.playAnimation(this.config.receiveRightAnim);
@@ -154,7 +170,7 @@ export class Player {
 
     // Personaje idle izda
     idleLeft() {
-        if (this.isParalyzed) return;
+        if (this.isParalyzed || this.isReceiving) return;
 
         // si está tocando el suelo, parado, se muestra idle
         if (this.sprite.body && this.sprite.body.blocked.down) {
@@ -165,7 +181,7 @@ export class Player {
     }
     // Personaje idle dcha
     idleRight() {
-        if (this.isParalyzed) return;
+        if (this.isParalyzed || this.isReceiving) return;
 
         // si está tocando el suelo, parado, se muestra idle
         if (this.sprite.body && this.sprite.body.blocked.down) {
