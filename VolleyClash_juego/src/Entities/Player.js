@@ -8,24 +8,35 @@ export class Player {
         this.id = id;                       // identificador del jugador (P1, P2)
         this.characterType = characterType; // indica qué personaje se ha elegido
 
-        // TODO: ajustar los valores
         this.moveSpeed = 200;   // velocidad de movimiento (horizontal)
         this.jumpSpeed = 200;   // fuerza de salto
 
-        this.activePowerUps = {};   // PowerUps activos
-        this.isParalyzed = false;   // para el power up "paralizar"
-        this.scoreMultiplier = 1;   // para por2 / por3
-        this.powerUpInventory = [];   // máximo 2
+        this.activePowerUps = {};   // powerups activos
+
+        // estados de power-ups
+        this.isParalyzed = false;       // para el power up "paralizar"
+        this.paralysisTween = null;     // al quedarse paralizado -> rojo
+        this.speedEffectActive = false; // velocidad -> cian/verde
+        this.slowEffectActive = false;  // ralentizado -> azul
+
+        this.scoreMultiplier = 1;       // para por2 / por3
+        // texto flotante para mostrar x2 / x3
+        this.multiplierText = this.scene.add.text(x, y - 50, '', {
+            fontFamily: 'Arial',
+            fontSize: '20px',
+            color: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 4
+        })
+            .setOrigin(0.5, 1)
+            .setDepth(20)
+            .setVisible(false);
+        
+        this.powerUpInventory = []; // máximo 2
         
         this.isReceiving = false;   // estado de recepción
 
-        // Límites de movimiento personalizados
-        this.boundsLeft = 0;
-        this.boundsRight = 960;
-        this.boundsTop = 0;
-        this.boundsBottom = 540;
-
-        // Límites de movimiento personalizados
+        // límites de movimiento personalizados
         this.boundsLeft = 0;
         this.boundsRight = 960;
         this.boundsTop = 0;
@@ -89,9 +100,6 @@ export class Player {
         // se ajusta la hitbox al nuevo tamaño para las colisiones  
         this.sprite.body.setSize(this.sprite.width, this.sprite.height, true);
 
-        // No usar colisión con límites del mundo - usamos límites personalizados
-        // this.sprite.setCollideWorldBounds(true);
-
         // se guarda una referencia hacia Player dentro del propio sprite
         // (es útil si en colisiones se quiere acceder a la lógica)
         this.sprite.setData('player', this);
@@ -101,22 +109,56 @@ export class Player {
 
         // estado simple: en el aire o no
         this.isOnGround = false;
+        
+        // flag para saber si está en animación de salto
+        this.isJumping = false;
+        
+        // timestamp para detectar si isJumping se queda stuck (timeout de 1 segundo)
+        this.jumpStartTime = 0;
 
         // cuando se termine la animación de recibir, se deja de "estar recibiendo"
         this.sprite.on('animationcomplete', (anim) => {
-            if (
-                anim.key === this.config.receiveLeftAnim ||
-                anim.key === this.config.receiveRightAnim
-            ) {
-                this.isReceiving = false;
+            try {
+                if (
+                    anim.key === this.config.receiveLeftAnim ||
+                    anim.key === this.config.receiveRightAnim
+                ) {
+                    this.isReceiving = false;
+                }
+
+                // el salto termina según la física + update(), no por la animación.
+            } catch (error) {
+                console.error(`Animation complete handler error for ${anim.key}:`, error);
             }
         });
+
+    }
+
+    // Helper para verificar si está en el suelo de forma fiable
+    isGrounded() {
+        const body = this.sprite.body;
+        if (!body) return false;
+
+        // blocked.down → colisiones con límites del mundo
+        // touching.down → colisiones con otros cuerpos
+        return body.blocked.down || body.touching.down;
+    }
+
+    // Comprueba si los pies del jugador están cerca del suelo
+    isNearGround(threshold = 12) {
+        const body = this.sprite.body;
+        if (!body) return false;
+        if (typeof this.scene.groundY !== 'number') return false;
+
+        // parte inferior del body (no del sprite escalado)
+        const feetY = body.y + body.height;
+        return Math.abs(feetY - this.scene.groundY) <= threshold;
     }
 
     //// ANIMACIONES ////
     // Movimiento del personaje hacia la izquierda
     moveLeft() {
-        if (this.isParalyzed) return;
+        if (this.isParalyzed || this.isReceiving) return;
 
         this.sprite.setVelocityX(-this.moveSpeed);
         this.facing = 'left';
@@ -124,7 +166,7 @@ export class Player {
     }
     // Movimiento del personaje hacia la derecha
     moveRight() {
-        if (this.isParalyzed) return;
+        if (this.isParalyzed || this.isReceiving) return;
 
         this.sprite.setVelocityX(this.moveSpeed);
         this.facing = 'right';
@@ -135,8 +177,12 @@ export class Player {
     jumpLeft() {
         if (this.isParalyzed) return;
 
-        // si está tocando el suelo, salta/remata
-        if (this.sprite.body && this.sprite.body.blocked.down) {
+        if (this.isGrounded() || this.isNearGround(20)) {
+            // por si una recepción se quedó a medias, se cancela
+            this.isReceiving = false;
+
+            this.isJumping = true;
+            this.jumpStartTime = this.scene.time.now;
             this.sprite.setVelocityY(-this.jumpSpeed);
             this.facing = 'left';
             this.playAnimation(this.config.jumpLeftAnim);
@@ -146,8 +192,11 @@ export class Player {
     jumpRight() {
         if (this.isParalyzed) return;
 
-        // si está tocando el suelo, salta/remata
-        if (this.sprite.body && this.sprite.body.blocked.down) {
+        if (this.isGrounded() || this.isNearGround(20)) {
+            this.isReceiving = false;
+
+            this.isJumping = true;
+            this.jumpStartTime = this.scene.time.now;
             this.sprite.setVelocityY(-this.jumpSpeed);
             this.facing = 'right';
             this.playAnimation(this.config.jumpRightAnim);
@@ -157,10 +206,10 @@ export class Player {
     // Recepción del personaje por la izquierda
     receiveLeft() {
         if (this.isParalyzed) return;
-        if (this.isReceiving) return; // no reiniciar si ya está recibiendo 
+        if (this.isReceiving) return; // no se reinicia si ya está recibiendo 
 
         // si está tocando el suelo, recibe la pelota
-        if (this.sprite.body && this.sprite.body.blocked.down) {
+        if (this.isGrounded() || this.isNearGround(20)) {
             this.isReceiving = true;
             this.sprite.setVelocityX(0);
             this.facing = 'left';
@@ -170,10 +219,10 @@ export class Player {
     // Recepción del personaje por la derecha
     receiveRight() {
         if (this.isParalyzed) return;
-        if (this.isReceiving) return; // no reiniciar si ya está recibiendo 
+        if (this.isReceiving) return; // no se reinicia si ya está recibiendo 
 
         // si está tocando el suelo, recibe la pelota
-        if (this.sprite.body && this.sprite.body.blocked.down) {
+        if (this.isGrounded() || this.isNearGround(20)) {
             this.isReceiving = true;
             this.sprite.setVelocityX(0);
             this.facing = 'right';
@@ -183,25 +232,23 @@ export class Player {
 
     // Personaje idle izda
     idleLeft() {
-        if (this.isParalyzed || this.isReceiving) return;
+        if (this.isReceiving) return;
 
-        // si está tocando el suelo, parado, se muestra idle
-        if (this.sprite.body && this.sprite.body.blocked.down) {
-            this.sprite.setVelocityX(0);
-            this.facing = 'left';
-            this.playAnimation(this.config.idleLeftAnim);
-        }
+        // siempre detener la velocidad horizontal al entrar en idle
+        this.sprite.setVelocityX(0);
+        this.facing = 'left';
+        // reproducir la animación de idle
+        this.playAnimation(this.config.idleLeftAnim);
     }
     // Personaje idle dcha
     idleRight() {
-        if (this.isParalyzed || this.isReceiving) return;
+        if (this.isReceiving) return;
 
-        // si está tocando el suelo, parado, se muestra idle
-        if (this.sprite.body && this.sprite.body.blocked.down) {
-            this.sprite.setVelocityX(0);
-            this.facing = 'right';
-            this.playAnimation(this.config.idleRightAnim);
-        }
+        // siempre detener la velocidad horizontal al entrar en idle
+        this.sprite.setVelocityX(0);
+        this.facing = 'right';
+        // reproducir la animación de idle
+        this.playAnimation(this.config.idleRightAnim);
     }
     ////////
 
@@ -216,9 +263,7 @@ export class Player {
     // Mantener el jugador dentro de los límites
     clampWithinBounds() {
         const halfWidth = this.sprite.width / 2;
-        const halfHeight = this.sprite.height / 2;
-
-        // Limitar posición horizontal
+        // limitar posición horizontal (X)
         if (this.sprite.x - halfWidth < this.boundsLeft) {
             this.sprite.x = this.boundsLeft + halfWidth;
             this.sprite.setVelocityX(0);
@@ -227,23 +272,39 @@ export class Player {
             this.sprite.x = this.boundsRight - halfWidth;
             this.sprite.setVelocityX(0);
         }
-
-        // Limitar posición vertical
-        if (this.sprite.y - halfHeight < this.boundsTop) {
-            this.sprite.y = this.boundsTop + halfHeight;
-            this.sprite.setVelocityY(0);
-        }
-        if (this.sprite.y + halfHeight > this.boundsBottom) {
-            this.sprite.y = this.boundsBottom - halfHeight;
-            this.sprite.setVelocityY(0);
-        }
     }
 
-    // TODO: revisar si esto es necesario
-    // Reproduce una animación si existe
+    updateMultiplierTextPosition() {
+        if (!this.multiplierText || !this.sprite) return;
+
+        // altura “visual” del sprite para colocar el texto encima de la cabeza
+        const displayH = this.sprite.displayHeight || this.sprite.height || 40;
+        const offsetY = displayH * 0.6; // ajusta si quieres más arriba/abajo
+
+        this.multiplierText.setPosition(
+            this.sprite.x,
+            this.sprite.y - offsetY
+        );
+    }
+
+    // Reproduce una animación si existe (solo si no está ya reproduciéndose)
     playAnimation(animKey) {
         if (!animKey) return;
         if (!this.sprite.anims) return;
+
+        // si estamos en salto, ignorar cualquier animación que no sea de salto
+        if (
+            this.isJumping &&
+            animKey !== this.config.jumpLeftAnim &&
+            animKey !== this.config.jumpRightAnim
+        ) {
+            return;
+        }
+
+        const currentAnim = this.sprite.anims.currentAnim;
+        if (this.sprite.anims.isPlaying && currentAnim && currentAnim.key === animKey) {
+            return;
+        }
 
         this.sprite.anims.play(animKey, true);
     }
@@ -251,15 +312,59 @@ export class Player {
     // Actualizar flags como isOnGround (se llama a esto desde la escena, en cada frame)
     update() {
         if (this.sprite.body) {
-            this.isOnGround = this.sprite.body.blocked.down;
+            const wasOnGround = this.isOnGround;
+            this.isOnGround = this.isGrounded();
+
+            const currentAnim = this.sprite.anims.currentAnim;
+            const currentKey = currentAnim ? currentAnim.key : null;
+
+            if (this.isParalyzed) {
+                this.sprite.setVelocityX(0); // por si acaso
+            }
+
+            // failsafe recepción: si el flag dice "recibiendo" pero la animación no lo es
+            if (
+                this.isReceiving &&
+                currentKey !== this.config.receiveLeftAnim &&
+                currentKey !== this.config.receiveRightAnim
+            ) {
+                this.isReceiving = false;
+            }
+
+            // failsafe salto: si isJumping es true pero la animación actual NO es de salto
+            // (y hay animación), se asume que terminó
+            if (
+                this.isJumping &&
+                currentKey &&
+                currentKey !== this.config.jumpLeftAnim &&
+                currentKey !== this.config.jumpRightAnim
+            ) {
+                this.isJumping = false;
+            }
+
+            // timeout de salto por seguridad
+            if (this.isJumping && (this.scene.time.now - this.jumpStartTime > 1500)) {
+                this.isJumping = false;
+            }
+
+            // aterrizaje real
+            if (this.isJumping && !wasOnGround && this.isOnGround) {
+                this.isJumping = false;
+                if (this.facing === 'left') {
+                    this.idleLeft();
+                } else {
+                    this.idleRight();
+                }
+            }
         }
-        // Mantener el jugador dentro de los límites de la cancha
         this.clampWithinBounds();
+
+        this.updateMultiplierTextPosition();
     }
 
     // Uso de los power-ups
     applyPowerUp(type) {
-        // Inventario máximo de 2
+        // inventario máximo de 2
         if (this.powerUpInventory.length >= 2) return false;
 
         this.powerUpInventory.push(type);
@@ -279,55 +384,185 @@ export class Player {
         switch(type) {
             case 'velocidad':
                 this.moveSpeed *= 1.5;
+                this.setSpeedEffect(true);
                 break;
             case 'ralentizar':
                 const opponent = this.getOpponent();
-                if (opponent) opponent.moveSpeed *= 0.5;
+                if (opponent) {
+                    opponent.moveSpeed *= 0.5;
+                    opponent.setSlowEffect(true);
+                }
                 break;
             case 'paralizar':
+                /*const opp = this.getOpponent();
+                if (opp) opp.isParalyzed = true;*/
                 const opp = this.getOpponent();
-                if (opp) opp.isParalyzed = true;
+                if (opp) opp.setParalyzed(true);
                 break;
-            case 'por2':
+            /*case 'por2':
                 this.scoreMultiplier = 2;
                 break;
             case 'por3':
                 this.scoreMultiplier = 3;
+                break;*/
+            case 'por2':
+            case 'por3':
                 break;
         }
 
         this.activePowerUps[type] = now + 10000;
+
+        // se calcula el multiplicador de puntuación si es por2/por3
+        if (type === 'por2' || type === 'por3') {
+            this.recalculateScoreEffect();
+        }
     }
 
     // Actualiza los power-ups
     updatePowerUps() {
         const now = this.scene.time.now;
+        let scoreNeedsRecalc = false;
+
         for (const type in this.activePowerUps) {
             if (now > this.activePowerUps[type]) {
-                // Restaurar efecto
+                // restaurar el efecto
                 switch(type) {
                     case 'velocidad':
                         this.moveSpeed /= 1.5;
+                        this.setSpeedEffect(false);
                         break;
                     case 'ralentizar':
                         const opponent = this.getOpponent();
-                        if (opponent) opponent.moveSpeed /= 0.5;
+                        if (opponent) {
+                            opponent.moveSpeed /= 0.5;
+                            opponent.setSlowEffect(false);
+                        }
                         break;
                     case 'paralizar':
+                        /*const opp = this.getOpponent();
+                        if (opp) opp.isParalyzed = false;*/
                         const opp = this.getOpponent();
-                        if (opp) opp.isParalyzed = false;
+                        if (opp) opp.setParalyzed(false);
                         break;
                     case 'por2':
                     case 'por3':
-                        this.scoreMultiplier = 1;
+                        //this.scoreMultiplier = 1;
+                        scoreNeedsRecalc = true;
                         break;
                 }
                 delete this.activePowerUps[type];
             }
         }
+        if (scoreNeedsRecalc) {
+            this.recalculateScoreEffect();
+        }
     }
 
-    // para modo EN RED?
+    //// EFECTOS VISUALES DE LOS POWER-UPS ////
+    setParalyzed(isParalyzed) {
+        this.isParalyzed = isParalyzed;
+
+        if (isParalyzed) {
+            // feedback visual: rojo + parpadeo
+            this.sprite.setTint(0xff5555);   // rojizo
+            this.sprite.setAlpha(1);
+
+            // por si ya había un tween anterior
+            if (this.paralysisTween) {
+                this.paralysisTween.stop();
+                this.paralysisTween = null;
+            }
+
+            this.paralysisTween = this.scene.tweens.add({
+                targets: this.sprite,
+                alpha: 0.3,
+                yoyo: true,
+                duration: 200,
+                repeat: -1
+            });
+
+            // seguridad extra: que se quede quieto horizontalmente
+            this.sprite.setVelocityX(0);
+
+        } else {
+            // quitar solo el efecto de parpadeo, el color se recalcula
+            this.sprite.setAlpha(1);
+
+            if (this.paralysisTween) {
+                this.paralysisTween.stop();
+                this.paralysisTween = null;
+            }
+
+            // Volvemos a aplicar el color de otros power-ups activos (si los hay)
+            this.refreshPowerUpVisuals();
+        }
+    }    
+
+    // velocidad -> cian/verde
+    setSpeedEffect(active) {
+        this.speedEffectActive = active;
+        this.refreshPowerUpVisuals();
+    }
+
+    // ralentizar -> azul
+    setSlowEffect(active) {
+        this.slowEffectActive = active;
+        this.refreshPowerUpVisuals();
+    }
+
+    // Recalcula el multiplicador de puntuación en función de por2/por3 activos
+    recalculateScoreEffect() {
+        let multiplier = 1;
+
+        if (this.activePowerUps['por2']) {
+            multiplier = Math.max(multiplier, 2);
+        }
+        if (this.activePowerUps['por3']) {
+            multiplier = Math.max(multiplier, 3);
+        }
+
+        this.scoreMultiplier = multiplier;
+
+        // feedback visual con texto x2 / x3
+        if (this.multiplierText) {
+            if (this.scoreMultiplier > 1) {
+                this.multiplierText.setText('x' + this.scoreMultiplier);
+                this.multiplierText.setVisible(true);
+            } else {
+                this.multiplierText.setVisible(false);
+            }
+        }
+
+        // mantener los colores que ya se tenían
+        this.refreshPowerUpVisuals();
+    }
+
+
+    // Decide qué tinte mostrar según el estado actual
+    refreshPowerUpVisuals() {
+        // si está paralizado, la parálisis manda (color  rojo + parpadeo)
+        if (this.isParalyzed) {
+            return;
+        }
+
+        // Phaser solo permite un color/tint a la vez por sprite, por eso la
+        // prioridad visual es: ralentizado > velocidad > multiplicador
+        if (this.slowEffectActive) {
+            // azul oscuro para "pesado / lento"
+            this.sprite.setTint(0x5555ff);
+        } else if (this.speedEffectActive) {
+            // cian/verde para "rápido"
+            this.sprite.setTint(0x55ffdd);
+        } else if (this.scoreMultiplier > 1) {
+            // dorado para "x2 / x3 puntos"
+            this.sprite.setTint(0xffdd55);
+        } else {
+            // sin efectos
+            this.sprite.clearTint();
+        }
+    }
+    ///////
+
     getOpponent() {
         if (!this.scene.players) return null;
         return Array.from(this.scene.players.values()).find(p => p !== this);

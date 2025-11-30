@@ -12,8 +12,6 @@ export class Game_Scene extends Phaser.Scene {
         super('Game_Scene');
     }
 
-
-
     init(data) {
         this.players = new Map();
         this.inputMappings = [];
@@ -93,21 +91,31 @@ export class Game_Scene extends Phaser.Scene {
         this._createAnimations();
 
         // TODO: cambiar?
-        // suelo de prueba
-        const ground = this.physics.add.staticImage(
+        // suelo de prueba: crear un cuerpo estático rectangular invisible
+        // Configurable: altura y desplazamiento desde el fondo (`groundOffset`)
+        const groundHeight = 20;
+        const groundOffset = 90; // elevar el suelo 100px desde el fondo
+        this.groundHeight = groundHeight;
+        this.groundY = this.worldHeight - groundOffset;
+
+        const ground = this.add.rectangle(
             this.worldWidth / 2,
-            this.worldHeight - 10,
-            'ground'
-        ).setVisible(false);
+            this.groundY,
+            this.worldWidth,
+            groundHeight
+        ).setOrigin(0.5, 0).setVisible(false);
+        // añadir un cuerpo físico estático al rectángulo
+        this.physics.add.existing(ground, true);
         
         // primero se crean los jugadores
         this._createPlayers();
         // después, se montan las colisiones con el suelo, red, etc.
-        //this._setupPhysicsWorld(ground);
+        // montar colisiones físicas entre jugadores y suelo para que body.blocked.down funcione
+        this._setupPhysicsWorld(ground);
         // por último, se asignan las teclas
         this._setupInputMappings();
 
-        // PowerUps
+        // powerups
         this.powerUps = [];
         this.maxPowerUps = 2;
 
@@ -122,7 +130,7 @@ export class Game_Scene extends Phaser.Scene {
             ]
         };
 
-        // Cada 2-5s intentamos generar uno
+        // cada 2-5s intentamos generar uno
         this.time.addEvent({
             delay: Phaser.Math.Between(2000, 5000),
             loop: true,
@@ -130,7 +138,7 @@ export class Game_Scene extends Phaser.Scene {
                 if (this.powerUps.length >= this.maxPowerUps) return;
 
                 const x = Phaser.Math.Between(50, this.worldWidth - 50);
-                const y = Phaser.Math.Between(this.worldHeight - 140, this.worldHeight - 120); // evitar la red y suelo
+                const y = Phaser.Math.Between(this.worldHeight - 140, this.worldHeight - 120); // evitar la red y el suelo
 
                 const types = ['velocidad', 'ralentizar', 'paralizar', 'por2', 'por3'];
                 const type = Phaser.Utils.Array.GetRandom(types);
@@ -138,7 +146,7 @@ export class Game_Scene extends Phaser.Scene {
                 const powerUp = new PowerUp(this, x, y, type);
                 this.powerUps.push(powerUp);
 
-                // Crear colisión con los jugadores
+                // crear colisión con los jugadores
                 this.players.forEach(player => {
                     this.physics.add.overlap(player.sprite, powerUp.sprite, () => {
                         const stored = player.applyPowerUp(type);
@@ -175,11 +183,12 @@ export class Game_Scene extends Phaser.Scene {
         // se actualiza el estado de la pelota
         if (this.ball) {
             this.ball.update();
-            // Verificar si la pelota golpea el suelo (cerca del fondo de la pantalla)
-            if (this.ball.isBallLive && this.ball.sprite.y > this.worldHeight - 30) {
+            // verificar si la pelota golpea el suelo (comparar con la posición del suelo)
+            // groundY es la parte superior del suelo
+            if (this.ball.isBallLive && this.ball.sprite.y > this.groundY) {
                 this.ball.onGrounded();
             }
-            // Verificar si la pelota cruza la red (red está en x = 480)
+            // verificar si la pelota cruza la red (red está en x = 480)
             if (this.ball.sprite.x < 475 && this.ball.courtSide === 'right') {
                 this.ball.crossNet();
             } else if (this.ball.sprite.x > 485 && this.ball.courtSide === 'left') {
@@ -208,52 +217,52 @@ export class Game_Scene extends Phaser.Scene {
         this.anims.create({
             key: 'charA_idleRight',
             frames: this.anims.generateFrameNumbers('charA_move', { start: 0, end: 1 }), // fila 0
-            frameRate: 4,
+            frameRate: 5,
             repeat: -1
         });
         this.anims.create({
             key: 'charA_idleLeft',
             frames: this.anims.generateFrameNumbers('charA_move', { start: 20, end: 21 }).reverse(), // fila 0
-            frameRate: 4,
+            frameRate: 5,
             repeat: -1
         });
 
         this.anims.create({
             key: 'charA_receiveRight',
             frames: this.anims.generateFrameNumbers('charA_move', { start: 0, end: 10 }), // fila 0
-            frameRate: 12,
+            frameRate: 15,
             repeat: 0
         });
         this.anims.create({
             key: 'charA_receiveLeft',
             frames: this.anims.generateFrameNumbers('charA_move', { start: 11, end: 21 }).reverse(), // fila 1
-            frameRate: 12,
+            frameRate: 15,
             repeat: 0
         });
 
         this.anims.create({
             key: 'charA_runRight',
             frames: this.anims.generateFrameNumbers('charA_move', { start: 22, end: 32 }), // fila 2
-            frameRate: 18,
+            frameRate: 20,
             repeat: -1
         });
         this.anims.create({
             key: 'charA_runLeft',
             frames: this.anims.generateFrameNumbers('charA_move', { start: 33, end: 43 }).reverse(), // fila 3
-            frameRate: 18,
+            frameRate: 20,
             repeat: -1
         });
 
         this.anims.create({
             key: 'charA_jumpRight',
             frames: this.anims.generateFrameNumbers('charA_jump', { start: 0, end: 12 }), // fila 0
-            frameRate: 12,
+            frameRate: 15,
             repeat: 0
         });
         this.anims.create({
             key: 'charA_jumpLeft',
             frames: this.anims.generateFrameNumbers('charA_jump', { start: 13, end: 25 }).reverse(), // fila 1
-            frameRate: 12,
+            frameRate: 15,
             repeat: 0
         });
         ////////
@@ -262,52 +271,52 @@ export class Game_Scene extends Phaser.Scene {
         this.anims.create({
             key: 'charB_idleRight',
             frames: this.anims.generateFrameNumbers('charB_move', { start: 0, end: 1 }), // fila 0
-            frameRate: 4,
+            frameRate: 5,
             repeat: -1
         });
         this.anims.create({
             key: 'charB_idleLeft',
             frames: this.anims.generateFrameNumbers('charB_move', { start: 20, end: 21 }).reverse(), // fila 0
-            frameRate: 4,
+            frameRate: 5,
             repeat: -1
         });       
 
         this.anims.create({
             key: 'charB_receiveRight',
             frames: this.anims.generateFrameNumbers('charB_move', { start: 0, end: 10 }), // fila 0
-            frameRate: 12,
+            frameRate: 15,
             repeat: 0
         });
         this.anims.create({
             key: 'charB_receiveLeft',
             frames: this.anims.generateFrameNumbers('charB_move', { start: 11, end: 21 }).reverse(), // fila 1
-            frameRate: 12,
+            frameRate: 15,
             repeat: 0
         });
 
         this.anims.create({
             key: 'charB_runRight',
             frames: this.anims.generateFrameNumbers('charB_move', { start: 22, end: 32 }), // fila 2
-            frameRate: 18,
+            frameRate: 20,
             repeat: -1
         });
         this.anims.create({
             key: 'charB_runLeft',
             frames: this.anims.generateFrameNumbers('charB_move', { start: 33, end: 43 }).reverse(), // fila 3
-            frameRate: 18,
+            frameRate: 20,
             repeat: -1
         });
 
         this.anims.create({
             key: 'charB_jumpRight',
             frames: this.anims.generateFrameNumbers('charB_jump', { start: 0, end: 12 }), // fila 0
-            frameRate: 12,
+            frameRate: 15,
             repeat: 0
         });
         this.anims.create({
             key: 'charB_jumpLeft',
             frames: this.anims.generateFrameNumbers('charB_jump', { start: 13, end: 25 }).reverse(), // fila 1
-            frameRate: 12,
+            frameRate: 15,
             repeat: 0
         });
         ////////
@@ -316,52 +325,52 @@ export class Game_Scene extends Phaser.Scene {
         this.anims.create({
             key: 'charC_idleRight',
             frames: this.anims.generateFrameNumbers('charC_move', { start: 0, end: 1 }), // fila 0
-            frameRate: 4,
+            frameRate: 5,
             repeat: -1
         });
         this.anims.create({
             key: 'charC_idleLeft',
             frames: this.anims.generateFrameNumbers('charC_move', { start: 20, end: 21 }).reverse(), // fila 0
-            frameRate: 4,
+            frameRate: 5,
             repeat: -1
         });      
 
         this.anims.create({
             key: 'charC_receiveRight',
             frames: this.anims.generateFrameNumbers('charC_move', { start: 0, end: 10 }), // fila 0
-            frameRate: 12,
+            frameRate: 15,
             repeat: 0
         });
         this.anims.create({
             key: 'charC_receiveLeft',
             frames: this.anims.generateFrameNumbers('charC_move', { start: 11, end: 21 }).reverse(), // fila 1
-            frameRate: 12,
+            frameRate: 15,
             repeat: 0
         });
 
         this.anims.create({
             key: 'charC_runRight',
             frames: this.anims.generateFrameNumbers('charC_move', { start: 22, end: 32 }), // fila 2
-            frameRate: 18,
+            frameRate: 20,
             repeat: -1
         });
         this.anims.create({
             key: 'charC_runLeft',
             frames: this.anims.generateFrameNumbers('charC_move', { start: 33, end: 43 }).reverse(), // fila 3
-            frameRate: 18,
+            frameRate: 20,
             repeat: -1
         });
 
         this.anims.create({
             key: 'charC_jumpRight',
             frames: this.anims.generateFrameNumbers('charC_jump', { start: 0, end: 12 }), // fila 0
-            frameRate: 12,
+            frameRate: 15,
             repeat: 0
         });
         this.anims.create({
             key: 'charC_jumpLeft',
             frames: this.anims.generateFrameNumbers('charC_jump', { start: 13, end: 25 }).reverse(), // fila 1
-            frameRate: 12,
+            frameRate: 15,
             repeat: 0
         });
         ////////
@@ -376,7 +385,7 @@ export class Game_Scene extends Phaser.Scene {
             this,
             'player1',
             this.worldWidth * 0.25,   // izquierda
-            this.worldHeight * 0.7,
+            this.groundY - 50,        // arriba del suelo (más margen)
             charP1
         );
 
@@ -384,7 +393,7 @@ export class Game_Scene extends Phaser.Scene {
             this,
             'player2',
             this.worldWidth * 0.75,   // derecha
-            this.worldHeight * 0.7,
+            this.groundY - 50,        // arriba del suelo (más margen)
             charP2
         );
 
@@ -393,7 +402,9 @@ export class Game_Scene extends Phaser.Scene {
 
         // se establecen los límites de la cancha para cada jugador
         const courtTop = 50;
-        const courtBottom = 430;
+        // alinear el límite inferior justo por encima del suelo
+        // como el ground ahora tiene origin en (0.5, 0), groundY es la parte superior
+        const courtBottom = Math.floor(this.groundY);
         const courtInteriorMargin = 25;
         const courtExteriortMargin = 80;
 
@@ -492,11 +503,13 @@ export class Game_Scene extends Phaser.Scene {
                 direction = (player.facing === 'left') ? 'idleLeft': 'idleRight';
             }
 
-            // se aplica siempre el movimiento/idle
-            this.commandProcessor.process(
-                new MovePlayerCommand(player, direction)
-            );
-            //////// 
+            // se aplica movimiento/idle SOLO si no está saltando
+            // si está saltando, no se procesa el movimiento para no sobrescribir la animación
+            if (!player.isJumping) {
+                this.commandProcessor.process(
+                    new MovePlayerCommand(player, direction)
+                );
+            }
 
             // recepción
             if (Phaser.Input.Keyboard.JustDown(mapping.receiveKeyObj)) {
@@ -514,7 +527,7 @@ export class Game_Scene extends Phaser.Scene {
                 );
             }
 
-            // Power Ups
+            // PowerUps
             if (Phaser.Input.Keyboard.JustDown(mapping.powerKeyObj)) {
                 player.useNextPowerUp();
                 this.updatePlayerInventoryUI(player);
@@ -559,7 +572,6 @@ export class Game_Scene extends Phaser.Scene {
     _setupBallEvents() {
         this.events.on('rallyConcluded', (data) => {
             console.log(`Rally concluded: ${data.scoringPlayerId} scores!`);
-            // TODO: Actualizar puntuación, disparar saque, reproducir efectos de sonido
         });
     }
 
