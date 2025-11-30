@@ -278,12 +278,12 @@ Se han diseñado logotipos tanto para la empresa como para el videojuego, con el
 
 **Logo de la empresa:**
 
-![Logo de la empresa](ASSETS/LOGO/logo_empresa.png)
+![Logo de la empresa](VolleyClash_juego/public/ASSETS/LOGO/logo_empresa.png)
 
 **Logo del juego:**
 El logotipo seleccionado representa un **balón de voleibol en llamas**, símbolo de la **intensidad, la energía y la competitividad** que caracterizan al juego. Su diseño busca transmitir dinamismo y emoción, reforzando la temática deportiva y el espíritu competitivo del videojuego.
 
-![Logo del juego](ASSETS/LOGO/Logo.png)
+![Logo del juego](VolleyClash_juego/public/ASSETS/LOGO/Logo.png)
 
 
 ## 5.5 Bocetos
@@ -294,34 +294,34 @@ Para ello, se han creado las siguientes pantallas: **menú inicial**, **configur
 #### Menú inicial
 En esta interfaz, el jugador podrá **comenzar una partida**, acceder a la **pantalla de configuración** o a los **créditos** del juego.  
 
-![Menú principal](ASSETS/INTERFACES/Pantalla_de_inicio.png)
+![Menú principal](VolleyClash_juego/public/ASSETS/INTERFACES/Pantalla_de_inicio.png)
 
 #### Configuración
 En esta pantalla, el jugador puede **cambiar el volumen del sonido** del juego y **modificar los controles** de la partida.  
 Además, en el modo de juego se añadirá un botón para **abandonar la partida**.  
 
-![Pantalla de configuración](ASSETS/INTERFACES/Configuracion_inicial.png)  
-![Pantalla de configuración en partida](ASSETS/INTERFACES/Configuracion_partida.png)
+![Pantalla de configuración](VolleyClash_juego/public/ASSETS/INTERFACES/Configuracion_inicial.png)  
+![Pantalla de configuración en partida](VolleyClash_juego/public/ASSETS/INTERFACES/Configuracion_partida.png)
 
 #### Créditos
 En esta interfaz se incluirán **únicamente los miembros del equipo y sus tareas**, con la opción de volver a la pantalla de inicio.  
 
-![Pantalla de créditos](ASSETS/INTERFACES/Creditos.png)
+![Pantalla de créditos](VolleyClash_juego/public/ASSETS/INTERFACES/Creditos.png)
 
 #### Modo de juego
 En esta pantalla se presentan dos botones para elegir entre los modos de **juego local o en red**, según prefiera el jugador.  
 
-![Pantalla de modo de juego](ASSETS/INTERFACES/Modo_de_juego.png)
+![Pantalla de modo de juego](VolleyClash_juego/public/ASSETS/INTERFACES/Modo_de_juego.png)
 
 #### Personalizar personaje del jugador
 En esta interfaz, el jugador podrá **elegir su nombre, el color de la equipación y el personaje** que desee utilizar.  
 
-![Pantalla de selección de personaje](ASSETS/INTERFACES/Seleccion_de_personaje.png)
+![Pantalla de selección de personaje](VolleyClash_juego/public/ASSETS/INTERFACES/Seleccion_de_personaje.png)
 
 #### Selección de escenario
 En esta pantalla, el jugador podrá **elegir el escenario** en el que desea jugar la partida.  
 
-![Pantalla de selección de escenario](ASSETS/INTERFACES/Seleccion_de_escenario.png)
+![Pantalla de selección de escenario](VolleyClash_juego/public/ASSETS/INTERFACES/Seleccion_de_escenario.png)
 
 #### Pantalla de juego
 En la pantalla de juego se pueden encontrar los siguientes elementos:
@@ -330,19 +330,19 @@ En la pantalla de juego se pueden encontrar los siguientes elementos:
 - Tiempo restante de la partida
 - Botón de configuración
 
-![Pantalla de juego](ASSETS/INTERFACES/Partida.png)  
+![Pantalla de juego](VolleyClash_juego/public/ASSETS/INTERFACES/Partida.png)  
 
 #### Fin de partida
 En esta interfaz aparecerá el **nombre del jugador ganador**.  
 Además, habrá dos botones: uno para **buscar una nueva partida** y otro para **volver al menú inicial**.
 
-![Pantalla de fin de juego](ASSETS/INTERFACES/Fin_de_partida.png)  
+![Pantalla de fin de juego](VolleyClash_juego/public/ASSETS/INTERFACES/Fin_de_partida.png)  
 
 
 ### 5.5.2 Diagrama de Estados
 Este es el diagrama de estados del juego, con todas las interfaces y las diferentes interacciones entre ellas.
 
-![Diagrama de Estados](ASSETS/DIAGRAMAS/Diagrama%20de%20Estados.jpg)
+![Diagrama de Estados](VolleyClash_juego/public/ASSETS/DIAGRAMAS/Diagrama%20de%20Estados.jpg)
 
 
 ### 5.5.3 Personajes
@@ -351,14 +351,14 @@ Se han diseñado diversos personajes jugables que el usuario puede seleccionar p
 Cada uno representa un estereotipo distinto presente en la narración del videojuego, tanto en su apariencia como en su comportamiento.
 | Equilibrado y Simpático | Rápido y Competitivo | Divertido y algo Distraído|
 |-----------|--------|---------------|
-| ![Personaje A](ASSETS/PERSONAJES/personajes_a.png) | ![Personaje B](ASSETS/PERSONAJES/personajes_b.png) | ![Personaje C](ASSETS/PERSONAJES/personaje_c.png) |
+| ![Personaje A](VolleyClash_juego/public/ASSETS/PERSONAJES/PERSONAJES_POSE/personajes_a.png) | ![Personaje B](VolleyClash_juego/public/ASSETS/PERSONAJES/PERSONAJES_POSE/personajes_b.png) | ![Personaje C](VolleyClash_juego/public/ASSETS/PERSONAJES/PERSONAJES_POSE/personaje_c.png) |
 
 ### 5.5.4 Escenarios
 Para los escenarios, se han recreado **lugares típicos donde se suelen desarrollar los partidos de voleibol**.
 
 | Gimnasio | Playa | Patio trasero |
 |-----------|--------|---------------|
-| ![Gimnasio](ASSETS/FONDOS/GIMNASIO.png) | ![Playa](ASSETS/FONDOS/PLAYA.png) | ![Patio trasero](ASSETS/FONDOS/JARDIN.png) |
+| ![Gimnasio](VolleyClash_juego/public/ASSETS/FONDOS/GIMNASIO.png) | ![Playa](VolleyClash_juego/public/ASSETS/FONDOS/PLAYA.png) | ![Patio trasero](VolleyClash_juego/public/ASSETS/FONDOS/JARDIN.png) |
 
 
 ### 5.5.5 Elementos del juego
@@ -367,7 +367,7 @@ Para los escenarios, se han recreado **lugares típicos donde se suelen desarrol
 
 | **Velocidad** | **Ralentizar** | **Paralizado** | **Multiplicador x3** | **Multiplicador x2** |
 |:-------------:|:--------------:|:--------------:|:--------------------:|:--------------------:|
-| ![Velocidad](ASSETS/ITEMS/POWER%20UPS/VELOCIDAD.png) | ![Ralentizar](ASSETS/ITEMS/POWER%20UPS/RELENTIZAR.png) | ![Paralizado](ASSETS/ITEMS/POWER%20UPS/PARALIZADO.png) | ![Multiplicador x3](ASSETS/ITEMS/POWER%20UPS/MULTIPLICADOR%203.png) | ![Multiplicador x2](ASSETS/ITEMS/POWER%20UPS/MULTIPLICADOR%202.png) |
+| ![Velocidad](VolleyClash_juego/public/ASSETS/ITEMS/POWER%20UPS/VELOCIDAD.png) | ![Ralentizar](VolleyClash_juego/public/ASSETS/ITEMS/POWER%20UPS/RELENTIZAR.png) | ![Paralizado](VolleyClash_juego/public/ASSETS/ITEMS/POWER%20UPS/PARALIZADO.png) | ![Multiplicador x3](VolleyClash_juego/public/ASSETS/ITEMS/POWER%20UPS/MULTIPLICADOR%203.png) | ![Multiplicador x2](VolleyClash_juego/public/ASSETS/ITEMS/POWER%20UPS/MULTIPLICADOR%202.png) |
 | Aumenta la velocidad del jugador temporalmente. | Ralentiza al oponente durante unos segundos. | Paraliza al oponente brevemente, impidiéndole moverse. | Triplica los puntos obtenidos durante un corto tiempo. | Duplica los puntos obtenidos durante un corto tiempo. |
 
 
@@ -375,7 +375,7 @@ Para los escenarios, se han recreado **lugares típicos donde se suelen desarrol
 
 | **Pelota Normal** | **Pelota Plus** | **Pelota de Playa** |
 |:-----------------:|:---------------:|:-------------------:|
-| ![Normal](ASSETS/ITEMS/PELOTAS/P_NORMAL.png) | ![Plus](ASSETS/ITEMS/PELOTAS/P_PLUS.png) | ![Playa](ASSETS/ITEMS/PELOTAS/P_PLAYA.png) |
+| ![Normal](VolleyClash_juego/public/ASSETS/ITEMS/PELOTAS/P_NORMAL.png) | ![Plus](VolleyClash_juego/public/ASSETS/ITEMS/PELOTAS/P_PLUS.png) | ![Playa](VolleyClash_juego/public/ASSETS/ITEMS/PELOTAS/P_PLAYA.png) |
 
 ---
 
