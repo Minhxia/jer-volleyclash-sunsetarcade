@@ -15,6 +15,7 @@ export class Player {
         this.activePowerUps = {};   // PowerUps activos
         this.isParalyzed = false;   // para el power up "paralizar"
         this.scoreMultiplier = 1;   // para por2 / por3
+        this.powerUpInventory = [];   // máximo 2
         
         this.isReceiving = false;   // estado de recepción
 
@@ -210,6 +211,21 @@ export class Player {
 
     // Uso de los power-ups
     applyPowerUp(type) {
+        // Inventario máximo de 2
+        if (this.powerUpInventory.length >= 2) return false;
+
+        this.powerUpInventory.push(type);
+        return true;
+    }
+
+    useNextPowerUp() {
+        if (this.powerUpInventory.length === 0) return;
+
+        const type = this.powerUpInventory.shift();
+        this._activatePowerUp(type);
+    }
+
+    _activatePowerUp(type) {
         const now = this.scene.time.now;
 
         switch(type) {
@@ -232,7 +248,6 @@ export class Player {
                 break;
         }
 
-        // Duración 10 segundos
         this.activePowerUps[type] = now + 10000;
     }
 

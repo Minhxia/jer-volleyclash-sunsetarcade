@@ -5,8 +5,8 @@ export class PowerUp {
         this.scene = scene;
         this.type = type; // "velocidad", "ralentizar", "paralizar", "por2", "por3"
 
-        this.sprite = scene.physics.add.sprite(x, y, type)
-            .setScale(0.5)
+        this.sprite = scene.physics.add.staticImage(x, y, type)
+            .setScale(1.2)
             .setInteractive();
 
         this.spawnTime = scene.time.now;
@@ -26,15 +26,57 @@ export class PowerUp {
         scene.players.forEach(player => {
             scene.physics.add.overlap(player.sprite, this.sprite, () => this.collect(player), null, this);
         });
+
+        this._lifetimeTimer = scene.time.delayedCall(this.lifetime, () => {
+            this.destroy(); // limpieza centralizada
+        });
     }
 
     collect(player) {
         if (this.isCollected) return;
         this.isCollected = true;
-        this.sprite.destroy();
 
         this.scene.commandProcessor.process(
             new ApplyPowerUpCommand(player, this.type)
         );
+
+        this.destroy();
+
+        if (this.scene.updatePlayerInventoryUI) {
+            this.scene.updatePlayerInventoryUI(player);
+        }
+    }
+
+    destroy() {
+        // Evitar múltiples llamadas
+        if (this._destroyed) return;
+        this._destroyed = true;
+
+        // cancelar tween si existe
+        if (this.fadeTween) {
+            this.fadeTween.stop();
+            this.fadeTween = null;
+        }
+
+        // cancelar timer si existe
+        if (this._lifetimeTimer) {
+            this._lifetimeTimer.remove(false);
+            this._lifetimeTimer = null;
+        }
+
+        // destruir sprite si existe y no está ya destruido
+        if (this.sprite && this.sprite.destroy) {
+            try {
+                this.sprite.destroy();
+            } catch (e) {
+                // ignore
+            }
+            this.sprite = null;
+        }
+
+        // quitar referencia del array scene.powerUps si existe
+        if (Array.isArray(this.scene.powerUps)) {
+            this.scene.powerUps = this.scene.powerUps.filter(p => p !== this);
+        }
     }
 }

@@ -102,21 +102,46 @@ export class Game_Scene extends Phaser.Scene {
         this.powerUps = [];
         this.maxPowerUps = 2;
 
-        // Cada 10-20s intentamos generar uno
+        this.inventoryUI = {
+            player1: [
+                this.add.image(50, 50, '').setScale(1.4).setVisible(false),
+                this.add.image(110, 50, '').setScale(1.4).setVisible(false)
+            ],
+            player2: [
+                this.add.image(this.worldWidth - 110, 50, '').setScale(1.4).setVisible(false),
+                this.add.image(this.worldWidth - 50, 50, '').setScale(1.4).setVisible(false)
+            ]
+        };
+
+        // Cada 2-5s intentamos generar uno
         this.time.addEvent({
-            delay: Phaser.Math.Between(10000, 20000),
+            delay: Phaser.Math.Between(2000, 5000),
             loop: true,
             callback: () => {
                 if (this.powerUps.length >= this.maxPowerUps) return;
 
                 const x = Phaser.Math.Between(50, this.worldWidth - 50);
-                const y = Phaser.Math.Between(100, this.worldHeight - 150); // evitar la red y suelo
+                const y = Phaser.Math.Between(this.worldHeight - 140, this.worldHeight - 120); // evitar la red y suelo
 
                 const types = ['velocidad', 'ralentizar', 'paralizar', 'por2', 'por3'];
                 const type = Phaser.Utils.Array.GetRandom(types);
 
                 const powerUp = new PowerUp(this, x, y, type);
                 this.powerUps.push(powerUp);
+
+                // Crear colisión con los jugadores
+                this.players.forEach(player => {
+                    this.physics.add.overlap(player.sprite, powerUp.sprite, () => {
+                        const stored = player.applyPowerUp(type);
+
+                        if (stored) {
+                            powerUp.destroy();
+                            this.powerUps = this.powerUps.filter(p => p !== powerUp);
+                            this.updatePlayerInventoryUI(player);
+                        }
+
+                    });
+                });
 
                 // limpiar de la lista cuando desaparece
                 this.time.delayedCall(powerUp.lifetime, () => {
@@ -132,6 +157,19 @@ export class Game_Scene extends Phaser.Scene {
         this._handleInputForAllPlayers();
         // se actualizan los power-ups
         this.players.forEach(player => player.updatePowerUps());
+    }
+
+    updatePlayerInventoryUI(player) {
+        const ui = this.inventoryUI[player.id];
+
+        for (let i = 0; i < 2; i++) {
+            if (player.powerUpInventory[i]) {
+                ui[i].setTexture(player.powerUpInventory[i]);
+                ui[i].setVisible(true);
+            } else {
+                ui[i].setVisible(false);
+            }
+        }
     }
     
     //// MÉTODOS AUXILIARES ////
@@ -348,7 +386,8 @@ export class Game_Scene extends Phaser.Scene {
                 leftKey: 'A',
                 rightKey: 'D',
                 jumpKey: 'W',
-                receiveKey: 'S'
+                receiveKey: 'S',
+                powerKey: 'E'
             },
             // jugador 2
             {
@@ -356,7 +395,8 @@ export class Game_Scene extends Phaser.Scene {
                 leftKey: 'J',
                 rightKey: 'L',
                 jumpKey: 'I',
-                receiveKey: 'K'
+                receiveKey: 'K',
+                powerKey: 'O'
             }
         ];
 
@@ -374,6 +414,9 @@ export class Game_Scene extends Phaser.Scene {
                 ),
                 receiveKeyObj: this.input.keyboard.addKey(
                     Phaser.Input.Keyboard.KeyCodes[config.receiveKey]
+                ),
+                powerKeyObj: this.input.keyboard.addKey(
+                    Phaser.Input.Keyboard.KeyCodes[config.powerKey]
                 )
             };
         });
@@ -428,6 +471,12 @@ export class Game_Scene extends Phaser.Scene {
                 this.commandProcessor.process(
                     new MovePlayerCommand(player, jumpDir)
                 );
+            }
+
+            // Power Ups
+            if (Phaser.Input.Keyboard.JustDown(mapping.powerKeyObj)) {
+                player.useNextPowerUp();
+                this.updatePlayerInventoryUI(player);
             }
         });
 
