@@ -26,6 +26,7 @@ export class SelectScenario_Scene extends Phaser.Scene {
 
     create() {
         const { width, height } = this.scale;
+        const style = this.game.globals.defaultTextStyle;
 
         const background = this.add.image(0, 0, 'fondo')
         .setOrigin(0)
@@ -33,6 +34,7 @@ export class SelectScenario_Scene extends Phaser.Scene {
 
         // Titulo
         this.add.text(width/2, 50, 'Selecciona Escenario', {
+            ...style,
             fontSize: '40px',
             color: '#000',
             fontStyle: 'bold'
@@ -53,7 +55,7 @@ export class SelectScenario_Scene extends Phaser.Scene {
                 .setScale(1.75);
 
             // Texto con el nombre del escenario
-            const texto = this.add.text(0, 0, nombre, { fontSize: '24px', color: '#000' });
+            const texto = this.add.text(0, 0, nombre, { ...style, fontSize: '24px', color: '#000' });
             Phaser.Display.Align.In.Center(texto, boton);
 
             boton.on('pointerover', () => boton.setTexture('botonSeleccionado'));
@@ -73,7 +75,7 @@ export class SelectScenario_Scene extends Phaser.Scene {
         const nextButton = this.add.image(width/2, 500, 'botonSimple')
             .setInteractive()
             .setScale(1.5);
-        const nextText = this.add.text(0, 0, 'Siguiente', { fontSize: '12px', color: '#000' });
+        const nextText = this.add.text(0, 0, 'Siguiente', { ...style, fontSize: '12px', color: '#000' });
         Phaser.Display.Align.In.Center(nextText, nextButton);
 
         nextButton.on('pointerover', () => nextButton.setTexture('botonSimpleSeleccionado'));

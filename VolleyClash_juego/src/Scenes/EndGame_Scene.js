@@ -19,6 +19,8 @@ export class EndGame_Scene extends Phaser.Scene {
 
     create() { 
         const { width, height } = this.scale;
+        const style = this.game.globals.defaultTextStyle;
+
 
         const charP1 = this.player1.name;
         const charP2 = this.player2.name;
@@ -28,7 +30,8 @@ export class EndGame_Scene extends Phaser.Scene {
 
         // Título principal
         this.add.text(width / 2, height * 0.18, "¡FIN DEL PARTIDO!", {
-           fontSize: '64px',
+            ...style,
+            fontSize: '64px',
             color: '#5f0000ff'
         }).setOrigin(0.5);
 
@@ -39,7 +42,8 @@ export class EndGame_Scene extends Phaser.Scene {
                 : "Ganador:" + charP2;
 
         this.add.text(width / 2, height * 0.40, winnerText, {
-           fontSize: '32px',
+            ...style,
+            fontSize: '32px',
             color: '#5f0000ff'
         }).setOrigin(0.5);
 
@@ -52,7 +56,8 @@ export class EndGame_Scene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true });
 
         const menuText = this.add.text(0, 0 * 0.52, "Volver a inicio", {
-           fontSize: '26px',
+            ...style,
+            fontSize: '26px',
             color: '#000000'
         });
 

@@ -11,9 +11,21 @@ export class Menu_Scene extends Phaser.Scene {
         this.load.image('botonSeleccionado', 'ASSETS/UI/BOTONES/BOTON_BASE_G_SELECCIONADO.png');
         this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_BASE_G.png');
         this.load.image('fondoMenuPrincipal', 'ASSETS/FONDOS/MENU_PRINCIPAL.png')
+        // Audio
+        this.load.audio('sonidoGeneral', 'ASSETS/SONIDO/SONIDO1.mp3');
     }
 
     create() {        
+        const style = this.game.globals.defaultTextStyle;
+        const volume = parseFloat(localStorage.getItem('volume')) || 1;
+        if (!this.game.globals.music) {
+            // Solo crearla la primera vez
+            this.game.globals.music = this.sound.add('sonidoGeneral', { loop: true, volume });
+            this.game.globals.music.play();
+        } else {
+            // Si ya existe, solo actualizar volumen
+            this.game.globals.music.setVolume(volume);
+        }
         // posiciones base para los botones del menú
         // (así se puede cambiar el tamaño sin problemas)
         const { width, height } = this.scale;
@@ -27,6 +39,7 @@ export class Menu_Scene extends Phaser.Scene {
         // TODO: cambiar por una imagen?
         // título del juego
         this.add.text(mitadDerechaX, 100, 'Volley Clash', {
+            ...style,
             fontSize: '32px',
             color: '#ffffff'
         }).setOrigin(0.5);
@@ -38,6 +51,7 @@ export class Menu_Scene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true });
 
         const playText = this.add.text(0, 0, 'Jugar', {
+            ...style,
             fontSize: '20px',
             color: '#000000'
         });
@@ -67,6 +81,7 @@ export class Menu_Scene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true });
 
         const configText = this.add.text(0, 0, 'Configuración', {
+            ...style,
             fontSize: '20px',
             color: '#000000'
         });
@@ -95,6 +110,7 @@ export class Menu_Scene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true });
 
         const creditsText = this.add.text(0, 0, 'Créditos', {
+            ...style,
             fontSize: '20px',
             color: '#000000'
         });

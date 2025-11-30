@@ -13,16 +13,17 @@ export class Pause_Scene extends Phaser.Scene {
         this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_BASE_G.png');
     }
 
-    create() { 
+    create() {
+        const style = this.game.globals.defaultTextStyle; 
         const { width, height } = this.scale;
         const centerX = width / 2;
 
         this.add.image(0, 0, 'fondo').setOrigin(0).setDepth(-1);
 
-
         //TÍTULO PRINCIPAL → “PAUSA”
         this.add.text(centerX, height * 0.18, 'PAUSA', {
-           fontSize: '32px',
+            ...style,
+            fontSize: '32px',
             color: '#5f0000ff'
         }).setOrigin(0.5);
 
@@ -33,6 +34,7 @@ export class Pause_Scene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true });
 
         const continuarText = this.add.text(0, 0 * 0.52, "Continuar", {
+            ...style,
            fontSize: '20px',
             color: '#000000'
         });
@@ -47,10 +49,6 @@ export class Pause_Scene extends Phaser.Scene {
         continuarBG.on("pointerover", () => continuarBG.setTexture('botonSeleccionado'));
         continuarBG.on("pointerout", () => continuarBG.setTexture('botonSinSeleccionar'));
 
-        
-        
-
-
         // --- BOTÓN VOLVER AL MENÚ ---
        const menuBotton = this.add
             .sprite(centerX, height * 0.66, 'botonSinSeleccionar')
@@ -58,12 +56,20 @@ export class Pause_Scene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true });
 
         const menuText = this.add.text(0, 0 * 0.52, "Menú Principal", {
-           fontSize: '20px',
+            ...style,
+            fontSize: '20px',
             color: '#000000'
         });
         Phaser.Display.Align.In.Center(menuText, menuBotton);
 
         menuBotton.on("pointerdown", () => {
+            // Limpiar listeners y keys del teclado de Game_Scene
+            const gameScene = this.scene.get("Game_Scene");
+            if (gameScene) {
+                gameScene.input.keyboard.removeAllListeners();
+                gameScene.input.keyboard.removeAllKeys();
+            }
+
             this.scene.stop("Game_Scene");
             this.scene.start("Menu_Scene");
         });
@@ -84,6 +90,5 @@ export class Pause_Scene extends Phaser.Scene {
             this.scene.stop();
             this.scene.resume('Game_Scene');
         });
-
     }
 }

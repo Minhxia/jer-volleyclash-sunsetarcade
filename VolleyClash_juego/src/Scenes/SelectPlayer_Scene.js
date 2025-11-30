@@ -22,7 +22,12 @@ export class SelectPlayer_Scene extends Phaser.Scene {
     }
 
     create() {
+        // Liberar todas las teclas capturadas por Phaser
+        this.input.keyboard.removeAllKeys(true);
+        this.input.keyboard.removeAllListeners();
+
         const { width, height } = this.scale;
+        const style = this.game.globals.defaultTextStyle;
 
         const background = this.add.image(0, 0, 'fondo')
         .setOrigin(0)
@@ -37,7 +42,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         this.selectedCharacters = new Set(); // Conjunto con los personajes seleccionados
 
         // Texto superior
-        this.add.text(width / 2, 50, 'Selecciona Personaje', { fontSize: '40px', color: '#000', fontStyle: 'bold' }).setOrigin(0.5);
+        this.add.text(width / 2, 50, 'Selecciona Personaje', { ...style, fontSize: '40px', color: '#000', fontStyle: 'bold' }).setOrigin(0.5);
 
         // Crear áreas de selección
         this.createPlayerArea(0); // Jugador 1
@@ -47,7 +52,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         const nextButton = this.add.image(width/2, 500, 'botonSimple')
             .setInteractive()
             .setScale(1.5);
-        const nextText = this.add.text(0, 0, 'Siguiente', { fontSize: '12px', color: '#000' });
+        const nextText = this.add.text(0, 0, 'Siguiente', { ...style, fontSize: '12px', color: '#000' });
         Phaser.Display.Align.In.Center(nextText, nextButton);
 
         nextButton.on('pointerover', () => nextButton.setTexture('botonSimpleSeleccionado'));
@@ -90,6 +95,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
     createPlayerArea(idx) {
         const { width, height } = this.scale;
         const player = this.players[idx];
+        const style = this.game.globals.defaultTextStyle;
 
         // Turno: 0 = jugador 1, 1 = jugador 2
         this.currentTurn = 0;
@@ -97,13 +103,14 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         // Crear inputs y marcos para cada jugador
         this.players.forEach((player, idx) => {
             // Input de nombre arriba
-            this.add.text(width * (0.25 + 0.5 * idx), 110, 'Nombre:', { fontSize: '24px', color: '#000' }).setOrigin(0.5);
+            this.add.text(width * (0.25 + 0.5 * idx), 110, 'Nombre:', { ...style,  fontSize: '24px', color: '#000' }).setOrigin(0.5);
             const input = this.add.dom(width * (0.25 + 0.5 * idx), 150).createFromHTML(`
                 <input type="text" placeholder="Nombre jugador" maxlength="10"
                         style="
                                 width:150px;
                                 padding:6px;
                                 font-size:16px;
+                                font-family:${style.fontFamily};
                                 border-radius:12px;
                                 border: 6px solid #FFAA00;
                                 outline: none;
@@ -117,6 +124,21 @@ export class SelectPlayer_Scene extends Phaser.Scene {
             `);
 
             const inputElement = input.node.querySelector('input');
+
+            inputElement.addEventListener('focus', (e) => {
+                this.input.keyboard.enabled = false;
+                e.stopPropagation();
+            });
+
+            inputElement.addEventListener('blur', (e) => {
+                this.input.keyboard.enabled = true;
+                e.stopPropagation();
+            });
+
+            inputElement.addEventListener('keydown', (e) => {
+                e.stopPropagation();
+            });
+
             inputElement.addEventListener('input', () => {
                 // Solo permitir letras y espacios
                 inputElement.value = inputElement.value.replace(/[^a-zA-Z]/g, '');
