@@ -7,9 +7,12 @@ export class SelectScenario_Scene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('botonSeleccionado', 'ASSETS/UI/BOTONES/BOTON_SELECCIONDO.png');
-        this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_SIN_SELECCIONAR.png');
-        this.load.image('botonVolver', 'ASSETS/UI/BOTONES/VOLVER.png');
+        this.load.image('botonSeleccionado', 'ASSETS/UI/BOTONES/BOTON_BASE.png');
+        this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_BASE_SINSELECCIONAR.png');
+        this.load.image('botonVolver', 'ASSETS/UI/BOTONES/FLECHA_VOLVER.png');
+        this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
+        this.load.image('botonSimple', 'ASSETS/UI/BOTONES/BOTON_BASE_SINSELECCIONAR.png');
+        this.load.image('botonSimpleSeleccionado', 'ASSETS/UI/BOTONES/BOTON_BASE.png');
 
         this.load.image('Gym', 'ASSETS/FONDOS/GIMNASIO.png');
         this.load.image('Playa', 'ASSETS/FONDOS/PLAYA.png');
@@ -23,6 +26,10 @@ export class SelectScenario_Scene extends Phaser.Scene {
 
     create() {
         const { width, height } = this.scale;
+
+        const background = this.add.image(0, 0, 'fondo')
+        .setOrigin(0)
+        .setDepth(-1);
 
         // Titulo
         this.add.text(width/2, 50, 'Selecciona Escenario', {
@@ -43,7 +50,7 @@ export class SelectScenario_Scene extends Phaser.Scene {
         escenarios.forEach((nombre, i) => {
             const boton = this.add.image(startX + i * spacing, 440, 'botonSinSeleccionar')
                 .setInteractive()
-                .setScale(0.6);
+                .setScale(1.75);
 
             // Texto con el nombre del escenario
             const texto = this.add.text(0, 0, nombre, { fontSize: '24px', color: '#000' });
@@ -63,15 +70,15 @@ export class SelectScenario_Scene extends Phaser.Scene {
         });
 
         // Boton Siguiente
-        const nextButton = this.add.image(width/2, 500, 'botonSinSeleccionar')
+        const nextButton = this.add.image(width/2, 500, 'botonSimple')
             .setInteractive()
-            .setScale(0.4);
+            .setScale(1.5);
         const nextText = this.add.text(0, 0, 'Siguiente', { fontSize: '12px', color: '#000' });
         Phaser.Display.Align.In.Center(nextText, nextButton);
 
-        nextButton.on('pointerover', () => nextButton.setTexture('botonSeleccionado'));
-        nextButton.on('pointerout', () => nextButton.setTexture('botonSinSeleccionar'));
-        nextButton.on('pointerdown', () => nextButton.setTexture('botonSeleccionado'));
+        nextButton.on('pointerover', () => nextButton.setTexture('botonSimpleSeleccionado'));
+        nextButton.on('pointerout', () => nextButton.setTexture('botonSimple'));
+        nextButton.on('pointerdown', () => nextButton.setTexture('botonSimpleSeleccionado'));
         nextButton.on('pointerup', () => {
             // Pasar todos los datos a la siguiente escena
             this.scene.start('Game_Scene', {
@@ -87,7 +94,7 @@ export class SelectScenario_Scene extends Phaser.Scene {
 
         const backButton = this.add
             .sprite(backX, backY, 'botonVolver')
-            .setScale(0.1)
+            .setScale(1)
             .setInteractive({ useHandCursor: true });
 
         backButton.on('pointerdown', () => {
