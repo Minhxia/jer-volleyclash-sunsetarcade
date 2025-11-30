@@ -3,24 +3,27 @@
 export class Player {
 
     constructor(scene, id, x, y, characterType) {
+        // INICIALIZACIÓN
         this.scene = scene;
         this.id = id;                       // identificador del jugador (P1, P2)
         this.characterType = characterType; // indica qué personaje se ha elegido
 
         // TODO: ajustar los valores
-        this.moveSpeed = 300;   // velocidad de movimiento (horizontal)
-        this.jumpSpeed = 550;   // fuerza de salto
+        this.moveSpeed = 200;   // velocidad de movimiento (horizontal)
+        this.jumpSpeed = 200;   // fuerza de salto
 
         this.activePowerUps = {};   // PowerUps activos
+        this.isParalyzed = false;   // para el power up "paralizar"
+        this.scoreMultiplier = 1;   // para por2 / por3
 
-        // TODO: comprobar que los nombres de las keys son correctos
         // configuración de los sprites y las animaciones según el personaje elegido
         const CHARACTER_CONFIG = {
             // equilibrado y simpático
-            personajeA: {
+            characterA: {
                 textureKey: 'charA_move',
                 startFrame: 0,
-                idleAnim: 'charA_idle',
+                idleLeftAnim: 'charA_idleLeft',
+                idleRightAnim: 'charA_idleRight',
                 runLeftAnim: 'charA_runLeft',
                 runRightAnim: 'charA_runRight',
                 jumpLeftAnim: 'charA_jumpLeft',
@@ -29,10 +32,11 @@ export class Player {
                 receiveRightAnim: 'charA_receiveRight'
             },
             // rápido y competitivo
-            personajeB: {
+            characterB: {
                 textureKey: 'charB_move',
                 startFrame: 0,
-                idleAnim: 'charB_idle',
+                idleLeftAnim: 'charB_idleLeft',
+                idleRightAnim: 'charB_idleRight',
                 runLeftAnim: 'charB_runLeft',
                 runRightAnim: 'charB_runRight',
                 jumpLeftAnim: 'charB_jumpLeft',
@@ -41,10 +45,11 @@ export class Player {
                 receiveRightAnim: 'charB_receiveRight'
             },
             // divertido y algo distraído
-            personajeC: {
+            characterC: {
                 textureKey: 'charC_move',
                 startFrame: 0,
-                idleAnim: 'charC_idle',
+                idleLeftAnim: 'charC_idleLeft',
+                idleRightAnim: 'charC_idleRight',
                 runLeftAnim: 'charC_runLeft',
                 runRightAnim: 'charC_runRight',
                 jumpLeftAnim: 'charC_jumpLeft',
@@ -64,11 +69,13 @@ export class Player {
             this.config.textureKey,
             this.config.startFrame
         );
+        // se hace un poco más grande
+        this.sprite.setScale(2);
+        // se ajusta la hitbox al nuevo tamaño para las colisiones  
+        this.sprite.body.setSize(this.sprite.width, this.sprite.height, true);
 
         // Collider
         this.sprite.setCollideWorldBounds(true);
-        // si es necesario, se puede ajustar el tamaño del hitbox
-        // this.sprite.body.setSize(ancho, alto, true);
 
         // se guarda una referencia hacia Player dentro del propio sprite
         // (es útil si en colisiones se quiere acceder a la lógica)
@@ -84,12 +91,16 @@ export class Player {
     //// ANIMACIONES ////
     // Movimiento del personaje hacia la izquierda
     moveLeft() {
+        if (this.isParalyzed) return;
+
         this.sprite.setVelocityX(-this.moveSpeed);
         this.facing = 'left';
         this.playAnimation(this.config.runLeftAnim);
     }
     // Movimiento del personaje hacia la derecha
     moveRight() {
+        if (this.isParalyzed) return;
+
         this.sprite.setVelocityX(this.moveSpeed);
         this.facing = 'right';
         this.playAnimation(this.config.runRightAnim);
@@ -97,6 +108,8 @@ export class Player {
 
     // Salto/remate del personaje hacia la izquierda
     jumpLeft() {
+        if (this.isParalyzed) return;
+
         // si está tocando el suelo, salta/remata
         if (this.sprite.body && this.sprite.body.blocked.down) {
             this.sprite.setVelocityY(-this.jumpSpeed);
@@ -106,6 +119,8 @@ export class Player {
     }
     // Salto/remate del personaje hacia la derecha
     jumpRight() {
+        if (this.isParalyzed) return;
+
         // si está tocando el suelo, salta/remata
         if (this.sprite.body && this.sprite.body.blocked.down) {
             this.sprite.setVelocityY(-this.jumpSpeed);
@@ -116,14 +131,19 @@ export class Player {
 
     // Recepción del personaje por la izquierda
     receiveLeft() {
+        if (this.isParalyzed) return;
+
         // si está tocando el suelo, recibe la pelota
         if (this.sprite.body && this.sprite.body.blocked.down) {
+            this.sprite.setVelocityX(0);
             this.facing = 'left';
             this.playAnimation(this.config.receiveLeftAnim);
         }
     }
     // Recepción del personaje por la derecha
     receiveRight() {
+        if (this.isParalyzed) return;
+
         // si está tocando el suelo, recibe la pelota
         if (this.sprite.body && this.sprite.body.blocked.down) {
             this.sprite.setVelocityX(0);
@@ -132,12 +152,26 @@ export class Player {
         }
     }
 
-    // Personaje idle
-    stop() {
-        this.sprite.setVelocityX(0);
+    // Personaje idle izda
+    idleLeft() {
+        if (this.isParalyzed) return;
+
         // si está tocando el suelo, parado, se muestra idle
         if (this.sprite.body && this.sprite.body.blocked.down) {
-            this.playAnimation(this.config.idleAnim);
+            this.sprite.setVelocityX(0);
+            this.facing = 'left';
+            this.playAnimation(this.config.idleLeftAnim);
+        }
+    }
+    // Personaje idle dcha
+    idleRight() {
+        if (this.isParalyzed) return;
+
+        // si está tocando el suelo, parado, se muestra idle
+        if (this.sprite.body && this.sprite.body.blocked.down) {
+            this.sprite.setVelocityX(0);
+            this.facing = 'right';
+            this.playAnimation(this.config.idleRightAnim);
         }
     }
     ////////
@@ -148,7 +182,6 @@ export class Player {
         if (!animKey) return;
         if (!this.sprite.anims) return;
 
-        // ignoreIfPlaying evita reiniciar la animación si ya está en curso
         this.sprite.anims.play(animKey, true);
     }
 
@@ -159,6 +192,7 @@ export class Player {
         }
     }
 
+    // Uso de los power-ups
     applyPowerUp(type) {
         const now = this.scene.time.now;
 
@@ -186,6 +220,7 @@ export class Player {
         this.activePowerUps[type] = now + 10000;
     }
 
+    // Actualiza los power-ups
     updatePowerUps() {
         const now = this.scene.time.now;
         for (const type in this.activePowerUps) {
@@ -213,6 +248,7 @@ export class Player {
         }
     }
 
+    // para modo EN RED?
     getOpponent() {
         if (!this.scene.players) return null;
         return Array.from(this.scene.players.values()).find(p => p !== this);

@@ -128,8 +128,9 @@ export class Game_Scene extends Phaser.Scene {
     }
 
     update() {
+        // se procesan los inputs de los jugadores
         this._handleInputForAllPlayers();
-
+        // se actualizan los power-ups
         this.players.forEach(player => player.updatePowerUps());
     }
     
@@ -138,150 +139,167 @@ export class Game_Scene extends Phaser.Scene {
     _createAnimations() {
         //// CharacterA ////
         this.anims.create({
-            key: 'charA_idle',
+            key: 'charA_idleRight',
             frames: this.anims.generateFrameNumbers('charA_move', { start: 0, end: 1 }), // fila 0
-            frameRate: 6,
+            frameRate: 4,
             repeat: -1
-        });        
+        });
+        this.anims.create({
+            key: 'charA_idleLeft',
+            frames: this.anims.generateFrameNumbers('charA_move', { start: 20, end: 21 }).reverse(), // fila 0
+            frameRate: 4,
+            repeat: -1
+        });
 
         this.anims.create({
             key: 'charA_receiveRight',
             frames: this.anims.generateFrameNumbers('charA_move', { start: 0, end: 10 }), // fila 0
-            frameRate: 10,
+            frameRate: 12,
             repeat: 0
         });
         this.anims.create({
             key: 'charA_receiveLeft',
             frames: this.anims.generateFrameNumbers('charA_move', { start: 11, end: 21 }).reverse(), // fila 1
-            frameRate: 10,
+            frameRate: 12,
             repeat: 0
         });
 
         this.anims.create({
             key: 'charA_runRight',
             frames: this.anims.generateFrameNumbers('charA_move', { start: 22, end: 32 }), // fila 2
-            frameRate: 10,
+            frameRate: 18,
             repeat: -1
         });
         this.anims.create({
             key: 'charA_runLeft',
             frames: this.anims.generateFrameNumbers('charA_move', { start: 33, end: 43 }).reverse(), // fila 3
-            frameRate: 10,
+            frameRate: 18,
             repeat: -1
         });
 
         this.anims.create({
             key: 'charA_jumpRight',
             frames: this.anims.generateFrameNumbers('charA_jump', { start: 0, end: 12 }), // fila 0
-            frameRate: 10,
+            frameRate: 12,
             repeat: 0
         });
         this.anims.create({
             key: 'charA_jumpLeft',
             frames: this.anims.generateFrameNumbers('charA_jump', { start: 13, end: 25 }).reverse(), // fila 1
-            frameRate: 10,
+            frameRate: 12,
             repeat: 0
         });
         ////////
 
         //// CharacterB ////
         this.anims.create({
-            key: 'charB_idle',
+            key: 'charB_idleRight',
             frames: this.anims.generateFrameNumbers('charB_move', { start: 0, end: 1 }), // fila 0
-            frameRate: 6,
+            frameRate: 4,
             repeat: -1
-        });        
+        });
+        this.anims.create({
+            key: 'charB_idleLeft',
+            frames: this.anims.generateFrameNumbers('charB_move', { start: 20, end: 21 }).reverse(), // fila 0
+            frameRate: 4,
+            repeat: -1
+        });       
 
         this.anims.create({
             key: 'charB_receiveRight',
             frames: this.anims.generateFrameNumbers('charB_move', { start: 0, end: 10 }), // fila 0
-            frameRate: 10,
+            frameRate: 12,
             repeat: 0
         });
         this.anims.create({
             key: 'charB_receiveLeft',
             frames: this.anims.generateFrameNumbers('charB_move', { start: 11, end: 21 }).reverse(), // fila 1
-            frameRate: 10,
+            frameRate: 12,
             repeat: 0
         });
 
         this.anims.create({
             key: 'charB_runRight',
             frames: this.anims.generateFrameNumbers('charB_move', { start: 22, end: 32 }), // fila 2
-            frameRate: 10,
+            frameRate: 18,
             repeat: -1
         });
         this.anims.create({
             key: 'charB_runLeft',
             frames: this.anims.generateFrameNumbers('charB_move', { start: 33, end: 43 }).reverse(), // fila 3
-            frameRate: 10,
+            frameRate: 18,
             repeat: -1
         });
 
         this.anims.create({
             key: 'charB_jumpRight',
             frames: this.anims.generateFrameNumbers('charB_jump', { start: 0, end: 12 }), // fila 0
-            frameRate: 10,
+            frameRate: 12,
             repeat: 0
         });
         this.anims.create({
             key: 'charB_jumpLeft',
             frames: this.anims.generateFrameNumbers('charB_jump', { start: 13, end: 25 }).reverse(), // fila 1
-            frameRate: 10,
+            frameRate: 12,
             repeat: 0
         });
         ////////
 
         //// CharacterC ////
         this.anims.create({
-            key: 'charC_idle',
+            key: 'charC_idleRight',
             frames: this.anims.generateFrameNumbers('charC_move', { start: 0, end: 1 }), // fila 0
-            frameRate: 6,
+            frameRate: 4,
             repeat: -1
-        });        
+        });
+        this.anims.create({
+            key: 'charC_idleLeft',
+            frames: this.anims.generateFrameNumbers('charC_move', { start: 20, end: 21 }).reverse(), // fila 0
+            frameRate: 4,
+            repeat: -1
+        });      
 
         this.anims.create({
             key: 'charC_receiveRight',
             frames: this.anims.generateFrameNumbers('charC_move', { start: 0, end: 10 }), // fila 0
-            frameRate: 10,
+            frameRate: 12,
             repeat: 0
         });
         this.anims.create({
             key: 'charC_receiveLeft',
             frames: this.anims.generateFrameNumbers('charC_move', { start: 11, end: 21 }).reverse(), // fila 1
-            frameRate: 10,
+            frameRate: 12,
             repeat: 0
         });
 
         this.anims.create({
             key: 'charC_runRight',
             frames: this.anims.generateFrameNumbers('charC_move', { start: 22, end: 32 }), // fila 2
-            frameRate: 10,
+            frameRate: 18,
             repeat: -1
         });
         this.anims.create({
             key: 'charC_runLeft',
             frames: this.anims.generateFrameNumbers('charC_move', { start: 33, end: 43 }).reverse(), // fila 3
-            frameRate: 10,
+            frameRate: 18,
             repeat: -1
         });
 
         this.anims.create({
             key: 'charC_jumpRight',
             frames: this.anims.generateFrameNumbers('charC_jump', { start: 0, end: 12 }), // fila 0
-            frameRate: 10,
+            frameRate: 12,
             repeat: 0
         });
         this.anims.create({
             key: 'charC_jumpLeft',
             frames: this.anims.generateFrameNumbers('charC_jump', { start: 13, end: 25 }).reverse(), // fila 1
-            frameRate: 10,
+            frameRate: 12,
             repeat: 0
         });
         ////////
     }
 
-    // TODO: esta hardcodeado, habrá que enlazarlo con la escena de selección de personaje
     // Crea los personajes de cada jugador
     _createPlayers() {
         const charP1 = this.player1;
@@ -309,8 +327,9 @@ export class Game_Scene extends Phaser.Scene {
         this.commandProcessor.setPlayers(this.players);
         this.commandProcessor.setGameScene(this);
 
-        p1.stop();
-        p2.stop();
+        // por defecto, animación idle
+        p1.idleRight();
+        p2.idleLeft();
     }    
 
     // Crea el suelo, la red, los límites, etc.
@@ -323,19 +342,21 @@ export class Game_Scene extends Phaser.Scene {
     // Asigna los controles/teclas de cada jugador
     _setupInputMappings() {
         const inputConfig = [
+            // jugador 1
             {
                 playerId: 'player1',
                 leftKey: 'A',
                 rightKey: 'D',
                 jumpKey: 'W',
-                receiveKey: 'SHIFT'
+                receiveKey: 'S'
             },
+            // jugador 2
             {
                 playerId: 'player2',
                 leftKey: 'J',
                 rightKey: 'L',
                 jumpKey: 'I',
-                receiveKey: 'SHIFT'
+                receiveKey: 'K'
             }
         ];
 
@@ -364,35 +385,42 @@ export class Game_Scene extends Phaser.Scene {
             const player = this.players.get(mapping.playerId);
             if (!player) return;
 
-            let direction = 'stop';
-
-            // recepción
-            if (mapping.receiveKeyObj.isDown) {
-                // si las teclas de dirección (left, right) están pulsadas
-                if (mapping.leftKeyObj.isDown) {
-                    direction = 'receiveLeft';
-                } 
-                else if (mapping.rightKeyObj.isDown) {
-                    direction = 'receiveRight';
-                }
-                // si solo se pulsa SHIFT, se usala orientación actual
-                else {                    
-                    direction = (player.facing === 'left') ? 'receiveLeft': 'receiveRight';
-                }
+            // si está paralizado, se deja en idle
+            if (player.isParalyzed) {
+                const idleDir = (player.facing === 'left') ? 'idleLeft' : 'idleRight';
+                this.commandProcessor.process(
+                    new MovePlayerCommand(player, idleDir)
+                );
+                return;
             }
-            // moivimiento horizontal normal 
+
+            let direction;
+
+            // movimiento horizontal normal
+            if (mapping.leftKeyObj.isDown) {
+                direction = 'left';
+            }
+            else if (mapping.rightKeyObj.isDown) {
+                direction = 'right';
+            }
+            // no se pulsa nada, así que se queda idle según hacia dónde miraba
             else {
-                if (mapping.leftKeyObj.isDown) {
-                    direction = 'left';
-                } else if (mapping.rightKeyObj.isDown) {
-                    direction = 'right';
-                }
+                direction = (player.facing === 'left') ? 'idleLeft': 'idleRight';
             }
 
-            // recepción o movimiento
+            // se aplica siempre el movimiento/idle
             this.commandProcessor.process(
                 new MovePlayerCommand(player, direction)
             );
+            //////// 
+
+            // recepción
+            if (Phaser.Input.Keyboard.JustDown(mapping.receiveKeyObj)) {
+                const receiveDir = (player.facing === 'left') ? 'receiveLeft' : 'receiveRight';
+                this.commandProcessor.process(
+                    new MovePlayerCommand(player, receiveDir)
+                );
+            }
 
             // salto/remate
             if (Phaser.Input.Keyboard.JustDown(mapping.jumpKeyObj)) {
