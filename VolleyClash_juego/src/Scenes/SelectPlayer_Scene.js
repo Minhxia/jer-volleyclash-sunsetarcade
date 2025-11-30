@@ -100,8 +100,28 @@ export class SelectPlayer_Scene extends Phaser.Scene {
             this.add.text(width * (0.25 + 0.5 * idx), 110, 'Nombre:', { fontSize: '24px', color: '#000' }).setOrigin(0.5);
             const input = this.add.dom(width * (0.25 + 0.5 * idx), 150).createFromHTML(`
                 <input type="text" placeholder="Nombre jugador" maxlength="10"
-                    style="width:120px; padding:5px; font-size:16px; border-radius:5px;">
+                        style="
+                                width:150px;
+                                padding:6px;
+                                font-size:16px;
+                                border-radius:12px;
+                                border: 6px solid #FFAA00;
+                                outline: none;
+                                text-align:center;
+                                background-color:#f0f0f0;
+                                transition: border-color 0.2s, box-shadow 0.2s;
+                        "
+                        onfocus="this.style.borderColor='#FF8316'; this.style.boxShadow='0 0 5px #FF8316';"
+                        onblur="this.style.borderColor='#FFAA00'; this.style.boxShadow='none';"
+                    >
             `);
+
+            const inputElement = input.node.querySelector('input');
+            inputElement.addEventListener('input', () => {
+                // Solo permitir letras y espacios
+                inputElement.value = inputElement.value.replace(/[^a-zA-Z]/g, '');
+            });
+
             if (!this.playerInputs) this.playerInputs = [];
             this.playerInputs[idx] = input;
 
@@ -113,6 +133,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
             player.bigFrame = this.add.image(player.bigImage.x, player.bigImage.y, 'marco')
             .setScale(2.8) 
             .setVisible(true);
+
             // Marco sobre miniatura
             player.frame = this.add.rectangle(0, 0, 60, 120)
                 .setStrokeStyle(4, player.color)
