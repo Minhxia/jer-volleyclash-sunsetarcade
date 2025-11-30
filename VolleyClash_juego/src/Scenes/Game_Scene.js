@@ -22,6 +22,8 @@ export class Game_Scene extends Phaser.Scene {
         this.player2 = data.player2;
         this.selectedScenario = data.selectedScenario;
         this.ball = null;
+        this.scoreP1 = 0;
+        this.scoreP2 = 0;
     }
 
     preload() {
@@ -527,11 +529,6 @@ export class Game_Scene extends Phaser.Scene {
             this.scene.launch("Pause_Scene"); // muestra la escena de pausa
         });
 
-         this.input.keyboard.on("keydown-ALT", () => {
-            this.scene.pause();               // detiene el game loop
-            this.scene.start("EndGame_Scene", { winner: "player1" , player1: this.player1,
-                player2: this.player2,}); // muestra la escena de pausa
-        });
     }
 
     // Crea la pelota
@@ -576,4 +573,27 @@ export class Game_Scene extends Phaser.Scene {
 
         ball.hit(player, playerDirection, isJumping, isReceiving);
     }
+    
+    _checkWinCondition() {
+    const maxPoints = 5; // el que sea
+
+        if (this.scoreP1 >= maxPoints) {
+             this._endMatch("player1");
+        }
+
+        if (this.scoreP2 >= maxPoints) {
+            this._endMatch("player2");
+        }
+    }
+
+    _endMatch(winner) {
+    this.scene.pause(); 
+    this.scene.start("EndGame_Scene", {
+        winner: winner,
+        player1: this.player1,
+        player2: this.player2,
+    });
+}
+
+
 }
