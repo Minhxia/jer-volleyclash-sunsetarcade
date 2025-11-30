@@ -123,6 +123,22 @@ export class Game_Scene extends Phaser.Scene {
             .setDisplaySize(width, height); 
 
         this._createAnimations();
+    //PUNTUACION DE LOS JUGADORES
+            this.pointsLeft = 0;
+            this.pointsRight = 0;
+
+            this.scoreLeft = this.add.text(100, 50, '0', {
+                ...style,
+                fontSize: '48px',
+                color: '#2f1801ff'
+            }).setDepth(9999);
+            
+
+            this.rightScore = this.add.text(700, 50, '0', {
+                ...style,
+                fontSize: '48px',
+                color: '#2f1801ff'
+            }).setDepth(9999);
 
         // TODO: cambiar?
         // suelo de prueba: crear un cuerpo estático rectangular invisible
@@ -628,6 +644,16 @@ export class Game_Scene extends Phaser.Scene {
     _setupBallEvents() {
         this.events.on('rallyConcluded', (data) => {
             console.log(`Rally concluded: ${data.scoringPlayerId} scores!`);
+        const scorer = data.scoringPlayerId;
+
+        if (scorer === 'player1') {
+            this.pointsLeft++;
+            this.scoreLeft.setText(this.pointsLeft.toString());
+        }
+        else if (scorer === 'player2') {
+            this.pointsRight++;
+            this.rightScore.setText(this.pointsRight.toString());
+        }
         });
     }
 
