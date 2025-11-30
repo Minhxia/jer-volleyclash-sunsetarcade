@@ -19,6 +19,18 @@ export class Player {
         
         this.isReceiving = false;   // estado de recepción
 
+        // Límites de movimiento personalizados
+        this.boundsLeft = 0;
+        this.boundsRight = 960;
+        this.boundsTop = 0;
+        this.boundsBottom = 540;
+
+        // Límites de movimiento personalizados
+        this.boundsLeft = 0;
+        this.boundsRight = 960;
+        this.boundsTop = 0;
+        this.boundsBottom = 540;
+
         // configuración de los sprites y las animaciones según el personaje elegido
         const CHARACTER_CONFIG = {
             // equilibrado y simpático
@@ -77,8 +89,8 @@ export class Player {
         // se ajusta la hitbox al nuevo tamaño para las colisiones  
         this.sprite.body.setSize(this.sprite.width, this.sprite.height, true);
 
-        // Collider
-        this.sprite.setCollideWorldBounds(true);
+        // No usar colisión con límites del mundo - usamos límites personalizados
+        // this.sprite.setCollideWorldBounds(true);
 
         // se guarda una referencia hacia Player dentro del propio sprite
         // (es útil si en colisiones se quiere acceder a la lógica)
@@ -193,6 +205,40 @@ export class Player {
     }
     ////////
 
+    // Establecer los límites de movimiento del jugador (para confinar a la cancha)
+    setBounds(left, right, top, bottom) {
+        this.boundsLeft = left;
+        this.boundsRight = right;
+        this.boundsTop = top;
+        this.boundsBottom = bottom;
+    }
+
+    // Mantener el jugador dentro de los límites
+    clampWithinBounds() {
+        const halfWidth = this.sprite.width / 2;
+        const halfHeight = this.sprite.height / 2;
+
+        // Limitar posición horizontal
+        if (this.sprite.x - halfWidth < this.boundsLeft) {
+            this.sprite.x = this.boundsLeft + halfWidth;
+            this.sprite.setVelocityX(0);
+        }
+        if (this.sprite.x + halfWidth > this.boundsRight) {
+            this.sprite.x = this.boundsRight - halfWidth;
+            this.sprite.setVelocityX(0);
+        }
+
+        // Limitar posición vertical
+        if (this.sprite.y - halfHeight < this.boundsTop) {
+            this.sprite.y = this.boundsTop + halfHeight;
+            this.sprite.setVelocityY(0);
+        }
+        if (this.sprite.y + halfHeight > this.boundsBottom) {
+            this.sprite.y = this.boundsBottom - halfHeight;
+            this.sprite.setVelocityY(0);
+        }
+    }
+
     // TODO: revisar si esto es necesario
     // Reproduce una animación si existe
     playAnimation(animKey) {
@@ -202,11 +248,13 @@ export class Player {
         this.sprite.anims.play(animKey, true);
     }
 
-    // Actualiza flags como isOnGround (se llama a esto desde la escena, en cada frame)
+    // Actualizar flags como isOnGround (se llama a esto desde la escena, en cada frame)
     update() {
         if (this.sprite.body) {
             this.isOnGround = this.sprite.body.blocked.down;
         }
+        // Mantener el jugador dentro de los límites de la cancha
+        this.clampWithinBounds();
     }
 
     // Uso de los power-ups

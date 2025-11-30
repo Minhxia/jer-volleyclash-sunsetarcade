@@ -389,6 +389,18 @@ export class Game_Scene extends Phaser.Scene {
         this.players.set('player1', p1);
         this.players.set('player2', p2);
 
+        // se establecen los límites de la cancha para cada jugador
+        const courtTop = 50;
+        const courtBottom = 430;
+        const courtInteriorMargin = 25;
+        const courtExteriortMargin = 80;
+
+        // player1 (izquierda):
+        p1.setBounds(courtExteriortMargin, 480 - courtInteriorMargin, courtTop, courtBottom);
+        
+        // player2 (derecha):
+        p2.setBounds(480 + courtInteriorMargin, this.worldWidth - courtExteriortMargin, courtTop, courtBottom);
+
         this.commandProcessor.setPlayers(this.players);
         this.commandProcessor.setGameScene(this);
 
