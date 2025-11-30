@@ -11,9 +11,9 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_SIN_SELECCIONAR.png');
         this.load.image('botonVolver', 'ASSETS/UI/BOTONES/VOLVER.png');
 
-        this.load.image('personajeA', 'ASSETS/PERSONAJES/PERSONAJES_POSE/personajes_a.png');
-        this.load.image('personajeB', 'ASSETS/PERSONAJES/PERSONAJES_POSE/personajes_b.png');
-        this.load.image('personajeC', 'ASSETS/PERSONAJES/PERSONAJES_POSE/personaje_c.png');
+        this.load.image('characterA', 'ASSETS/PERSONAJES/PERSONAJES_POSE/personajes_a.png');
+        this.load.image('characterB', 'ASSETS/PERSONAJES/PERSONAJES_POSE/personajes_b.png');
+        this.load.image('characterC', 'ASSETS/PERSONAJES/PERSONAJES_POSE/personaje_c.png');
     }
 
     create() {
@@ -59,8 +59,8 @@ export class SelectPlayer_Scene extends Phaser.Scene {
             this.players[1].name = name2;
 
             this.scene.start('SelectScenario_Scene', { 
-                player1: this.players[0],
-                player2: this.players[1]
+                player1: this.players[0].character,
+                player2: this.players[1].character
             });
         });
 
@@ -97,7 +97,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
             this.playerInputs[idx] = input;
 
             // Imagen grande
-            player.bigImage = this.add.image(width * (0.25 + 0.5 * idx), height * 0.6, 'personajeA')
+            player.bigImage = this.add.image(width * (0.25 + 0.5 * idx), height * 0.6, 'characterA')
                 .setScale(1.2)
                 .setVisible(false);
 
@@ -109,7 +109,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
 
 
         // Miniaturas en triángulo central
-        const personajes = ['personajeA', 'personajeB', 'personajeC'];
+        const personajes = ['characterA', 'characterB', 'characterC'];
         const spacing = 150; // aumenta espaciado
         const startX = width / 2 - spacing / 2;
         const startY = height * 0.5;
