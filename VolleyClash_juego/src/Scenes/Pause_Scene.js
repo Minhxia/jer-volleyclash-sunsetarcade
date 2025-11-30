@@ -6,7 +6,7 @@ export class Pause_Scene extends Phaser.Scene {
         super('Pause_Scene');
     }
 
-   preload() {
+    preload() {
         this.load.image('botonVolver', 'ASSETS/UI/BOTONES/VOLVER.png');
         this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
         this.load.image('botonSeleccionado', 'ASSETS/UI/BOTONES/BOTON_BASE_G_SELECCIONADO.png');
@@ -44,6 +44,7 @@ export class Pause_Scene extends Phaser.Scene {
         continuarBG.on("pointerdown", () => {
             this.scene.stop();              // quitamos la escena de pausa
             this.scene.resume("Game_Scene"); // volvemos al juego
+            
         });
 
         continuarBG.on("pointerover", () => continuarBG.setTexture('botonSeleccionado'));

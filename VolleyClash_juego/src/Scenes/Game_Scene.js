@@ -117,6 +117,8 @@ export class Game_Scene extends Phaser.Scene {
         });
 
         this.updateTimer();
+
+        
         // FONDO DEL ESCENARIO SELECCIONADO
         this.add.image(width / 2, height / 2, this.selectedScenario)
             .setOrigin(0.5)
@@ -226,7 +228,11 @@ export class Game_Scene extends Phaser.Scene {
 
         this.input.keyboard.on("keydown-ESC", () => {
             this.scene.pause();               // detiene el game loop
+            this.timerEvent.paused = true;
             this.scene.launch("Pause_Scene"); // muestra la escena de pausa
+        });
+        this.events.on('resume', () => {
+            this.timerEvent.paused = false;
         });
     }
 
