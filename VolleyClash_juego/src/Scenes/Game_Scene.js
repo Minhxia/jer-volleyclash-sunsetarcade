@@ -3,6 +3,7 @@
 import Phaser from 'phaser';
 import { Player } from '../Entities/Player.js';
 import { PowerUp } from '../Entities/PowerUp.js';
+import { Ball } from '../Entities/Ball.js';
 import { CommandProcessor } from '../Commands/CommandProcessor.js';
 import { MovePlayerCommand } from '../Commands/MovePlayerCommand.js';
 
@@ -18,6 +19,7 @@ export class Game_Scene extends Phaser.Scene {
         this.player1 = data.player1;
         this.player2 = data.player2;
         this.selectedScenario = data.selectedScenario;
+        this.ball = null; // Will be initialized in create()
     }
 
     preload() {
@@ -68,6 +70,9 @@ export class Game_Scene extends Phaser.Scene {
         this.load.image('paralizar', 'ASSETS/ITEMS/POWER UPS/PARALIZADO.png')
         this.load.image('ralentizar', 'ASSETS/ITEMS/POWER UPS/RELENTIZAR.png')
         this.load.image('velocidad', 'ASSETS/ITEMS/POWER UPS/VELOCIDAD.png')
+
+        // Ball
+        this.load.image('ball', 'ASSETS/ITEMS/PELOTAS/P_NORMAL.png')
     }
 
     create() {
@@ -125,6 +130,13 @@ export class Game_Scene extends Phaser.Scene {
             }
         });
 
+        // Ball initialization
+        this._createBall();
+        // Ball collision handlers
+        this._setupBallCollisions();
+        // Ball event listeners
+        this._setupBallEvents();
+
     }
 
     update() {
@@ -132,6 +144,20 @@ export class Game_Scene extends Phaser.Scene {
         this._handleInputForAllPlayers();
         // se actualizan los power-ups
         this.players.forEach(player => player.updatePowerUps());
+        // se actualiza el estado de la pelota
+        if (this.ball) {
+            this.ball.update();
+            // Check if ball hits ground (near bottom of screen)
+            if (this.ball.isBallLive && this.ball.sprite.y > this.worldHeight - 30) {
+                this.ball.onGrounded();
+            }
+            // Check if ball crosses net (net is at x = 480)
+            if (this.ball.sprite.x < 475 && this.ball.courtSide === 'right') {
+                this.ball.crossNet();
+            } else if (this.ball.sprite.x > 485 && this.ball.courtSide === 'left') {
+                this.ball.crossNet();
+            }
+        }
     }
     
     //// MÉTODOS AUXILIARES ////
@@ -433,5 +459,49 @@ export class Game_Scene extends Phaser.Scene {
 
         // se actualiza el estado de los jugadores (suelo, etc.)
         this.players.forEach(player => player.update());
+    }
+
+    // Crea la pelota
+    _createBall() {
+        this.ball = new Ball(this, this.worldWidth / 2, 150);
+    }
+
+    // Configura las colisiones de la pelota
+    _setupBallCollisions() {
+        // Ball collisions with players
+        this.players.forEach(player => {
+            this.physics.add.overlap(
+                this.ball.sprite,
+                player.sprite,
+                () => this._onBallPlayerCollision(this.ball, player),
+                null,
+                this
+            );
+        });
+
+        // Ball collision with ground (triggers scoring)
+        const groundY = this.worldHeight - 10;
+        this.ball.sprite.setCollideWorldBounds(true);
+        this.ball.sprite.setBounce(0.8);
+
+        // Check ground collision in update loop (see below)
+    }
+
+    // Configura los event listeners de la pelota
+    _setupBallEvents() {
+        this.events.on('rallyConcluded', (data) => {
+            console.log(`Rally concluded: ${data.scoringPlayerId} scores!`);
+            // TODO: Update score, trigger serve, play sound effects
+        });
+    }
+
+    // Maneja colisión entre pelota y jugador
+    _onBallPlayerCollision(ball, player) {
+        if (!ball.isBallLive) return;
+
+        const isJumping = !player.sprite.body.blocked.down;
+        const playerDirection = player.facing;
+
+        ball.hit(player, playerDirection, isJumping);
     }
 }
