@@ -500,8 +500,9 @@ export class Game_Scene extends Phaser.Scene {
         if (!ball.isBallLive) return;
 
         const isJumping = !player.sprite.body.blocked.down;
+        const isReceiving = player.isReceiving;
         const playerDirection = player.facing;
 
-        ball.hit(player, playerDirection, isJumping);
+        ball.hit(player, playerDirection, isJumping, isReceiving);
     }
 }

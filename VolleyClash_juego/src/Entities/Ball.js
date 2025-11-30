@@ -26,8 +26,9 @@ export class Ball {
      * @param {Object} player - The player who hit the ball
      * @param {string} playerFacingDirection - 'left' or 'right'
      * @param {boolean} isJumping - Whether player was airborne
+     * @param {boolean} isReceiving - Whether player is in receiving state
      */
-    hit(player, playerFacingDirection, isJumping) {
+    hit(player, playerFacingDirection, isJumping, isReceiving = false) {
         if (!this.isBallLive) return;
 
         // Increment touch count if same player continues, reset if different player
@@ -45,21 +46,44 @@ export class Ball {
             return;
         }
 
-        // Calculate ball velocity based on player direction and jump state
+        // Calculate ball velocity based on player direction and jump/receive state
         let velocityX, velocityY;
 
-        // Horizontal velocity: stronger if jumping (smash), weaker if receiving
-        const baseSpeedX = 250;
-        const jumpBonus = isJumping ? 1.5 : 1.0;
+        if (isReceiving) {
+            // Receiving: long and wide parabola (defensive trajectory)
+            // Lower horizontal speed, higher vertical speed for arc
+            const baseSpeedX = 180;
+            const verticalStrength = -350; // Higher vertical component for arc
 
-        if (playerFacingDirection === 'left') {
-            velocityX = -baseSpeedX * jumpBonus;
+            if (playerFacingDirection === 'left') {
+                velocityX = -baseSpeedX;
+            } else {
+                velocityX = baseSpeedX;
+            }
+            velocityY = verticalStrength;
+        } else if (isJumping) {
+            // Jumping/Attack: strong horizontal, weak vertical (spike/smash)
+            // High horizontal speed, low vertical speed for flat trajectory
+            const baseSpeedX = 300;
+            const verticalStrength = -150; // Low vertical component for flat attack
+
+            if (playerFacingDirection === 'left') {
+                velocityX = -baseSpeedX;
+            } else {
+                velocityX = baseSpeedX;
+            }
+            velocityY = verticalStrength;
         } else {
-            velocityX = baseSpeedX * jumpBonus;
-        }
+            // Regular ground hit
+            const baseSpeedX = 200;
 
-        // Vertical velocity: upward if jumping, slight upward if on ground
-        velocityY = isJumping ? -300 : -100;
+            if (playerFacingDirection === 'left') {
+                velocityX = -baseSpeedX;
+            } else {
+                velocityX = baseSpeedX;
+            }
+            velocityY = -100;
+        }
 
         this.sprite.setVelocity(velocityX, velocityY);
 
