@@ -301,7 +301,7 @@ En esta interfaz, el jugador podrá **comenzar una partida**, acceder a la **pan
 #### Configuración
 En esta pantalla, el jugador puede **cambiar el volumen del sonido** del juego y **ver los controles** de la partida.  
 
-![Pantalla de configuración](VolleyClash_juego/public/ASSETS/INTERFACES/Configuracion_inicial.png)  
+<img src="VolleyClash_juego/public/ASSETS/INTERFACES/Configuracion_inicial.png" width="960" height="540" alt="Pantalla de configuración">
 
 #### Créditos
 En esta interfaz se incluirán **únicamente los miembros del equipo**, con la opción de volver a la pantalla de inicio.  
