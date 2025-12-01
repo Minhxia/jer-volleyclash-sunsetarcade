@@ -125,7 +125,7 @@ La versión inicial se centra en:
 
 # 2. Características Principales
 - **Multijugador en tiempo real** (2 jugadores).  
-- **Juego rápido y competitivo** con duración de partidas de 2 a 5 minutos.  
+- **Juego rápido y competitivo** con duración de partidas de 1 minuto.  
 - ***Power-ups*** **aleatorios** que alteran la dinámica del juego (velocidad, parálisis, puntos extra).  
 - **Estética pixel-art** minimalista y colorida.  
 - **Controles simples y responsivos**:  
@@ -166,7 +166,7 @@ El sistema está dividido en dos capas:
 ---
 
 # 4. Jugabilidad
-**Volley Clash** consiste en partidos rápidos (**2-5 minutos**) y competitivos de **voleibol arcade** en **1vs1** local y *online*. Cada jugador mueve a su personaje en un **entorno 2D**, y tiene que golpear la pelota en el momento adecuado para devolverla al campo rival. Además, durante el partido aparecen ***power-ups*** en la pista, que los jugadores pueden usar para ganar ventaja.
+**Volley Clash** consiste en partidos rápidos (**1 minuto**) y competitivos de **voleibol arcade** en **1vs1** local y *online*. Cada jugador mueve a su personaje en un **entorno 2D**, y tiene que golpear la pelota en el momento adecuado para devolverla al campo rival. Además, durante el partido aparecen ***power-ups*** en la pista, que los jugadores pueden usar para ganar ventaja.
 
 
 ## 4.1 Objetivo del juego
@@ -213,13 +213,13 @@ La pelota **no sale fuera** por los laterales o la parte superior, sino que **re
 
 
 ### 4.3.7 Power-Ups
-Durante el partido, los *power-ups* aparecen de forma **aleatoria** en zonas válidas de la pista (nunca sobre la red). Permanecen visibles un tiempo corto (**5 segundos**) y si no se recogen, a partir de los 3 segundos empiezan a **desvanecerse** poco a poco hasta desaparecer.
+Durante el partido, los *power-ups* aparecen de forma **aleatoria** en zonas válidas de la pista (nunca sobre la red). Permanecen visibles un tiempo corto (**5 segundos**) y si no se recogen, a partir de los 3 segundos empiezan a **desvanecerse** poco a poco hasta desaparecer. Tienen un código de color para dar feedback visual a los jugadores.
 
 - **Efectos disponibles:**
-  - **Aumentar velocidad** del jugador.
-  - **Ralentizar** al rival.
-  - **Paralizar** al rival durante un breve intervalo.
-  - **Multiplicar** la puntuación (**x2/x3**).
+  - **Aumentar velocidad** del jugador. Color cian/verde.
+  - **Ralentizar** al rival. Color azul oscuro.
+  - **Paralizar** al rival durante un breve intervalo. Color rojo, parpadeante.
+  - **Multiplicar** la puntuación (**x2/x3**). Color dorado, además aparece un texto con el multiplicador correspondiente sobre el personaje.
 
 - **Frecuencia de aparición:** **cada 2–5 segundos** en función de la duración del partido, siempre que haya **menos de 2** *power-ups* en pantalla.
 
