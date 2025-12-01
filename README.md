@@ -358,6 +358,15 @@ Cada uno representa un estereotipo distinto presente en la narración del videoj
 |-----------|--------|---------------|
 | ![Personaje A](VolleyClash_juego/public/ASSETS/PERSONAJES/PERSONAJES_POSE/personajes_a.png) | ![Personaje B](VolleyClash_juego/public/ASSETS/PERSONAJES/PERSONAJES_POSE/personajes_b.png) | ![Personaje C](VolleyClash_juego/public/ASSETS/PERSONAJES/PERSONAJES_POSE/personaje_c.png) |
 
+Cada uno tiene su hoja de Sprites con las animaciones de **Remate, recibo y movimiento**.
+| Equilibrado y Simpático | Rápido y Competitivo | Divertido y algo Distraído |
+|-------------|-------------|-------------|
+| **Remate**  | **Remate**  | **Remate**  |
+| ![Remate A](VolleyClash_juego/public/ASSETS/PERSONAJES/ANIMACIONES/PERSONAJE_A/ANIMACION_REMATE.png) | ![Remate B](VolleyClash_juego/public/ASSETS/PERSONAJES/ANIMACIONES/PERSONAJE_B/ANIMACION_REMATE.png) | ![Remate C](VolleyClash_juego/public/ASSETS/PERSONAJES/ANIMACIONES/PERSONAJE_C/ANIMACION_REMATE.png) |
+| **Correr / Recibir** | **Correr / Recibir** | **Correr / Recibir** |
+| ![Correr A](VolleyClash_juego/public/ASSETS/PERSONAJES/ANIMACIONES/PERSONAJE_A/ANIMACIONES_CORRER_RECIBIR.png) | ![Correr B](VolleyClash_juego/public/ASSETS/PERSONAJES/ANIMACIONES/PERSONAJE_B/ANIMACIONES_CORRER_RECIBIR.png) | ![Correr C](VolleyClash_juego/public/ASSETS/PERSONAJES/ANIMACIONES/PERSONAJE_C/ANIMACIONES_CORRER_RECIBIR.png) |
+
+
 ### 5.5.4 Escenarios
 Para los escenarios, se han recreado **lugares típicos donde se suelen desarrollar los partidos de voleibol**.
 
@@ -381,6 +390,13 @@ Para los escenarios, se han recreado **lugares típicos donde se suelen desarrol
 | **Pelota Normal** | **Pelota Plus** | **Pelota de Playa** |
 |:-----------------:|:---------------:|:-------------------:|
 | ![Normal](VolleyClash_juego/public/ASSETS/ITEMS/PELOTAS/P_NORMAL.png) | ![Plus](VolleyClash_juego/public/ASSETS/ITEMS/PELOTAS/P_PLUS.png) | ![Playa](VolleyClash_juego/public/ASSETS/ITEMS/PELOTAS/P_PLAYA.png) |
+
+
+#### Campo de Juego
+
+| **Marco PowerUp** | **Timer** | **Red** |
+|:-----------------:|:---------------:|:-------------------:|
+| ![Marco](VolleyClash_juego/public/ASSETS/JUEGO/Base_powerUp.png) | ![Timer](VolleyClash_juego/public/ASSETS/JUEGO/TIMER.png) | ![Red](VolleyClash_juego/public/ASSETS/JUEGO/RED.png) |
 
 ---
 
