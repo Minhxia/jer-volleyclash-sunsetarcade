@@ -96,7 +96,7 @@ export class Player {
             this.config.startFrame
         );
         // se hace un poco más grande
-        this.sprite.setScale(2);
+        this.sprite.setScale(3);
         // se ajusta la hitbox al nuevo tamaño para las colisiones  
         this.sprite.body.setSize(this.sprite.width, this.sprite.height, true);
 
