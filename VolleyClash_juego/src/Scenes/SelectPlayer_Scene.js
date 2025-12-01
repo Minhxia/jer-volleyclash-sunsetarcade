@@ -18,7 +18,9 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         this.load.image('characterA', 'ASSETS/PERSONAJES/PERSONAJES_POSE/personajes_a.png');
         this.load.image('characterB', 'ASSETS/PERSONAJES/PERSONAJES_POSE/personajes_b.png');
         this.load.image('characterC', 'ASSETS/PERSONAJES/PERSONAJES_POSE/personaje_c.png');
-        
+
+        // Sonido
+        this.load.audio('sonidoClick', 'ASSETS/SONIDO/SonidoBoton.mp3');
     }
 
     create() {
@@ -89,6 +91,17 @@ export class SelectPlayer_Scene extends Phaser.Scene {
 
         backButton.on('pointerdown', () => {
             this.scene.start('ModeGame_Scene');
+        });
+
+        this.addClickSound(nextButton);
+        this.addClickSound(backButton);
+    }
+
+    // Función para añadir sonido de clic con volumen global
+    addClickSound(button) {
+        button.on('pointerdown', () => {
+            const volume = parseFloat(localStorage.getItem('volume')) || 1;
+            this.sound.play('sonidoClick', { volume });
         });
     }
 
@@ -180,6 +193,8 @@ export class SelectPlayer_Scene extends Phaser.Scene {
                 .setInteractive()
                 .setScale(0.45)
                 .setData('characterName', nombre);
+                
+            this.addClickSound(mini);
 
             mini.on('pointerdown', () => {
                 const player1 = this.players[0];

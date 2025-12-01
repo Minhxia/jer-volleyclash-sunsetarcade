@@ -11,6 +11,9 @@ export class ModeGame_Scene extends Phaser.Scene {
         this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_SIN_SELECCIONAR.png');
         this.load.image('botonVolver', 'ASSETS/UI/BOTONES/FLECHA_VOLVER.png');
         this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
+
+        // Sonido
+        this.load.audio('sonidoClick', 'ASSETS/SONIDO/SonidoBoton.mp3');
     }
 
     create() {
@@ -71,5 +74,17 @@ export class ModeGame_Scene extends Phaser.Scene {
         backButton.on('pointerdown', () => {
             this.scene.start('Menu_Scene');
         });
+
+        // Función para añadir sonido de clic con volumen global
+        const addClickSound = (button) => {
+            button.on('pointerdown', () => {
+                const volume = parseFloat(localStorage.getItem('volume')) || 1;
+                this.sound.play('sonidoClick', { volume });
+            });
+        };
+
+        addClickSound(backButton);
+        addClickSound(localButton);
+        addClickSound(networkButton);
     }
 }

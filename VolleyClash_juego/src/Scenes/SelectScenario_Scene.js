@@ -17,6 +17,9 @@ export class SelectScenario_Scene extends Phaser.Scene {
         this.load.image('Gym', 'ASSETS/FONDOS/GIMNASIO.png');
         this.load.image('Playa', 'ASSETS/FONDOS/PLAYA.png');
         this.load.image('Jardin', 'ASSETS/FONDOS/JARDIN.png');
+
+        // Sonido
+        this.load.audio('sonidoClick', 'ASSETS/SONIDO/SonidoBoton.mp3');
     }
 
     init(data) {
@@ -57,6 +60,8 @@ export class SelectScenario_Scene extends Phaser.Scene {
             // Texto con el nombre del escenario
             const texto = this.add.text(0, 0, nombre, { ...style, fontSize: '24px', color: '#000' });
             Phaser.Display.Align.In.Center(texto, boton);
+
+            this.addClickSound(boton);
 
             boton.on('pointerover', () => boton.setTexture('botonSeleccionado'));
             boton.on('pointerout', () => {
@@ -101,6 +106,16 @@ export class SelectScenario_Scene extends Phaser.Scene {
 
         backButton.on('pointerdown', () => {
             this.scene.start('SelecPlayer_Scene');
+        });
+
+        this.addClickSound(nextButton);
+        this.addClickSound(backButton);
+    }
+
+    addClickSound(button) {
+        button.on('pointerdown', () => {
+            const volume = parseFloat(localStorage.getItem('volume')) || 1;
+            this.sound.play('sonidoClick', { volume });
         });
     }
 }

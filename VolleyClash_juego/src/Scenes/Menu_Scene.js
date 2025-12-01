@@ -17,6 +17,7 @@ export class Menu_Scene extends Phaser.Scene {
 
         // Audio
         this.load.audio('sonidoGeneral', 'ASSETS/SONIDO/SONIDO1.mp3');
+        this.load.audio('sonidoClick', 'ASSETS/SONIDO/SonidoBoton.mp3');
     }
 
     create() {        
@@ -141,5 +142,17 @@ export class Menu_Scene extends Phaser.Scene {
         this.add.image(this.scale.width - 20, this.scale.height - 20, 'logoEmpresa')
             .setScale(0.5)
             .setOrigin(1, 1) // Para que el punto de referencia sea la esquina inferior derecha
+
+        // Función para añadir sonido de clic con volumen global
+        const addClickSound = (button) => {
+            button.on('pointerdown', () => {
+                const volume = parseFloat(localStorage.getItem('volume')) || 1;
+                this.sound.play('sonidoClick', { volume });
+            });
+        };
+
+        addClickSound(playButton);
+        addClickSound(configButton);
+        addClickSound(creditsButton);
     }
 }

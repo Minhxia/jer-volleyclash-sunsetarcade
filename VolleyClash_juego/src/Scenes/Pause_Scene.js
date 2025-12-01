@@ -11,6 +11,9 @@ export class Pause_Scene extends Phaser.Scene {
         this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
         this.load.image('botonSeleccionado', 'ASSETS/UI/BOTONES/BOTON_BASE_G_SELECCIONADO.png');
         this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_BASE_G.png');
+
+        // Sonido
+        this.load.audio('sonidoClick', 'ASSETS/SONIDO/SonidoBoton.mp3');
     }
 
     create() {
@@ -77,19 +80,16 @@ export class Pause_Scene extends Phaser.Scene {
 
         menuBotton.on("pointerover", () => menuBotton.setTexture('botonSeleccionado'));
         menuBotton.on("pointerout", () => menuBotton.setTexture('botonSinSeleccionar'));
-  
-        // --- BOTÓN VOLVER ARRIBA A LA IZQUIERDA ---
-        const backX = width * 0.06;
-        const backY = height * 0.08;
 
-        const backButton = this.add
-            .sprite(backX, backY, 'botonVolver')
-            .setScale(0.1)
-            .setInteractive({ useHandCursor: true });
+        // Función para añadir sonido de clic con volumen global
+        const addClickSound = (button) => {
+            button.on('pointerdown', () => {
+                const volume = parseFloat(localStorage.getItem('volume')) || 1;
+                this.sound.play('sonidoClick', { volume });
+            });
+        };
 
-        backButton.on('pointerdown', () => {
-            this.scene.stop();
-            this.scene.resume('Game_Scene');
-        });
+        addClickSound(menuBotton);
+        addClickSound(continuarBG);
     }
 }

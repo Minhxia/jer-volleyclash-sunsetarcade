@@ -15,6 +15,9 @@ export class EndGame_Scene extends Phaser.Scene {
         this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
         this.load.image('botonSeleccionado', 'ASSETS/UI/BOTONES/BOTON_BASE_G_SELECCIONADO.png');
         this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_BASE_G.png');
+
+        // Sonido
+        this.load.audio('sonidoClick', 'ASSETS/SONIDO/SonidoBoton.mp3');
     }
 
     create() { 
@@ -38,8 +41,8 @@ export class EndGame_Scene extends Phaser.Scene {
         // Texto del ganador
         const winnerText =
             this.winner === "player1"
-                ? "Ganador:" + charP1
-                : "Ganador:" + charP2;
+                ? "Ganador: " + charP1
+                : "Ganador: " + charP2;
 
         this.add.text(width / 2, height * 0.40, winnerText, {
             ...style,
@@ -76,5 +79,15 @@ export class EndGame_Scene extends Phaser.Scene {
             volverButton.setTexture('botonSinSeleccionar');
         });
 
+
+        // Función para añadir sonido de clic con volumen global
+        const addClickSound = (button) => {
+            button.on('pointerdown', () => {
+                const volume = parseFloat(localStorage.getItem('volume')) || 1;
+                this.sound.play('sonidoClick', { volume });
+            });
+        };
+
+        addClickSound(volverButton);
     }
 }

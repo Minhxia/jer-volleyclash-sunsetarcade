@@ -14,6 +14,9 @@ export class Configuration_Scene extends Phaser.Scene {
         // Controles
         this.load.image('derTeclas', 'ASSETS/UI/CONTROLES/der.png');
         this.load.image('izqTeclas', 'ASSETS/UI/CONTROLES/izq.png');
+
+        // Sonido
+        this.load.audio('sonidoClick', 'ASSETS/SONIDO/SonidoBoton.mp3');
     }
 
     create() {
@@ -107,5 +110,15 @@ export class Configuration_Scene extends Phaser.Scene {
         this.add.image(width / 2 - separation / 2, 380, 'izqTeclas')
             .setScale(0.35)
             .setOrigin(0.5);
+
+        // Función para añadir sonido de clic con volumen global
+        const addClickSound = (button) => {
+            button.on('pointerdown', () => {
+                const volume = parseFloat(localStorage.getItem('volume')) || 1;
+                this.sound.play('sonidoClick', { volume });
+            });
+        };
+
+        addClickSound(backButton);
     }
 }
