@@ -249,7 +249,7 @@ La pelota rebota con el jugador, en la red y en los límites de la pantalla, ten
 ## 4.5 Calidad del Escenario
 El **escenario** tiene un estilo ***pixel-art***. Los personajes y la pelota tienen una silueta clara y unos colores que contrastan con el fondo. La red también destaca, pero sin desviar la atención de los jugadores.
 
-El **HUD** es claro y limpio. El **marcador** con la puntuación se encuentra centrado en la pantalla y es grande. El **inventario** de cada jugador se coloca en la parte superior de su propio lado de la pantalla, para que resulte más visible.
+El **HUD** es claro y limpio. Los **marcadores** con las puntuaciones se encuentran en cada lado de la pantalla y son grandes. El **inventario** de cada jugador se coloca en la parte superior de su propio lado de la pantalla, para que resulte más visible.
 
 La **cámara** es estática y se mantiene centrada, de modo que se visualiza todo el escenario.
 
@@ -290,8 +290,8 @@ El logotipo seleccionado representa un **balón de voleibol en llamas**, símbol
 
 ## 5.5 Bocetos
 ### 5.5.1 Interfaces
-Se han realizado bocetos de distintas interfaces para ofrecer al usuario una experiencia **fácil, agradable e intuitiva** al jugar.  
-Para ello, se han creado las siguientes pantallas: **menú inicial**, **configuración**, **créditos**, **modo de juego**, **personalización de personaje**, **selección de escenario**, **pantalla de juego** y **fin de partida**.
+Se han realizado distintas interfaces para ofrecer al usuario una experiencia **fácil, agradable e intuitiva** al jugar.  
+Para ello, se han creado las siguientes pantallas: **menú inicial**, **configuración**, **créditos**, **modo de juego**, **personalización de personaje**, **selección de escenario**, **pausa**, **pantalla de juego** y **fin de partida**.
 
 #### Menú inicial
 En esta interfaz, el jugador podrá **comenzar una partida**, acceder a la **pantalla de configuración** o a los **créditos** del juego.  
@@ -299,14 +299,12 @@ En esta interfaz, el jugador podrá **comenzar una partida**, acceder a la **pan
 ![Menú principal](VolleyClash_juego/public/ASSETS/INTERFACES/Pantalla_de_inicio.png)
 
 #### Configuración
-En esta pantalla, el jugador puede **cambiar el volumen del sonido** del juego y **modificar los controles** de la partida.  
-Además, en el modo de juego se añadirá un botón para **abandonar la partida**.  
+En esta pantalla, el jugador puede **cambiar el volumen del sonido** del juego y **ver los controles** de la partida.  
 
 ![Pantalla de configuración](VolleyClash_juego/public/ASSETS/INTERFACES/Configuracion_inicial.png)  
-![Pantalla de configuración en partida](VolleyClash_juego/public/ASSETS/INTERFACES/Configuracion_partida.png)
 
 #### Créditos
-En esta interfaz se incluirán **únicamente los miembros del equipo y sus tareas**, con la opción de volver a la pantalla de inicio.  
+En esta interfaz se incluirán **únicamente los miembros del equipo**, con la opción de volver a la pantalla de inicio.  
 
 ![Pantalla de créditos](VolleyClash_juego/public/ASSETS/INTERFACES/Creditos.png)
 
@@ -316,7 +314,7 @@ En esta pantalla se presentan dos botones para elegir entre los modos de **juego
 ![Pantalla de modo de juego](VolleyClash_juego/public/ASSETS/INTERFACES/Modo_de_juego.png)
 
 #### Personalizar personaje del jugador
-En esta interfaz, el jugador podrá **elegir su nombre, el color de la equipación y el personaje** que desee utilizar.  
+En esta interfaz, el jugador podrá **elegir su nombre y el personaje** que desee utilizar.  
 
 ![Pantalla de selección de personaje](VolleyClash_juego/public/ASSETS/INTERFACES/Seleccion_de_personaje.png)
 
@@ -325,18 +323,23 @@ En esta pantalla, el jugador podrá **elegir el escenario** en el que desea juga
 
 ![Pantalla de selección de escenario](VolleyClash_juego/public/ASSETS/INTERFACES/Seleccion_de_escenario.png)
 
+#### Pausa
+En esta pantalla, el jugador podrá **volver al menú o reaunudar** la partida.  
+
+![Pantalla de selección de escenario](VolleyClash_juego/public/ASSETS/INTERFACES/Pausa.png)
+
 #### Pantalla de juego
 En la pantalla de juego se pueden encontrar los siguientes elementos:
 - Contador de puntos (uno para cada jugador, ubicado en su lado del campo)
 - *Power-ups* almacenados en el inventario de cada jugador
 - Tiempo restante de la partida
-- Botón de configuración
+- Set actual
 
 ![Pantalla de juego](VolleyClash_juego/public/ASSETS/INTERFACES/Partida.png)  
 
 #### Fin de partida
 En esta interfaz aparecerá el **nombre del jugador ganador**.  
-Además, habrá dos botones: uno para **buscar una nueva partida** y otro para **volver al menú inicial**.
+Además, habrá un botón para **volver al menú inicial**.
 
 ![Pantalla de fin de juego](VolleyClash_juego/public/ASSETS/INTERFACES/Fin_de_partida.png)  
 
