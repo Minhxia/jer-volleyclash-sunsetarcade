@@ -8,7 +8,7 @@ import { CommandProcessor } from '../Commands/CommandProcessor.js';
 import { MovePlayerCommand } from '../Commands/MovePlayerCommand.js';
 
 export class Game_Scene extends Phaser.Scene {
-    tiempoTotal = 10; // para 2 min poner 120 segundos
+    tiempoTotal = 60; // para 2 min poner 120 segundos
     tiempoRestante = this.tiempoTotal;
     timerText;
     timerEvent;
