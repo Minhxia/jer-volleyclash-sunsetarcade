@@ -18,6 +18,7 @@ export class Ball {
 
         // posición de la red (hardcodeado para ancho de 960px)
         this.netX = 480;
+        this.isFirstServe = true;
     }
 
     // Se llama cuando un jugador golpea la pelota
@@ -100,21 +101,22 @@ export class Ball {
 
     // Se llama cuando la pelota toca el suelo
     onGrounded() {
-        if (!this.isBallLive) return;
+if (!this.isBallLive) return;
 
-        // se determina en qué lado de la cancha está la pelota
-        const ballOnLeft = this.sprite.x < this.netX;
-        const ballOnRight = this.sprite.x > this.netX;
+    const ballOnLeft = this.sprite.x < this.netX;
+    const ballOnRight = this.sprite.x > this.netX;
 
-        // si la pelota está en la cancha, ese jugador pierde el rally
-        if (ballOnLeft) {
-            this.onRallyEnd('player2'); // player2 anota
-        } else if (ballOnRight) {
-            this.onRallyEnd('player1'); // player1 anota
-        }
-
-        this.resetRally();
+    // determinar quién anota
+    if (ballOnLeft) {
+        this.onRallyEnd('player2'); // player2 anota
+        this.resetRally('player1');
+    } else if (ballOnRight) {
+        this.onRallyEnd('player1'); // player1 anota
+        this.resetRally('player2');
     }
+    }
+
+    
 
     // Se llama cuando ocurre una falta (demasiados toques, pelota fuera de límites, etc.)
     onFalta(faltaType, faltingPlayer) {
@@ -140,15 +142,25 @@ export class Ball {
     }
 
     // Reinicia el estado del rally y reposiciona la pelota para el saque
-    resetRally() {
-        this.isBallLive = true;
-        this.lastTouchedBy = null;
-        this.touchCount = 0;
-        this.courtSide = 'left'; // por defecto, a la izquierda para el próximo saque
+    resetRally(scoringPlayer) {
+            this.isBallLive = true;
+    this.lastTouchedBy = null;
+    this.touchCount = 0;
 
-        // se reposiciona la pelota al centro de la cancha, ligeramente sobre el suelo
-        this.sprite.setPosition(this.netX, 100);
-        this.sprite.setVelocity(0, 0);
+    if (this.isFirstServe) {
+        // primer saque: siempre en el lado de player1
+        this.sprite.setPosition(this.netX - 100, 100); // lado izquierdo
+        this.isFirstServe = false; // ya no será el primer saque
+    } else {
+        // rallies normales: la pelota aparece del lado del jugador que anotó
+        if (scoringPlayer === 'player1') {
+            this.sprite.setPosition(this.netX + 100, 100); // lado derecho
+        } else {
+            this.sprite.setPosition(this.netX - 100, 100); // lado izquierdo
+        }
+    }
+
+    this.sprite.setVelocity(0, 0);
     }
 
     // Actualiza el estado de la pelota cada frame (se rastrea el lado de la cancha según la posición)
