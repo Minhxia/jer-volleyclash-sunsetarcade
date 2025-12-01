@@ -29,6 +29,7 @@ export class Game_Scene extends Phaser.Scene {
         this.setsP1 = 0;
         this.setsP2 = 0;
         this.maxSets = 3; // mejor de 3
+        this.currentSet = 1; // set actual
     }
 
     preload() {
@@ -74,16 +75,24 @@ export class Game_Scene extends Phaser.Scene {
         this.load.image('Jardin', 'ASSETS/FONDOS/JARDIN.png');
 
         // PowerUps
-        this.load.image('por2', 'ASSETS/ITEMS/POWER UPS/MULTIPLICADOR 2.png')
-        this.load.image('por3', 'ASSETS/ITEMS/POWER UPS/MULTIPLICADOR 3.png')
-        this.load.image('paralizar', 'ASSETS/ITEMS/POWER UPS/PARALIZADO.png')
-        this.load.image('ralentizar', 'ASSETS/ITEMS/POWER UPS/RELENTIZAR.png')
-        this.load.image('velocidad', 'ASSETS/ITEMS/POWER UPS/VELOCIDAD.png')
+        this.load.image('por2', 'ASSETS/ITEMS/POWER UPS/MULTIPLICADOR 2.png');
+        this.load.image('por3', 'ASSETS/ITEMS/POWER UPS/MULTIPLICADOR 3.png');
+        this.load.image('paralizar', 'ASSETS/ITEMS/POWER UPS/PARALIZADO.png');
+        this.load.image('ralentizar', 'ASSETS/ITEMS/POWER UPS/RELENTIZAR.png');
+        this.load.image('velocidad', 'ASSETS/ITEMS/POWER UPS/VELOCIDAD.png');
+        this.load.image('marcoPowerUp', 'ASSETS/JUEGO/Base_powerUp.png');
 
         // Ball
-        this.load.image('ball', 'ASSETS/ITEMS/PELOTAS/P_NORMAL.png')
+        this.load.image('ball', 'ASSETS/ITEMS/PELOTAS/P_NORMAL.png');
+
         //Cronometro
-        this.load.image('reloj', 'ASSETS/JUEGO/TIMER.png')
+        this.load.image('reloj', 'ASSETS/JUEGO/TIMER.png');
+
+        // Marco
+        this.load.image('marcoGeneral', 'ASSETS/JUEGO/MARCADOR_SET.png');
+
+        // Red
+        this.load.image('red', 'ASSETS/JUEGO/RED.png');
     }
 
     create() {
@@ -103,11 +112,28 @@ export class Game_Scene extends Phaser.Scene {
         .setOrigin(0.5, 0)
         .setScrollFactor(0)
         .setDepth(9999);
+
         this.timerIcon = this.add.image(this.scale.width / 2, 45, 'reloj')
+            .setOrigin(0.5)
+            .setScale(2)
+            .setScrollFactor(0)
+            .setDepth(9000); // debajo del texto
+
+        // Marco de set
+        this.setFrame = this.add.image(this.scale.width / 2, 120, 'marcoGeneral')
+            .setOrigin(0.5)
+            .setScale(1)
+            .setDepth(9998);
+
+        // Texto del set actual
+        this.setText = this.add.text(this.scale.width / 2, 120, `SET ${this.currentSet}`, {
+            ...style,
+            fontSize: '32px',
+            color: '#ffffff'
+        })
         .setOrigin(0.5)
-        .setScale(2)
-        .setScrollFactor(0)
-        .setDepth(9000); // debajo del texto
+        .setDepth(9999);
+
         // iniciar el contador
         this.timerEvent = this.time.addEvent({
             delay: 1000,
@@ -118,29 +144,42 @@ export class Game_Scene extends Phaser.Scene {
 
         this.updateTimer();
 
-        
         // FONDO DEL ESCENARIO SELECCIONADO
         this.add.image(width / 2, height / 2, this.selectedScenario)
             .setOrigin(0.5)
-            .setDisplaySize(width, height); 
+            .setDisplaySize(width, height)
+            .setDepth(-1); 
+
+        // Red
+        const red = this.physics.add.staticSprite(width / 2, height - 160, 'red').setScale(0.6);
+
+        const redTexture = this.textures.get('red').getSourceImage();
+        red.body.setSize(redTexture.width * 0.5, redTexture.height * 0.5); // multiplicar por el scale
+        red.body.setOffset(-red.body.width/2, -red.body.height/2);
+        red.body.updateFromGameObject();
+        this.red = red;
 
         this._createAnimations();
-    //PUNTUACION DE LOS JUGADORES
-            this.pointsLeft = 0;
-            this.pointsRight = 0;
 
-            this.scoreLeft = this.add.text(100, 50, '0', {
-                ...style,
-                fontSize: '48px',
-                color: '#2f1801ff'
-            }).setDepth(9999);
-            
+        //PUNTUACION DE LOS JUGADORES
+        // Marcos de puntuación
+        this.pointsLeft = 0;
+        this.pointsRight = 0;
 
-            this.rightScore = this.add.text(700, 50, '0', {
-                ...style,
-                fontSize: '48px',
-                color: '#2f1801ff'
-            }).setDepth(9999);
+        this.scoreFrameLeft = this.add.image(200, 50, 'marcoGeneral').setScale(0.8, 0.55).setOrigin(0.5);
+        this.scoreFrameRight = this.add.image(this.worldWidth - 200, 50, 'marcoGeneral').setScale(0.8, 0.55).setOrigin(0.5);
+
+        this.scoreLeft = this.add.text(200, 45, '0', {
+            ...style,
+            fontSize: '40px',
+            color: '#ffffffff'
+        }).setOrigin(0.5).setDepth(9999);
+
+        this.rightScore = this.add.text(this.worldWidth - 200, 45, '0', {
+            ...style,
+            fontSize: '40px',
+            color: '#ffffffff'
+        }).setOrigin(0.5).setDepth(9999);
 
         // TODO: cambiar?
         // suelo de prueba: crear un cuerpo estático rectangular invisible
@@ -173,12 +212,24 @@ export class Game_Scene extends Phaser.Scene {
 
         this.inventoryUI = {
             player1: [
-                this.add.image(50, 50, '').setScale(1.4).setVisible(false),
-                this.add.image(110, 50, '').setScale(1.4).setVisible(false)
+                this.add.image(50, 50, '').setScale(1.4).setVisible(false).setDepth(1),
+                this.add.image(110, 50, '').setScale(1.4).setVisible(false).setDepth(1)
             ],
             player2: [
-                this.add.image(this.worldWidth - 110, 50, '').setScale(1.4).setVisible(false),
-                this.add.image(this.worldWidth - 50, 50, '').setScale(1.4).setVisible(false)
+                this.add.image(this.worldWidth - 110, 50, '').setScale(1.4).setVisible(false).setDepth(1),
+                this.add.image(this.worldWidth - 50, 50, '').setScale(1.4).setVisible(false).setDepth(1)
+            ]
+        };
+
+        // Marcos del inventario
+        this.inventoryFrames = {
+            player1: [
+                this.add.image(50, 50, 'marcoPowerUp').setScale(1).setOrigin(0.5).setDepth(0),
+                this.add.image(110, 50, 'marcoPowerUp').setScale(1).setOrigin(0.5).setDepth(0)
+            ],
+            player2: [
+                this.add.image(this.worldWidth - 110, 50, 'marcoPowerUp').setScale(1).setOrigin(0.5).setDepth(0),
+                this.add.image(this.worldWidth - 50, 50, 'marcoPowerUp').setScale(1).setOrigin(0.5).setDepth(0)
             ]
         };
 
@@ -189,8 +240,8 @@ export class Game_Scene extends Phaser.Scene {
             callback: () => {
                 if (this.powerUps.length >= this.maxPowerUps) return;
 
-                const x = Phaser.Math.Between(50, this.worldWidth - 50);
-                const y = Phaser.Math.Between(this.worldHeight - 140, this.worldHeight - 120); // evitar la red y el suelo
+                const x = Phaser.Math.Between(80, this.worldWidth - 80);
+                const y = Phaser.Math.Between(this.worldHeight - 220, this.worldHeight - 120); // evitar la red y el suelo
 
                 const types = ['velocidad', 'ralentizar', 'paralizar', 'por2', 'por3'];
                 const type = Phaser.Utils.Array.GetRandom(types);
@@ -469,7 +520,7 @@ export class Game_Scene extends Phaser.Scene {
             this,
             'player1',
             this.worldWidth * 0.25,   // izquierda
-            this.groundY - 50,        // arriba del suelo (más margen)
+            this.groundY - 100,        // arriba del suelo (más margen)
             charP1
         );
 
@@ -477,7 +528,7 @@ export class Game_Scene extends Phaser.Scene {
             this,
             'player2',
             this.worldWidth * 0.75,   // derecha
-            this.groundY - 50,        // arriba del suelo (más margen)
+            this.groundY - 100,        // arriba del suelo (más margen)
             charP2
         );
 
@@ -509,6 +560,19 @@ export class Game_Scene extends Phaser.Scene {
     // Crea el suelo, la red, los límites, etc.
     _setupPhysicsWorld(ground) {
         this.players.forEach(player => {
+            this.physics.add.collider(player.sprite, ground);
+        });
+
+        this.players.forEach(player => {
+            // colisión jugador-red
+            this.physics.add.collider(player.sprite, this.red, () => {
+                // Se dispara si el jugador toca la red
+                console.log(`${player.id} tocó la red!`);
+                // Podrías detenerlo o empujarlo hacia atrás:
+                player.sprite.setVelocityX(0);
+            });
+
+            // colisión jugador-suelo
             this.physics.add.collider(player.sprite, ground);
         });
     }
@@ -640,6 +704,16 @@ export class Game_Scene extends Phaser.Scene {
             );
         });
 
+        // colisión pelota-red
+        this.physics.add.collider(this.ball.sprite, this.red, () => {
+            // Esto se dispara al tocar la red
+            console.log('La pelota toca la red!');
+            
+            // Por ejemplo, se puede frenar la pelota:
+            this.ball.sprite.setVelocityX(this.ball.sprite.body.velocity.x * 0.5);
+            this.ball.sprite.setVelocityY(this.ball.sprite.body.velocity.y * 0.5);
+        });
+
         // colisión de la pelota con el suelo (dispara puntuación)
         const groundY = this.worldHeight - 10;
         this.ball.sprite.setCollideWorldBounds(true);
@@ -699,6 +773,9 @@ export class Game_Scene extends Phaser.Scene {
 
         console.log(`Set terminado. Score sets: P1=${this.setsP1}, P2=${this.setsP2}`);
 
+        // Actualizar set actual
+        this.currentSet++;
+
         // Revisar si alguien ganó el partido
         if (this.setsP1 === 2) {
             this._endGame("player1");
@@ -711,6 +788,9 @@ export class Game_Scene extends Phaser.Scene {
     }
 
     _resetSet() {
+        // Actualizar set
+        this.setText.setText(`SET ${this.currentSet}`);
+
         // Reiniciar tiempo
         this.tiempoRestante = this.tiempoTotal;
         this.timerEvent.paused = false;

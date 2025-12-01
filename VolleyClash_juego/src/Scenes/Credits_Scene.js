@@ -9,6 +9,7 @@ export class Credits_Scene extends Phaser.Scene {
     preload() {
         this.load.image('botonVolver', 'ASSETS/UI/BOTONES/FLECHA_VOLVER.png');
         this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
+        this.load.image('logo', 'ASSETS/LOGO/Logo.png');
     }
 
     create() {
@@ -65,5 +66,7 @@ export class Credits_Scene extends Phaser.Scene {
             // vuelve al menú principal
             this.scene.start('Menu_Scene');
         });
+
+        this.add.image(width / 2, 400, 'logo').setOrigin(0.5).setScale(1.2);
     }
 }

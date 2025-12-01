@@ -10,7 +10,11 @@ export class Menu_Scene extends Phaser.Scene {
         // se cargan las imágenes de los botones
         this.load.image('botonSeleccionado', 'ASSETS/UI/BOTONES/BOTON_BASE_G_SELECCIONADO.png');
         this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_BASE_G.png');
-        this.load.image('fondoMenuPrincipal', 'ASSETS/FONDOS/MENU_PRINCIPAL.png')
+        this.load.image('fondoMenuPrincipal', 'ASSETS/FONDOS/MENU_PRINCIPAL.png');
+
+        // Logo
+        this.load.image('logoEmpresa', 'ASSETS/LOGO/logo_empresa.png');
+
         // Audio
         this.load.audio('sonidoGeneral', 'ASSETS/SONIDO/SONIDO1.mp3');
     }
@@ -132,6 +136,10 @@ export class Menu_Scene extends Phaser.Scene {
             this.scene.start('Credits_Scene');
         });
         ////////
-        
+
+        // Logo de Empresa
+        this.add.image(this.scale.width - 20, this.scale.height - 20, 'logoEmpresa')
+            .setScale(0.5)
+            .setOrigin(1, 1) // Para que el punto de referencia sea la esquina inferior derecha
     }
 }
