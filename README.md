@@ -316,7 +316,7 @@ En esta pantalla se presentan dos botones para elegir entre los modos de **juego
 #### Personalizar personaje del jugador
 En esta interfaz, el jugador podrá **elegir su nombre y el personaje** que desee utilizar.  
 
-![Pantalla de selección de personaje](VolleyClash_juego/public/ASSETS/INTERFACES/Seleccion_de_personaje.png)
+<img src="VolleyClash_juego/public/ASSETS/INTERFACES/Seleccion_de_personaje.png" width="960" height="540" alt="Pantalla de selección de personaje">
 
 #### Selección de escenario
 En esta pantalla, el jugador podrá **elegir el escenario** en el que desea jugar la partida.  
@@ -341,7 +341,7 @@ En la pantalla de juego se pueden encontrar los siguientes elementos:
 En esta interfaz aparecerá el **nombre del jugador ganador**.  
 Además, habrá un botón para **volver al menú inicial**.
 
-![Pantalla de fin de juego](VolleyClash_juego/public/ASSETS/INTERFACES/Fin_de_partida.png)  
+![Pantalla de fin de juego](VolleyClash_juego/public/ASSETS/INTERFACES/Fin_de_partida.jpg)  
 
 
 ### 5.5.2 Diagrama de Estados
