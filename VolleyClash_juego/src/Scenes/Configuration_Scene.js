@@ -10,6 +10,10 @@ export class Configuration_Scene extends Phaser.Scene {
         // Imágenes
         this.load.image('botonVolver', 'ASSETS/UI/BOTONES/FLECHA_VOLVER.png');
         this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
+
+        // Controles
+        this.load.image('derTeclas', 'ASSETS/UI/CONTROLES/der.png');
+        this.load.image('izqTeclas', 'ASSETS/UI/CONTROLES/izq.png');
     }
 
     create() {
@@ -28,7 +32,7 @@ export class Configuration_Scene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         // Subtítulo de controles
-        this.add.text(centerX, height * 0.25, 'Volumen', {
+        this.add.text(centerX, height * 0.2, 'Volumen', {
             ...style,
             fontSize: '24px',
             color: '#000'
@@ -44,7 +48,7 @@ export class Configuration_Scene extends Phaser.Scene {
 
 
         // Barra de volumen HTML
-        this.volumeSlider = this.add.dom(centerX, height * 0.3).createFromHTML(`
+        this.volumeSlider = this.add.dom(centerX, height * 0.25).createFromHTML(`
             <input type="range" min="0" max="1" step="0.01" value="${this.currentVolume}"
                 style="width:200px; height:20px; accent-color:#00aaff; border-radius:5px;">
         `);
@@ -77,13 +81,31 @@ export class Configuration_Scene extends Phaser.Scene {
             this.scene.start('Menu_Scene');
         });
 
+        // Separador
+        const line = this.add.graphics();
+            line.lineStyle(3, 0x000000, 1); // grosor, color, alpha
+            line.beginPath();
+            line.moveTo(width * 0.1, height * 0.35);   // inicio (20% del ancho)
+            line.lineTo(width * 0.9, height * 0.35);   // final   (80% del ancho)
+            line.strokePath();
 
         //Controles
-        this.add.text(centerX, height * 0.5, 'Controles', {
+        this.add.text(centerX, height * 0.4, 'Controles', {
         ...style,
-        fontSize: '24px',
-        color: '#000',
-        fontStyle: 'bold'
+        fontSize: '32px',
+        color: '#5f0000ff',
         }).setOrigin(0.5);
+
+        const separation = 400;
+
+        // TECLA DERECHA
+        this.add.image(width / 2 + separation / 2, 380, 'derTeclas')
+            .setScale(0.35)
+            .setOrigin(0.5);
+
+        // TECLA IZQUIERDA
+        this.add.image(width / 2 - separation / 2, 380, 'izqTeclas')
+            .setScale(0.35)
+            .setOrigin(0.5);
     }
 }
