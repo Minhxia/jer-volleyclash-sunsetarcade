@@ -650,18 +650,37 @@ export class Game_Scene extends Phaser.Scene {
     _setupBallEvents() {
         this.events.on('rallyConcluded', (data) => {
             console.log(`Rally concluded: ${data.scoringPlayerId} scores!`);
-        const scorer = data.scoringPlayerId;
+            const scorerId = data.scoringPlayerId;
 
-        if (scorer === 'player1') {
-            this.pointsLeft++;
-            this.scoreLeft.setText(this.pointsLeft.toString());
-        }
-        else if (scorer === 'player2') {
-            this.pointsRight++;
-            this.rightScore.setText(this.pointsRight.toString());
-        }
+            // se coge el Player que ha anotado
+            const scoringPlayer = this.players.get(scorerId);
+            const multiplier = scoringPlayer ? (scoringPlayer.scoreMultiplier || 1) : 1;
+
+            // 1 punto base * multiplicador
+            const pointsToAdd = multiplier;
+
+            if (scorerId === 'player1') {
+                this.pointsLeft += pointsToAdd;
+                this.scoreLeft.setText(this.pointsLeft.toString());
+            }
+            else if (scorerId === 'player2') {
+                this.pointsRight += pointsToAdd;
+                this.rightScore.setText(this.pointsRight.toString());
+            }
+
+            /*
+            // si el multiplicador también cuenta para la lógica de
+            //  sets basada en scoreP1 / scoreP2:
+            if (scorerId === 'player1') {
+                this.scoreP1 += pointsToAdd;
+            } else if (scorerId === 'player2') {
+                this.scoreP2 += pointsToAdd;
+            }
+            this._checkWinCondition();
+            */
         });
     }
+
 
     // Maneja colisión entre pelota y jugador
     _onBallPlayerCollision(ball, player) {
