@@ -103,8 +103,8 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         // Crear inputs y marcos para cada jugador
         this.players.forEach((player, idx) => {
             // Input de nombre arriba
-            this.add.text(width * (0.25 + 0.5 * idx), 110, 'Nombre:', { ...style,  fontSize: '24px', color: '#000' }).setOrigin(0.5);
-            const input = this.add.dom(width * (0.25 + 0.5 * idx), 150).createFromHTML(`
+            this.add.text(width * (0.25 + 0.5 * idx), 100, 'Nombre:', { ...style,  fontSize: '24px', color: '#000' }).setOrigin(0.5);
+            const input = this.add.dom(width * (0.25 + 0.5 * idx), 140).createFromHTML(`
                 <input type="text" placeholder="Nombre jugador" maxlength="10"
                         style="
                                 width:150px;
