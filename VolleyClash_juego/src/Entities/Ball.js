@@ -5,7 +5,7 @@ export class Ball {
         this.commandProcessor = null;
 
         this.sprite = scene.physics.add.sprite(x, y, 'ball');
-        this.sprite.setScale(0.5);
+        this.sprite.setScale(1.0);
         this.sprite.setBounce(0.8);
         this.sprite.setCollideWorldBounds(true);
         this.sprite.setData('ball', this);

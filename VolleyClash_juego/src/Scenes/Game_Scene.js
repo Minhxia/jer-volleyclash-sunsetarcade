@@ -8,7 +8,7 @@ import { CommandProcessor } from '../Commands/CommandProcessor.js';
 import { MovePlayerCommand } from '../Commands/MovePlayerCommand.js';
 
 export class Game_Scene extends Phaser.Scene {
-    tiempoTotal = 120;
+    tiempoTotal = 60; // para 2 min poner 120 segundos
     tiempoRestante = this.tiempoTotal;
     timerText;
     timerEvent;
@@ -365,39 +365,39 @@ export class Game_Scene extends Phaser.Scene {
         this.anims.create({
             key: 'charA_receiveRight',
             frames: this.anims.generateFrameNumbers('charA_move', { start: 0, end: 10 }), // fila 0
-            frameRate: 15,
+            frameRate: 17,
             repeat: 0
         });
         this.anims.create({
             key: 'charA_receiveLeft',
             frames: this.anims.generateFrameNumbers('charA_move', { start: 11, end: 21 }).reverse(), // fila 1
-            frameRate: 15,
+            frameRate: 17,
             repeat: 0
         });
 
         this.anims.create({
             key: 'charA_runRight',
             frames: this.anims.generateFrameNumbers('charA_move', { start: 22, end: 32 }), // fila 2
-            frameRate: 20,
+            frameRate: 22,
             repeat: -1
         });
         this.anims.create({
             key: 'charA_runLeft',
             frames: this.anims.generateFrameNumbers('charA_move', { start: 33, end: 43 }).reverse(), // fila 3
-            frameRate: 20,
+            frameRate: 22,
             repeat: -1
         });
 
         this.anims.create({
             key: 'charA_jumpRight',
             frames: this.anims.generateFrameNumbers('charA_jump', { start: 0, end: 12 }), // fila 0
-            frameRate: 15,
+            frameRate: 17,
             repeat: 0
         });
         this.anims.create({
             key: 'charA_jumpLeft',
             frames: this.anims.generateFrameNumbers('charA_jump', { start: 13, end: 25 }).reverse(), // fila 1
-            frameRate: 15,
+            frameRate: 17,
             repeat: 0
         });
         ////////
@@ -419,39 +419,39 @@ export class Game_Scene extends Phaser.Scene {
         this.anims.create({
             key: 'charB_receiveRight',
             frames: this.anims.generateFrameNumbers('charB_move', { start: 0, end: 10 }), // fila 0
-            frameRate: 15,
+            frameRate: 17,
             repeat: 0
         });
         this.anims.create({
             key: 'charB_receiveLeft',
             frames: this.anims.generateFrameNumbers('charB_move', { start: 11, end: 21 }).reverse(), // fila 1
-            frameRate: 15,
+            frameRate: 17,
             repeat: 0
         });
 
         this.anims.create({
             key: 'charB_runRight',
             frames: this.anims.generateFrameNumbers('charB_move', { start: 22, end: 32 }), // fila 2
-            frameRate: 20,
+            frameRate: 22,
             repeat: -1
         });
         this.anims.create({
             key: 'charB_runLeft',
             frames: this.anims.generateFrameNumbers('charB_move', { start: 33, end: 43 }).reverse(), // fila 3
-            frameRate: 20,
+            frameRate: 22,
             repeat: -1
         });
 
         this.anims.create({
             key: 'charB_jumpRight',
             frames: this.anims.generateFrameNumbers('charB_jump', { start: 0, end: 12 }), // fila 0
-            frameRate: 15,
+            frameRate: 17,
             repeat: 0
         });
         this.anims.create({
             key: 'charB_jumpLeft',
             frames: this.anims.generateFrameNumbers('charB_jump', { start: 13, end: 25 }).reverse(), // fila 1
-            frameRate: 15,
+            frameRate: 17,
             repeat: 0
         });
         ////////
@@ -473,39 +473,39 @@ export class Game_Scene extends Phaser.Scene {
         this.anims.create({
             key: 'charC_receiveRight',
             frames: this.anims.generateFrameNumbers('charC_move', { start: 0, end: 10 }), // fila 0
-            frameRate: 15,
+            frameRate: 17,
             repeat: 0
         });
         this.anims.create({
             key: 'charC_receiveLeft',
             frames: this.anims.generateFrameNumbers('charC_move', { start: 11, end: 21 }).reverse(), // fila 1
-            frameRate: 15,
+            frameRate: 17,
             repeat: 0
         });
 
         this.anims.create({
             key: 'charC_runRight',
             frames: this.anims.generateFrameNumbers('charC_move', { start: 22, end: 32 }), // fila 2
-            frameRate: 20,
+            frameRate: 22,
             repeat: -1
         });
         this.anims.create({
             key: 'charC_runLeft',
             frames: this.anims.generateFrameNumbers('charC_move', { start: 33, end: 43 }).reverse(), // fila 3
-            frameRate: 20,
+            frameRate: 22,
             repeat: -1
         });
 
         this.anims.create({
             key: 'charC_jumpRight',
             frames: this.anims.generateFrameNumbers('charC_jump', { start: 0, end: 12 }), // fila 0
-            frameRate: 15,
+            frameRate: 17,
             repeat: 0
         });
         this.anims.create({
             key: 'charC_jumpLeft',
             frames: this.anims.generateFrameNumbers('charC_jump', { start: 13, end: 25 }).reverse(), // fila 1
-            frameRate: 15,
+            frameRate: 17,
             repeat: 0
         });
         ////////
@@ -726,7 +726,7 @@ export class Game_Scene extends Phaser.Scene {
             console.log(`Rally concluded: ${data.scoringPlayerId} scores!`);
             const scorerId = data.scoringPlayerId;
 
-            // se coge el Player que ha anotado
+            // se coge el player que ha anotado
             const scoringPlayer = this.players.get(scorerId);
             const multiplier = scoringPlayer ? (scoringPlayer.scoreMultiplier || 1) : 1;
 
@@ -734,26 +734,25 @@ export class Game_Scene extends Phaser.Scene {
             const pointsToAdd = multiplier;
 
             if (scorerId === 'player1') {
+                // marcador visual
                 this.pointsLeft += pointsToAdd;
                 this.scoreLeft.setText(this.pointsLeft.toString());
+
+                // puntos del set (para lógica de sets)
+                this.scoreP1 += pointsToAdd;
             }
             else if (scorerId === 'player2') {
                 this.pointsRight += pointsToAdd;
                 this.rightScore.setText(this.pointsRight.toString());
-            }
 
-            /*
-            // si el multiplicador también cuenta para la lógica de
-            //  sets basada en scoreP1 / scoreP2:
-            if (scorerId === 'player1') {
-                this.scoreP1 += pointsToAdd;
-            } else if (scorerId === 'player2') {
                 this.scoreP2 += pointsToAdd;
             }
+
+            // condición de 11 puntos con 2 de diferencia
             this._checkWinCondition();
-            */
         });
     }
+
 
 
     // Maneja colisión entre pelota y jugador
@@ -792,37 +791,43 @@ export class Game_Scene extends Phaser.Scene {
 
         console.log(`Set terminado. Score sets: P1=${this.setsP1}, P2=${this.setsP2}`);
 
-        // Actualizar set actual
+        // se actualiza el set actual
         this.currentSet++;
 
-        // Revisar si alguien ganó el partido
+        // se revisa si alguien ganó el partido
         if (this.setsP1 === 2) {
             this._endGame("player1");
         } else if (this.setsP2 === 2) {
             this._endGame("player2");
         } else {
-            // Reiniciar set
+            // reiniciar set
             this._resetSet();
         }
     }
 
     _resetSet() {
-        // Actualizar set
+        // se actualiza el texto del set actual
         this.setText.setText(`SET ${this.currentSet}`);
 
-        // Reiniciar tiempo
+        // se reinicia el tiempo
         this.tiempoRestante = this.tiempoTotal;
         this.timerEvent.paused = false;
         this.updateTimer();
 
-        // Reiniciar puntuación
+        // se reinicia la puntuación del set (lógica)
         this.scoreP1 = 0;
         this.scoreP2 = 0;
 
-        // Reiniciar pelota
+        // se reinicia el marcador visual en pantalla
+        this.pointsLeft = 0;
+        this.pointsRight = 0;
+        this.scoreLeft.setText('0');
+        this.rightScore.setText('0');
+
+        // se reinicia la pelota
         this.ball.resetRally();
 
-        // Reposicionar jugadores a sus posiciones iniciales
+        // se reposicionan los jugadores a sus posiciones iniciales
         const p1 = this.players.get('player1');
         const p2 = this.players.get('player2');
 

@@ -20,7 +20,7 @@ import { SelectScenario_Scene } from "./Scenes/SelectScenario_Scene.js";
             default: 'arcade',
             arcade: {
                 gravity: {x: 0, y: 300},
-                debug: true
+                debug: false // poner a true para ver las líneas de los cuerpos físicos
             }
         },
         dom: {
@@ -30,8 +30,9 @@ import { SelectScenario_Scene } from "./Scenes/SelectScenario_Scene.js";
         backgroundColor:'#8675f1',
 };
 
-const game = new Phaser.Game(config);
-game.globals = {
-    defaultTextStyle: { fontFamily: 'MiFuente', fontSize: '20px', color: '#ffffff' }
-};
+    const game = new Phaser.Game(config);
+    game.globals = {
+        defaultTextStyle: { fontFamily: 'MiFuente', fontSize: '20px', color: '#ffffff' },
+        music: null
+    };
 })();

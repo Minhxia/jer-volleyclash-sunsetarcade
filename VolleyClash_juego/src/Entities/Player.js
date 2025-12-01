@@ -8,8 +8,8 @@ export class Player {
         this.id = id;                       // identificador del jugador (P1, P2)
         this.characterType = characterType; // indica qué personaje se ha elegido
 
-        this.moveSpeed = 200;   // velocidad de movimiento (horizontal)
-        this.jumpSpeed = 200;   // fuerza de salto
+        this.moveSpeed = 250;   // velocidad de movimiento (horizontal)
+        this.jumpSpeed = 275;   // fuerza de salto
 
         this.activePowerUps = {};   // powerups activos
 
@@ -96,9 +96,10 @@ export class Player {
             this.config.startFrame
         );
         // se hace un poco más grande
-        this.sprite.setScale(3);
-        // se ajusta la hitbox al nuevo tamaño para las colisiones  
-        this.sprite.body.setSize(this.sprite.width, this.sprite.height, true);
+        this.sprite.setScale(2.5);
+        // se ajusta la hitbox al nuevo tamaño para las colisiones, se reducen
+        //this.sprite.body.setSize(this.sprite.width, this.sprite.height, true);
+        this.sprite.body.setSize(this.sprite.width * 0.9, this.sprite.height * 0.9, true);
 
         // se guarda una referencia hacia Player dentro del propio sprite
         // (es útil si en colisiones se quiere acceder a la lógica)
@@ -273,6 +274,19 @@ export class Player {
             this.sprite.setVelocityX(0);
         }
     }
+
+    // Mover el jugador a una posición concreta (y detenerlo)
+    // (se llama al cambiar de sets)
+    setPosition(x, y) {
+        if (!this.sprite) return;
+
+        this.sprite.setPosition(x, y);
+        this.sprite.setVelocity(0, 0); // por si venía con velocidad
+
+        // actualizar también la posición del texto x2/x3
+        this.updateMultiplierTextPosition();
+    }
+
 
     updateMultiplierTextPosition() {
         if (!this.multiplierText || !this.sprite) return;
