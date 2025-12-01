@@ -119,13 +119,13 @@ export class Game_Scene extends Phaser.Scene {
             .setScrollFactor(0)
             .setDepth(9000); // debajo del texto
 
-        // Marco de set
+        // marco de set
         this.setFrame = this.add.image(this.scale.width / 2, 120, 'marcoGeneral')
             .setOrigin(0.5)
             .setScale(1)
             .setDepth(9998);
 
-        // Texto del set actual
+        // texto del set actual
         this.setText = this.add.text(this.scale.width / 2, 120, `SET ${this.currentSet}`, {
             ...style,
             fontSize: '32px',
@@ -133,6 +133,18 @@ export class Game_Scene extends Phaser.Scene {
         })
         .setOrigin(0.5)
         .setDepth(9999);
+
+        // texto para mostrar el ganador del set
+        this.setWinnerText = this.add.text(this.scale.width / 2, 185, '', {
+            ...style,
+            fontSize: '24px',
+            color: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 3
+        })
+        .setOrigin(0.5)
+        .setDepth(9999)
+        .setVisible(false);
 
         // iniciar el contador
         this.timerEvent = this.time.addEvent({
@@ -786,24 +798,40 @@ export class Game_Scene extends Phaser.Scene {
     }
 
     _endSet(winner) {
+        // actualizar sets ganados
         if (winner === 'player1') this.setsP1++;
         else if (winner === 'player2') this.setsP2++;
 
         console.log(`Set terminado. Score sets: P1=${this.setsP1}, P2=${this.setsP2}`);
 
-        // se actualiza el set actual
+        // mostrar mensaje de ganador de set
+        const winnerLabel = (winner === 'player1') ? 'Jugador 1' : 'Jugador 2';
+        this.setWinnerText.setText(`Set para ${winnerLabel}`);
+        this.setWinnerText.setVisible(true);
+
+        // Avanzar número de set
         this.currentSet++;
 
-        // se revisa si alguien ganó el partido
-        if (this.setsP1 === 2) {
-            this._endGame("player1");
-        } else if (this.setsP2 === 2) {
-            this._endGame("player2");
+        const matchOver = (this.setsP1 === 2 || this.setsP2 === 2);
+
+        if (matchOver) {
+            // último set: mostramos el mensaje 2s y luego pasamos a la escena final
+            this.time.delayedCall(2000, () => {
+                // (si quieres, aquí podrías ocultar el texto)
+                this._endGame(winner);
+            });
         } else {
-            // reiniciar set
-            this._resetSet();
+            // set intermedio: mostramos el mensaje 2s, lo ocultamos y reiniciamos el set
+            this.time.delayedCall(2000, () => {
+                if (this.setWinnerText) {
+                    this.setWinnerText.setVisible(false);
+                }
+                this._resetSet();
+            });
         }
     }
+
+
 
     _resetSet() {
         // se actualiza el texto del set actual

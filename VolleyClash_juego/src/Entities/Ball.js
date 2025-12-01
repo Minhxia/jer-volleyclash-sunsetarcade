@@ -18,11 +18,27 @@ export class Ball {
 
         // posición de la red (hardcodeado para ancho de 960px)
         this.netX = 480;
+
+        // para evitar toques múltiples por estar pegada y que "desaparezca"
+        this.lastHitTime = 0;
+        this.lastHitPlayerId = null;
     }
 
     // Se llama cuando un jugador golpea la pelota
     hit(player, playerFacingDirection, isJumping, isReceiving = false) {
         if (!this.isBallLive) return;
+
+        const now = this.scene.time.now;
+
+        // si es el mismo jugador y ha pasado muy poco tiempo,
+        // ignoramos ese "toque" para no sumar más golpes
+        if (this.lastHitPlayerId === player.id && (now - this.lastHitTime) < 120) {
+            return;
+        }
+
+        // registramos este nuevo golpe válido
+        this.lastHitPlayerId = player.id;
+        this.lastHitTime = now;
 
         // se incrementa el contador de toques si el mismo jugador continúa, se reinicia si es el otro
         if (this.lastTouchedBy === player.id) {
@@ -32,9 +48,7 @@ export class Ball {
             this.lastTouchedBy = player.id;
         }
 
-        // se verifica si se ha excedido el límite de toques (3 toques por lado de cancha)
         if (this.touchCount > 3) {
-            // Falta: demasiados toques
             this.onFalta('toqueExcedido', player);
             return;
         }
@@ -43,8 +57,8 @@ export class Ball {
         let velocityX, velocityY;
 
         if (isReceiving) {
-            // Recepción: parábola larga y ancha (trayectoria defensiva)
-            // Menor velocidad horizontal, mayor velocidad vertical para el arco
+            // recepción: parábola larga y ancha (trayectoria defensiva)
+            // menor velocidad horizontal, mayor velocidad vertical para el arco
             const baseSpeedX = 180;
             const verticalStrength = -350; // componente vertical mayor para el arco
 
@@ -55,9 +69,9 @@ export class Ball {
             }
             velocityY = verticalStrength;
         } else if (isJumping) {
-            // Salto/Ataque: horizontal fuerte, vertical débil (remate/smash)
-            // Alta velocidad horizontal, baja velocidad vertical para trayectoria plana
-            const baseSpeedX = 300;
+            // salto/ataque: horizontal fuerte, vertical débil (remate/smash)
+            // alta velocidad horizontal, baja velocidad vertical para trayectoria plana
+            const baseSpeedX = 220; // 300
             const verticalStrength = -150; // componente vertical bajo para ataque plano
 
             if (playerFacingDirection === 'left') {
@@ -149,6 +163,10 @@ export class Ball {
         // se reposiciona la pelota al centro de la cancha, ligeramente sobre el suelo
         this.sprite.setPosition(this.netX, 100);
         this.sprite.setVelocity(0, 0);
+
+        // limpiar info de último golpe
+        this.lastHitTime = 0;
+        this.lastHitPlayerId = null;
     }
 
     // Actualiza el estado de la pelota cada frame (se rastrea el lado de la cancha según la posición)
