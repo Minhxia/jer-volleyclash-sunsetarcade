@@ -9,7 +9,8 @@ export class Credits_Scene extends Phaser.Scene {
     preload() {
         this.load.image('botonVolver', 'ASSETS/UI/BOTONES/FLECHA_VOLVER.png');
         this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
-        this.load.image('logo', 'ASSETS/LOGO/Logo.png');
+        this.load.image('logo', 'ASSETS/LOGO/logo_empresa.png');
+        this.load.image('marco','ASSETS/UI/MARCOS/VACIOS/MARCOS_ESCENARIO.png')
 
         // Sonido
         this.load.audio('sonidoClick', 'ASSETS/SONIDO/SonidoBoton.mp3');
@@ -43,6 +44,9 @@ export class Credits_Scene extends Phaser.Scene {
             'Cristine Nioka Tewo',
             'Álvaro Ibáñez Montero'
         ];
+
+        this.add.image(width / 2, 210, 'marco').setOrigin(0.5).setScale(2.4);
+
         // se muestran los nombres centrados
         const inicioY = 150;
         const separacion = 30;
@@ -51,7 +55,7 @@ export class Credits_Scene extends Phaser.Scene {
             this.add.text(centerX, inicioY + index * separacion, nombre, {
                 ...style,
                 fontSize: '20px',
-                color: '#5f0000ff'
+                color: '#000'
             }).setOrigin(0.5);
         });
 
@@ -70,7 +74,7 @@ export class Credits_Scene extends Phaser.Scene {
             this.scene.start('Menu_Scene');
         });
 
-        this.add.image(width / 2, 400, 'logo').setOrigin(0.5).setScale(1.2);
+        this.add.image(width / 2, 400, 'logo').setOrigin(0.5).setScale(0.6);
 
         // Función para añadir sonido de clic con volumen global
         const addClickSound = (button) => {
