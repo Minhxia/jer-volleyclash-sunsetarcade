@@ -8,7 +8,7 @@ import { CommandProcessor } from '../Commands/CommandProcessor.js';
 import { MovePlayerCommand } from '../Commands/MovePlayerCommand.js';
 
 export class Game_Scene extends Phaser.Scene {
-    tiempoTotal = 60; // para 2 min poner 120 segundos
+    tiempoTotal = 10; // para 2 min poner 120 segundos
     tiempoRestante = this.tiempoTotal;
     timerText;
     timerEvent;
@@ -779,7 +779,18 @@ export class Game_Scene extends Phaser.Scene {
     }
 
     _endGame(winner) {
-        this.scene.pause(); 
+        // paramos el timer del set si sigue vivo
+        if (this.timerEvent) {
+            this.timerEvent.remove(false);   // elimina el evento
+            this.timerEvent = null;
+        }
+
+        // Opcional: detener la física de esta escena antes de salir
+        if (this.physics && this.physics.world) {
+            this.physics.world.pause();
+        }
+
+        // NO llamar a this.scene.pause() aquí
         this.scene.start("EndGame_Scene", {
             winner: winner,
             player1: this.player1,
