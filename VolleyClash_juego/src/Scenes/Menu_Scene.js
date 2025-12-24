@@ -82,6 +82,7 @@ export class Menu_Scene extends Phaser.Scene {
             onClick: () => this.scene.start('Credits_Scene'),
             textStyle: buttonTextStyle,
         });
+        /////////
 
         // logo de la empresa
         this.add.image(this.scale.width - 20, this.scale.height - 20, 'logoEmpresa')

@@ -1,6 +1,6 @@
 // Pantalla de Configuración
 import Phaser from 'phaser';
-import { getStoredVolume, setStoredVolume, applyStoredVolume, playClick } from '../UI/Audio.js';
+import { getStoredVolume, setStoredVolume, applyStoredVolume } from '../UI/Audio.js';
 import { createIconButton } from '../UI/Buttons.js';
 
 export class Configuration_Scene extends Phaser.Scene {
@@ -98,12 +98,12 @@ export class Configuration_Scene extends Phaser.Scene {
 
         const separation = 400;
 
-        // TECLA DERECHA
+        // Mini-tutorial
+        // TECLAS DERECHA
         this.add.image(width / 2 + separation / 2, 380, 'derTeclas')
             .setScale(0.35)
             .setOrigin(0.5);
-
-        // TECLA IZQUIERDA
+        // TECLAS IZQUIERDA
         this.add.image(width / 2 - separation / 2, 380, 'izqTeclas')
             .setScale(0.35)
             .setOrigin(0.5);

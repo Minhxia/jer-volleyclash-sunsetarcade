@@ -1,5 +1,6 @@
 // Pantalla de Créditos
 import Phaser from 'phaser';
+import { createIconButton } from '../UI/Buttons.js';
 
 export class Credits_Scene extends Phaser.Scene {
     constructor() {
@@ -7,83 +8,90 @@ export class Credits_Scene extends Phaser.Scene {
     }
 
     preload() {
+        // imágenes fondo y ui
         this.load.image('botonVolver', 'ASSETS/UI/BOTONES/FLECHA_VOLVER.png');
         this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
         this.load.image('logo', 'ASSETS/LOGO/logo_empresa.png');
         this.load.image('marco','ASSETS/UI/MARCOS/VACIOS/MARCOS_ESCENARIO.png')
 
-        // Sonido
+        // sonido
         this.load.audio('sonidoClick', 'ASSETS/SONIDO/SonidoBoton.mp3');
     }
 
     create() {
-        // posiciones base para los botones del menú
-        const style = this.game.globals.defaultTextStyle;
-
-        const background = this.add.image(0, 0, 'fondo')
-        .setOrigin(0)
-        .setDepth(-1);
-        // (así se puede cambiar el tamaño sin problemas)
         const { width, height } = this.scale;
         const centerX = width / 2;
 
-        // TODO: cambiar por una imagen?
-        // título de la escena de créditos
-        this.add.text(centerX, 80, 'Créditos', {
-            ...style,
-            fontSize: '32px',
-            color: '#5f0000ff'
-        }).setOrigin(0.5);
+        const style = this.game.globals?.defaultTextStyle ?? {
+            fontFamily: 'Arial',
+            fontSize: '20px',
+            color: '#000000',
+        };
 
-        // TODO: ponerlo más bonito
-        // miembros del equipo
+        // fondo
+        this.add
+            .image(0, 0, 'fondo')
+            .setOrigin(0)
+            .setDepth(-1)
+            .setDisplaySize(width, height);
+
+        // título
+        this.add
+            .text(centerX, height * 0.15, 'Créditos', {
+                ...style,
+                fontSize: '32px',
+                color: '#5f0000ff',
+            })
+            .setOrigin(0.5);
+
+        // nombres del equipo
         const nombresEquipo = [
             'GRUPO 5 - SUNSET ARCADE',
             'Sara Bueno Esteban',
             'Antonio Morán Barrera',
             'Cristine Nioka Tewo',
-            'Álvaro Ibáñez Montero'
+            'Álvaro Ibáñez Montero',
         ];
 
-        this.add.image(width / 2, 210, 'marco').setOrigin(0.5).setScale(2.4);
+        // marco centrado
+        this.textures.get('marco').setFilter(Phaser.Textures.FilterMode.LINEAR);
+        const frameY = height * 0.42;
+        const frame = this.add.image(centerX, frameY, 'marco').setOrigin(0.5);
 
-        // se muestran los nombres centrados
-        const inicioY = 150;
-        const separacion = 30;
+        // escala del marco según la resolución
+        const targetFrameWidth = width * 0.45;
+        const scale = targetFrameWidth / frame.width;
+        frame.setScale(scale);
 
-        nombresEquipo.forEach((nombre, index) => {
-            this.add.text(centerX, inicioY + index * separacion, nombre, {
-                ...style,
-                fontSize: '20px',
-                color: '#000'
-            }).setOrigin(0.5);
+        // textos dentro del marco centrados verticalmente
+        const lineSpacing = 30;
+        const startY = frameY - ((nombresEquipo.length - 1) * lineSpacing) / 2;
+
+        nombresEquipo.forEach((nombre, i) => {
+            const isHeader = i === 0;
+            this.add
+                .text(centerX, startY + i * lineSpacing, nombre, {
+                    ...style,
+                    fontSize: isHeader ? '22px' : '20px',
+                    color: '#000000',
+                })
+                .setOrigin(0.5);
         });
 
-        //// BOTÓN VOLVER ////
-        // arriba a la izquierda
-        const backX = width * 0.06;
-        const backY = height * 0.08;
+        // logo empresa
+        this.add
+            .image(centerX, height * 0.78, 'logo')
+            .setOrigin(0.5)
+            .setScale(0.6);
 
-        const backButton = this.add
-            .sprite(backX, backY, 'botonVolver')
-            .setScale(1)
-            .setInteractive({ useHandCursor: true });
-
-        backButton.on('pointerdown', () => {
-            // vuelve al menú principal
-            this.scene.start('Menu_Scene');
+        // botón Volver atrás
+        createIconButton(this, {
+            x: width * 0.06,
+            y: height * 0.08,
+            texture: 'botonVolver',
+            scale: 1,
+            hoverScale: 1.1,
+            onClick: () => this.scene.start('Menu_Scene'),
         });
-
-        this.add.image(width / 2, 400, 'logo').setOrigin(0.5).setScale(0.6);
-
-        // Función para añadir sonido de clic con volumen global
-        const addClickSound = (button) => {
-            button.on('pointerdown', () => {
-                const volume = parseFloat(localStorage.getItem('volume')) || 1;
-                this.sound.play('sonidoClick', { volume });
-            });
-        };
-
-        addClickSound(backButton);
     }
 }
