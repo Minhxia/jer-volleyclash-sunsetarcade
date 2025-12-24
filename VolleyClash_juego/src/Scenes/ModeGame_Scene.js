@@ -1,4 +1,4 @@
-// Pantalla de Modo de Juego
+// Pantalla para elegir Modo de Juego
 import Phaser from 'phaser';
 
 export class ModeGame_Scene extends Phaser.Scene {
@@ -7,12 +7,13 @@ export class ModeGame_Scene extends Phaser.Scene {
     }
 
     preload() {
+        // botones
         this.load.image('botonSeleccionado', 'ASSETS/UI/BOTONES/BOTON_SELECCIONDO.png');
         this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_SIN_SELECCIONAR.png');
         this.load.image('botonVolver', 'ASSETS/UI/BOTONES/FLECHA_VOLVER.png');
         this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
 
-        // Sonido
+        // sonido
         this.load.audio('sonidoClick', 'ASSETS/SONIDO/SonidoBoton.mp3');
     }
 
@@ -20,11 +21,11 @@ export class ModeGame_Scene extends Phaser.Scene {
         const { width, height } = this.scale;
         const style = this.game.globals.defaultTextStyle;
 
-        const background = this.add.image(0, 0, 'fondo')
-        .setOrigin(0)
-        .setDepth(-1);
+        this.add.image(0, 0, 'fondo')
+            .setOrigin(0)
+            .setDepth(-1);
 
-        // Título centrado
+        // título centrado
         this.add.text(width / 2, 100, 'Modo de Juego', {
             ...style,
             fontSize: '40px',
@@ -32,11 +33,11 @@ export class ModeGame_Scene extends Phaser.Scene {
             fontStyle: 'bold'
         }).setOrigin(0.5);
 
-        // Posiciones horizontales de los botones
+        // posiciones horizontales de los botones
         const spacing = 250;
         const startX = width / 2 - spacing / 2;
         
-        // Boton Local
+        // botón LOCAL
         const localButton = this.add.sprite(startX, 250, 'botonSinSeleccionar')
             .setInteractive({ useHandCursor: true })
             .setScale(2);
@@ -49,7 +50,7 @@ export class ModeGame_Scene extends Phaser.Scene {
         localButton.on('pointerdown', () => localButton.setTexture('botonSeleccionado'));
         localButton.on('pointerup', () => this.scene.start('SelecPlayer_Scene'));
 
-        // Boton Red
+        // botón RED
         const networkButton = this.add.sprite(startX + spacing, 250, 'botonSinSeleccionar')
             .setInteractive({ useHandCursor: true })
             .setScale(2);
@@ -59,10 +60,10 @@ export class ModeGame_Scene extends Phaser.Scene {
 
         networkButton.on('pointerover', () => networkButton.setTexture('botonSeleccionado'));
         networkButton.on('pointerout', () => networkButton.setTexture('botonSinSeleccionar'));
-        networkButton.on('pointerdown', () => localButton.setTexture('botonSeleccionado'));
+        networkButton.on('pointerdown', () => networkButton.setTexture('botonSeleccionado'));
         networkButton.on('pointerup', () => this.scene.start('SelecPlayer_Scene'));
 
-        // Boton Volver
+        // botón Volver atrás
         const backX = width * 0.06;
         const backY = height * 0.08;
 
@@ -74,11 +75,14 @@ export class ModeGame_Scene extends Phaser.Scene {
         backButton.on('pointerdown', () => {
             this.scene.start('Menu_Scene');
         });
+        ///////
 
-        // Función para añadir sonido de clic con volumen global
+        // Función para añadir sonido de click con volumen global
         const addClickSound = (button) => {
             button.on('pointerdown', () => {
-                const volume = parseFloat(localStorage.getItem('volume')) || 1;
+                const storedVolume = parseFloat(localStorage.getItem('volume'));
+                // se usa NaN porque 0 es valor falsy (así se puede mutear el volumen)
+                const volume = Number.isNaN(storedVolume) ? 1 : storedVolume;
                 this.sound.play('sonidoClick', { volume });
             });
         };
