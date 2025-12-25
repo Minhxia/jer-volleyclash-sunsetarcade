@@ -1,166 +1,184 @@
 //Pantalla de Seleccion de jugador
 import Phaser from 'phaser';
+import { applyStoredVolume, playClick } from '../UI/Audio.js';
+import { createUIButton, createIconButton } from '../UI/Buttons.js';
 
 export class SelectPlayer_Scene extends Phaser.Scene {
     constructor() {
         super('SelecPlayer_Scene');
+
+        this.players = [];
+        this.currentTurn = 0;       // 0 -> jugador1, 1 -> jugador2, null -> ambos completos
+        this.playerInputs = [];     // DOMElements Phaser
+        this.playerInputEls = [];   // HTMLInputElement
+        this.turnText = null;
+
+        this.mode = 'local';        // opcional (a lo mejor hay que borrar esto)
+    }
+
+    init(data) {
+        // si ModeGame_Scene pasa mode: local o red, se guarda
+        this.mode = data?.mode ?? 'local';
     }
 
     preload() {
+        // botones
         this.load.image('botonSeleccionado', 'ASSETS/UI/BOTONES/BOTON_SELECCIONDO.png');
         this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_SIN_SELECCIONAR.png');
         this.load.image('botonVolver', 'ASSETS/UI/BOTONES/VOLVER.png');
         this.load.image('botonSimple', 'ASSETS/UI/BOTONES/BOTON_BASE_SINSELECCIONAR.png');
         this.load.image('botonSimpleSeleccionado', 'ASSETS/UI/BOTONES/BOTON_BASE.png');
-        this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
-        this.load.image('marco','ASSETS/UI/MARCOS/VACIOS/MARCO_PERSONAJE_SELECCIONADO.png')
 
+        // fondo
+        this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
+        this.load.image('marco', 'ASSETS/UI/MARCOS/VACIOS/MARCO_PERSONAJE_SELECCIONADO.png');
+
+        // personajes
         this.load.image('characterA', 'ASSETS/PERSONAJES/PERSONAJES_POSE/personajes_a.png');
         this.load.image('characterB', 'ASSETS/PERSONAJES/PERSONAJES_POSE/personajes_b.png');
         this.load.image('characterC', 'ASSETS/PERSONAJES/PERSONAJES_POSE/personaje_c.png');
 
-        // Sonido
+        // sonido
         this.load.audio('sonidoClick', 'ASSETS/SONIDO/SonidoBoton.mp3');
     }
 
     create() {
-        // Liberar todas las teclas capturadas por Phaser
+        // se limpian todas las teclas capturadas por otras escenas
         this.input.keyboard.removeAllKeys(true);
         this.input.keyboard.removeAllListeners();
 
         const { width, height } = this.scale;
-        const style = this.game.globals.defaultTextStyle;
 
-        const background = this.add.image(0, 0, 'fondo')
-        .setOrigin(0)
-        .setDepth(-1);
+        const style = this.game.globals?.defaultTextStyle ?? {
+            fontFamily: 'Arial',
+            fontSize: '20px',
+            color: '#ffffff',
+        };
 
-        // Datos jugadores
+        // se aplica el volumen
+        applyStoredVolume(this);
+
+        // Fondo
+        this.add.image(0, 0, 'fondo')
+            .setOrigin(0)
+            .setDepth(-1)
+            .setDisplaySize(width, height);
+
+        // Título
+        this.add.text(width / 2, 50, 'Selecciona Personaje', {
+            ...style, fontSize: '40px', color: '#000', fontStyle: 'bold',
+        }).setOrigin(0.5);
+
+        // Datos de los jugadores
         this.players = [
-            { name: '', character: null, color: 0x00aaff }, // Azul - Jugador 1
-            { name: '', character: null, color: 0xff5555 }  // Rojo - Jugador 2
+            { name: '', character: null, color: 0x00aaff, bigImage: null, bigFrame: null, frame: null },
+            { name: '', character: null, color: 0xff5555, bigImage: null, bigFrame: null, frame: null },
         ];
 
-        this.selectedCharacters = new Set(); // Conjunto con los personajes seleccionados
+        // Texto de turno
+        this.turnText = this.add.text(width / 2, 90, 'Turno: Jugador 1', {
+            ...style, fontSize: '18px', color: '#000',
+        }).setOrigin(0.5);
 
-        // Texto superior
-        this.add.text(width / 2, 50, 'Selecciona Personaje', { ...style, fontSize: '40px', color: '#000', fontStyle: 'bold' }).setOrigin(0.5);
+        // UI jugadores + miniaturas
+        this.createPlayersUI();
+        this.createCharacterMiniatures();
+        this.updateTurnText();
 
-        // Crear áreas de selección
-        this.createPlayerArea(0); // Jugador 1
-        this.createPlayerArea(1); // Jugador 2
-
-        // Boton Siguiente
-        const nextButton = this.add.image(width/2, 500, 'botonSimple')
-            .setInteractive()
-            .setScale(1.5);
-        const nextText = this.add.text(0, 0, 'Siguiente', { ...style, fontSize: '12px', color: '#000' });
-        Phaser.Display.Align.In.Center(nextText, nextButton);
-
-        nextButton.on('pointerover', () => nextButton.setTexture('botonSimpleSeleccionado'));
-        nextButton.on('pointerout', () => nextButton.setTexture('botonSimple'));
-        nextButton.on('pointerdown', () => nextButton.setTexture('botonSimpleSeleccionado'));
-        nextButton.on('pointerup', () => {
-            const name1 = this.playerInputs[0].node.querySelector('input').value.trim();
-            const name2 = this.playerInputs[1].node.querySelector('input').value.trim();
-
-            console.log("Nombre de usuario:", name1);
-            console.log("Nombre de usuario:", name2);
-
-            if (!name1 || !name2) {
-                console.warn("Ambos jugadores deben poner nombre");
-                return;
-            }
-            this.players[0].name = name1;
-            this.players[1].name = name2;
-
-            this.scene.start('SelectScenario_Scene', { 
-                player1: this.players[0],
-                player2: this.players[1]
-            });
+        // Botón Siguiente
+        createUIButton(this, {
+            x: width / 2,
+            y: 500,
+            label: 'Siguiente',
+            onClick: () => this.handleNext(),
+            scale: 1.5,
+            textureNormal: 'botonSimple',
+            textureHover: 'botonSimpleSeleccionado',
+            textStyle: { ...style, fontSize: '14px', color: '#000' },
+            clickSoundKey: 'sonidoClick',
         });
 
-        // Boton Volver
-        const backX = width * 0.06;
-        const backY = height * 0.08;
-
-        const backButton = this.add
-            .sprite(backX, backY, 'botonVolver')
-            .setScale(1)
-            .setInteractive({ useHandCursor: true });
-
-        backButton.on('pointerdown', () => {
-            this.scene.start('ModeGame_Scene');
+        // Botón volver
+        createIconButton(this, {
+            x: width * 0.06,
+            y: height * 0.08,
+            texture: 'botonVolver',
+            scale: 1,
+            hoverScale: 1.1,
+            clickSoundKey: 'sonidoClick',
+            onClick: () => this.scene.start('ModeGame_Scene', { mode: this.mode }),
         });
 
-        this.addClickSound(nextButton);
-        this.addClickSound(backButton);
-    }
-
-    // Función para añadir sonido de clic con volumen global
-    addClickSound(button) {
-        button.on('pointerdown', () => {
-            const volume = parseFloat(localStorage.getItem('volume')) || 1;
-            this.sound.play('sonidoClick', { volume });
+        // se limpia DOM al salir
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            this.playerInputs.forEach((dom) => dom?.destroy());
+            this.playerInputs = [];
+            this.playerInputEls = [];
+            this.input.keyboard.enabled = true;
         });
     }
 
-    createPlayerArea(idx) {
+    // Crea la UI de selección de jugadores
+    createPlayersUI() {
         const { width, height } = this.scale;
-        const player = this.players[idx];
         const style = this.game.globals.defaultTextStyle;
 
-        // Turno: 0 = jugador 1, 1 = jugador 2
-        this.currentTurn = 0;
+        // se suaviza un poco el marco
+        if (this.textures.exists('marco')) {
+            this.textures.get('marco').setFilter(Phaser.Textures.FilterMode.LINEAR);
+        }
 
-        // Crear inputs y marcos para cada jugador
+        const positionsX = [width * 0.25, width * 0.75];
+
         this.players.forEach((player, idx) => {
-            // Input de nombre arriba
-            this.add.text(width * (0.25 + 0.5 * idx), 100, 'Nombre:', { ...style,  fontSize: '24px', color: '#000' }).setOrigin(0.5);
-            const input = this.add.dom(width * (0.25 + 0.5 * idx), 140).createFromHTML(`
+            const x = positionsX[idx];
+
+            // Label nombre
+            this.add.text(x, 100, 'Nombre:', { ...style, fontSize: '24px', color: '#000' })
+                .setOrigin(0.5);
+
+            // Input nombre
+            const dom = this.add.dom(x, 140).createFromHTML(`
                 <input type="text" placeholder="Nombre jugador" maxlength="10"
-                        style="
-                                width:150px;
-                                padding:6px;
-                                font-size:16px;
-                                font-family:${style.fontFamily};
-                                border-radius:12px;
-                                border: 6px solid #FFAA00;
-                                outline: none;
-                                text-align:center;
-                                background-color:#f0f0f0;
-                                transition: border-color 0.2s, box-shadow 0.2s;
-                        "
-                        onfocus="this.style.borderColor='#FF8316'; this.style.boxShadow='0 0 5px #FF8316';"
-                        onblur="this.style.borderColor='#FFAA00'; this.style.boxShadow='none';"
-                    >
+                style="
+                    width:150px;
+                    padding:6px;
+                    font-size:16px;
+                    font-family:${style.fontFamily};
+                    border-radius:12px;
+                    border: 6px solid #FFAA00;
+                    outline: none;
+                    text-align:center;
+                    background-color:#f0f0f0;
+                    transition: border-color 0.2s, box-shadow 0.2s;"
+                onfocus="this.style.borderColor='#FF8316'; this.style.boxShadow='0 0 5px #FF8316';"
+                onblur="this.style.borderColor='#FFAA00'; this.style.boxShadow='none';"
+                />
             `);
 
-            const inputElement = input.node.querySelector('input');
+            const inputEl = /** @type {HTMLInputElement} */ (dom.node.querySelector('input'));
 
-            inputElement.addEventListener('focus', (e) => {
+            // para que el teclado no interfiera con Phaser
+            inputEl.addEventListener('focus', (e) => {
                 this.input.keyboard.enabled = false;
                 e.stopPropagation();
             });
-
-            inputElement.addEventListener('blur', (e) => {
+            inputEl.addEventListener('blur', (e) => {
                 this.input.keyboard.enabled = true;
                 e.stopPropagation();
             });
+            inputEl.addEventListener('keydown', (e) => e.stopPropagation());
 
-            inputElement.addEventListener('keydown', (e) => {
-                e.stopPropagation();
+            // Letras + espacios
+            inputEl.addEventListener('input', () => {
+                inputEl.value = inputEl.value.replace(/[^a-zA-ZÀ-ÿñÑ ]/g, '');
+                this.updateTurnText();
             });
 
-            inputElement.addEventListener('input', () => {
-                // Solo permitir letras y espacios
-                inputElement.value = inputElement.value.replace(/[^a-zA-Z]/g, '');
-            });
+            this.playerInputs[idx] = dom;
+            this.playerInputEls[idx] = inputEl;
 
-            if (!this.playerInputs) this.playerInputs = [];
-            this.playerInputs[idx] = input;
-
-            // Imagen grande
+            // “Slot” grande + marco
             player.bigImage = this.add.image(width * (0.25 + 0.5 * idx), height * 0.6, 'characterA')
                 .setScale(1.2)
                 .setVisible(false);
@@ -169,90 +187,191 @@ export class SelectPlayer_Scene extends Phaser.Scene {
             .setScale(2.8) 
             .setVisible(true);
 
-            // Marco sobre miniatura
+            // Marco sobre miniatura (rectángulo)
             player.frame = this.add.rectangle(0, 0, 60, 120)
                 .setStrokeStyle(4, player.color)
                 .setVisible(false);
         });
 
+        // Turno empieza en jugador 1
+        this.currentTurn = 0;
+        this.updateTurnText();
+    }
 
-        // Miniaturas en triángulo central
+    // Crea las miniaturas de los personajes seleccionables
+    createCharacterMiniatures() {
+        const { width, height } = this.scale;
+
         const personajes = ['characterA', 'characterB', 'characterC'];
-        const spacing = 150; // aumenta espaciado
+        const spacing = 150;
         const startX = width / 2 - spacing / 2;
         const startY = height * 0.5;
 
         const positions = [
             { x: startX, y: startY },
             { x: startX + spacing, y: startY },
-            { x: startX + spacing / 2, y: startY + spacing / 2 }
+            { x: startX + spacing / 2, y: startY + spacing / 2 },
         ];
 
         personajes.forEach((nombre, i) => {
             const mini = this.add.image(positions[i].x, positions[i].y, nombre)
-                .setInteractive()
+                .setInteractive({ useHandCursor: true })
                 .setScale(0.45)
                 .setData('characterName', nombre);
-                
-            this.addClickSound(mini);
 
             mini.on('pointerdown', () => {
-                const player1 = this.players[0];
-                const player2 = this.players[1];
-
-                let currentPlayer, otherPlayer;
-
-                // Si currentTurn es null (ambos tienen personaje), nadie puede seleccionar
-                if (this.currentTurn === null) {
-                    // Pero si clickeas tu propio personaje para deseleccionar, permitimos
-                    if (player1.character === nombre) currentPlayer = player1;
-                    else if (player2.character === nombre) currentPlayer = player2;
-                    else return; // otro personaje ocupado, no permitir
-                    otherPlayer = currentPlayer === player1 ? player2 : player1;
-                } else {
-                    // Turno definido
-                    currentPlayer = this.players[this.currentTurn];
-                    otherPlayer = this.players[1 - this.currentTurn];
-                }
-
-                // Deseleccion si clickeo mi propio personaje
-                if (currentPlayer.character === nombre) {
-                    currentPlayer.character = null;
-                    currentPlayer.bigImage.setVisible(false);
-                    currentPlayer.frame.setVisible(false);
-                    this.selectedCharacters.delete(nombre);
-
-                    // Si ambos tenian personaje antes, este jugador tiene turno
-                    this.currentTurn = this.players.indexOf(currentPlayer);
-                    return;
-                }
-
-                // No permitir seleccionar si ya está ocupado por el otro jugador
-                if (otherPlayer.character === nombre) return;
-
-                // Si ambos jugadores ya tienen personaje, no permitir seleccionar otro
-                if (player1.character && player2.character) return;
-
-                // Liberar personaje anterior del jugador
-                if (currentPlayer.character) this.selectedCharacters.delete(currentPlayer.character);
-
-                // Asignar nuevo personaje
-                currentPlayer.character = nombre;
-                currentPlayer.bigImage.setTexture(nombre).setVisible(true);
-                this.selectedCharacters.add(nombre);
-
-                // Marco sobre miniatura
-                currentPlayer.frame.setPosition(mini.x, mini.y);
-                currentPlayer.frame.setVisible(true);
-
-                // Cambiar turno (Solo si el otro jugador no tiene personaje)
-                if (!otherPlayer.character) {
-                    this.currentTurn = 1 - this.currentTurn;
-                } else {
-                    // Ambos tienen personaje: no hay turno fijo
-                    this.currentTurn = null;
-                }
+                playClick(this, 'sonidoClick');
+                this.onMiniClicked(nombre, mini);
             });
         });
+    }
+
+    // Lógica al hacer click sobre una miniatura (personaje)
+    onMiniClicked(characterName, mini) {
+        const ownerIndex = this.players.findIndex(p => p.character === characterName);
+
+        // si el personaje ya pertenece a alguien, se deselecciona siempre
+        if (ownerIndex !== -1) {
+            const owner = this.players[ownerIndex];
+
+            owner.character = null;
+
+            if (owner.bigImage) owner.bigImage.setVisible(false);
+            if (owner.frame) owner.frame.setVisible(false);
+
+            // El turno pasa a ese jugador para que elija inmediatamente otro
+            this.currentTurn = ownerIndex;
+            this.updateTurnText();
+            return;
+        }
+
+        // si el personaje no pertenece a nadie, lo asignamos según el turno (o según quién falte)
+        const p1 = this.players[0];
+        const p2 = this.players[1];
+
+        let targetIndex = this.currentTurn;
+
+        // si currentTurn es null (ambos ya tenían), no se deja reemplazar sin deseleccionar antes,
+        // pero si uno está vacío, se elige automáticamente el vacío
+        if (targetIndex === null || targetIndex === undefined) {
+            if (!p1.character && p2.character) targetIndex = 0;
+            else if (!p2.character && p1.character) targetIndex = 1;
+            else if (!p1.character && !p2.character) targetIndex = 0;
+            else {
+                // ambos tienen personaje: para cambiar, primero deselecciona uno (click en su mini)
+                return;
+            }
+        }
+
+        const target = this.players[targetIndex];
+        const other = this.players[1 - targetIndex];
+
+        // no se permite escoger uno que tenga el otro
+        if (other.character === characterName) return;
+
+        // Asignar personaje
+        target.character = characterName;
+
+        if (target.bigImage) target.bigImage.setTexture(characterName).setVisible(true);
+        if (target.frame) target.frame.setPosition(mini.x, mini.y).setVisible(true);
+
+        // turno: si el otro aún no eligió, pasa al otro; si ya eligió, queda en null (ambos listos)
+        if (!other.character) this.currentTurn = 1 - targetIndex;
+        else this.currentTurn = null;
+
+        this.updateTurnText();
+    }
+
+    // Controla que pasa al hacer click en el botón Siguiente
+    handleNext() {
+        const name1 = this.playerInputEls?.[0]?.value?.trim() ?? '';
+        const name2 = this.playerInputEls?.[1]?.value?.trim() ?? '';
+
+        const p1HasChar = !!this.players?.[0]?.character;
+        const p2HasChar = !!this.players?.[1]?.character;
+
+        const ready = (name1.length > 0) && (name2.length > 0) && p1HasChar && p2HasChar;
+
+        if (!ready) {
+            // se actualiza el texto de arriba (turnText) con el mensaje específico
+            this.updateTurnText();
+
+            // se destaca el mensaje en rojo durante 1s
+            this.flashTurnText('#b00000', 900);
+
+            return;
+        }
+
+        // se guardan nombres
+        this.players[0].name = name1;
+        this.players[1].name = name2;
+
+        // se pasa a la siguiente escena
+        this.scene.start('SelectScenario_Scene', {
+            mode: this.mode,
+            player1: this.players[0],
+            player2: this.players[1],
+        });
+    }
+
+    // Hace parpadear el texto de turno con un color rojo durante unos milisegundos
+    flashTurnText(color = '#b00000', ms = 900) {
+        if (!this.turnText) return;
+
+        const oldColor = this.turnText.style.color || '#000000';
+        this.turnText.setColor(color);
+
+        this.time.delayedCall(ms, () => {
+            // vuelve al color normal y refresca el texto por si cambió algo
+            this.turnText.setColor(oldColor);
+            this.updateTurnText();
+        });
+    }
+
+    // Actualiza el texto de turno/estado actual
+    updateTurnText() {
+        if (!this.turnText) return;
+
+        const name1 = this.playerInputEls?.[0]?.value?.trim() ?? '';
+        const name2 = this.playerInputEls?.[1]?.value?.trim() ?? '';
+
+        const p1HasChar = !!this.players?.[0]?.character;
+        const p2HasChar = !!this.players?.[1]?.character;
+
+        const p1HasName = name1.length > 0;
+        const p2HasName = name2.length > 0;
+
+        const allChars = p1HasChar && p2HasChar;
+        const allNames = p1HasName && p2HasName;
+
+        // si todo está completo
+        if (allChars && allNames) {
+            this.turnText.setText('Listo: ambos jugadores tienen nombre y personaje');
+            return;
+        }
+
+        // si faltan NOMBRES (y ya están los personajes), especifica quién
+        if (allChars && !allNames) {
+            if (!p1HasName && !p2HasName) this.turnText.setText('Faltan los nombres de Jugador 1 y Jugador 2');
+            else if (!p1HasName) this.turnText.setText('Falta el nombre del Jugador 1');
+            else this.turnText.setText('Falta el nombre del Jugador 2');
+            return;
+        }
+
+        // si faltan PERSONAJES (y ya están los nombres), especifica quién
+        if (allNames && !allChars) {
+            if (!p1HasChar && !p2HasChar) this.turnText.setText('Faltan los personajes del Jugador 1 y Jugador 2');
+            else if (!p1HasChar) this.turnText.setText('Falta el personaje del Jugador 1');
+            else this.turnText.setText('Falta el personaje del Jugador 2');
+            return;
+        }
+
+        // si faltan cosas mixtas (nombres y personajes)
+        if (this.currentTurn === null || this.currentTurn === undefined) {
+            this.turnText.setText('Completa nombres y personajes');
+            return;
+        }
+
+        this.turnText.setText(`Turno: Jugador ${this.currentTurn + 1}`);
     }
 }

@@ -1,5 +1,7 @@
 // Pantalla para elegir Modo de Juego
 import Phaser from 'phaser';
+import { createUIButton, createIconButton } from '../UI/Buttons.js';
+import { applyStoredVolume } from '../UI/Audio.js';
 
 export class ModeGame_Scene extends Phaser.Scene {
     constructor() {
@@ -11,6 +13,8 @@ export class ModeGame_Scene extends Phaser.Scene {
         this.load.image('botonSeleccionado', 'ASSETS/UI/BOTONES/BOTON_SELECCIONDO.png');
         this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_SIN_SELECCIONAR.png');
         this.load.image('botonVolver', 'ASSETS/UI/BOTONES/FLECHA_VOLVER.png');
+
+        // fondo
         this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
 
         // sonido
@@ -19,76 +23,83 @@ export class ModeGame_Scene extends Phaser.Scene {
 
     create() {
         const { width, height } = this.scale;
-        const style = this.game.globals.defaultTextStyle;
-
-        this.add.image(0, 0, 'fondo')
-            .setOrigin(0)
-            .setDepth(-1);
-
-        // título centrado
-        this.add.text(width / 2, 100, 'Modo de Juego', {
-            ...style,
-            fontSize: '40px',
-            color: '#000',
-            fontStyle: 'bold'
-        }).setOrigin(0.5);
-
-        // posiciones horizontales de los botones
-        const spacing = 250;
-        const startX = width / 2 - spacing / 2;
         
-        // botón LOCAL
-        const localButton = this.add.sprite(startX, 250, 'botonSinSeleccionar')
-            .setInteractive({ useHandCursor: true })
-            .setScale(2);
-
-        const localText = this.add.text(0, 0, 'Local', { fontSize: '24px', color: '#000' });
-        Phaser.Display.Align.In.Center(localText, localButton);
-
-        localButton.on('pointerover', () => localButton.setTexture('botonSeleccionado'));
-        localButton.on('pointerout', () => localButton.setTexture('botonSinSeleccionar'));
-        localButton.on('pointerdown', () => localButton.setTexture('botonSeleccionado'));
-        localButton.on('pointerup', () => this.scene.start('SelecPlayer_Scene'));
-
-        // botón RED
-        const networkButton = this.add.sprite(startX + spacing, 250, 'botonSinSeleccionar')
-            .setInteractive({ useHandCursor: true })
-            .setScale(2);
-
-        const networkText = this.add.text(0, 0, 'Red', { fontSize: '24px', color: '#000' });
-        Phaser.Display.Align.In.Center(networkText, networkButton);
-
-        networkButton.on('pointerover', () => networkButton.setTexture('botonSeleccionado'));
-        networkButton.on('pointerout', () => networkButton.setTexture('botonSinSeleccionar'));
-        networkButton.on('pointerdown', () => networkButton.setTexture('botonSeleccionado'));
-        networkButton.on('pointerup', () => this.scene.start('SelecPlayer_Scene'));
-
-        // botón Volver atrás
-        const backX = width * 0.06;
-        const backY = height * 0.08;
-
-        const backButton = this.add
-            .sprite(backX, backY, 'botonVolver')
-            .setScale(1)
-            .setInteractive({ useHandCursor: true });
-
-        backButton.on('pointerdown', () => {
-            this.scene.start('Menu_Scene');
-        });
-        ///////
-
-        // Función para añadir sonido de click con volumen global
-        const addClickSound = (button) => {
-            button.on('pointerdown', () => {
-                const storedVolume = parseFloat(localStorage.getItem('volume'));
-                // se usa NaN porque 0 es valor falsy (así se puede mutear el volumen)
-                const volume = Number.isNaN(storedVolume) ? 1 : storedVolume;
-                this.sound.play('sonidoClick', { volume });
-            });
+        const style = this.game.globals?.defaultTextStyle ?? {
+            fontFamily: 'Arial',
+            fontSize: '20px',
+            color: '#000000',
         };
 
-        addClickSound(backButton);
-        addClickSound(localButton);
-        addClickSound(networkButton);
+        // se aplica el volumen
+        applyStoredVolume(this);
+
+        // fondo
+        this.add.image(0, 0, 'fondo')
+            .setOrigin(0)
+            .setDepth(-1)
+            .setDisplaySize(width, height);
+
+        // título
+        this.add
+            .text(width / 2, height * 0.18, 'Modo de Juego', {
+                ...style,
+                fontSize: '40px',
+                color: '#000000',
+                fontStyle: 'bold',
+            })
+            .setOrigin(0.5);
+
+        // layout
+        const buttonY = height * 0.5;
+        const spacing = Math.min(280, width * 0.3);
+        const startX = width / 2 - spacing / 2;
+
+        const buttonTextStyle = {
+            ...style,
+            fontSize: '24px',
+            color: '#000000',
+        };
+
+        const startMode = (mode) => {
+            // se pasa el modo a la siguiente escena
+            this.scene.start('SelecPlayer_Scene', { mode });
+        };
+
+        // Botón LOCAL
+        createUIButton(this, {
+            x: startX,
+            y: buttonY,
+            label: 'Local',
+            onClick: () => startMode('local'),
+            scale: 2,
+            textureNormal: 'botonSinSeleccionar',
+            textureHover: 'botonSeleccionado',
+            textStyle: buttonTextStyle,
+            clickSoundKey: 'sonidoClick',
+        });
+
+        // Botón RED
+        createUIButton(this, {
+            x: startX + spacing,
+            y: buttonY,
+            label: 'Red',
+            onClick: () => startMode('network'),
+            scale: 2,
+            textureNormal: 'botonSinSeleccionar',
+            textureHover: 'botonSeleccionado',
+            textStyle: buttonTextStyle,
+            clickSoundKey: 'sonidoClick',
+        });
+
+        // Botón volver
+        createIconButton(this, {
+            x: width * 0.06,
+            y: height * 0.08,
+            texture: 'botonVolver',
+            scale: 1,
+            hoverScale: 1.1,
+            clickSoundKey: 'sonidoClick',
+            onClick: () => this.scene.start('Menu_Scene'),
+        });
     }
 }
