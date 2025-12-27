@@ -3,78 +3,121 @@ import { ApplyPowerUpCommand } from "../Commands/ApplyPowerUpCommand";
 export class PowerUp {
     constructor(scene, x, y, type) {
         this.scene = scene;
-        this.type = type; // "velocidad", "ralentizar", "paralizar", "por2", "por3"
+        this.type = type;
+
+        this.isCollected = false;   // para evitar recoger varias veces
+        this._destroyed = false;    // para evitar destruir varias veces
+        this._cooldownUntil = 0;    // tiempo hasta el que no se puede recoger
+
+        this.fadeStart = 3000;      // ms hasta empezar a desvanecerse
+        this.lifetime = 5000;       // ms de vida total
+
+        this._overlaps = [];        // colliders overlaps
+        this.fadeTween = null;      // tween de fade
+        this._lifetimeTimer = null; // timer de vida
 
         this.sprite = scene.physics.add.staticImage(x, y, type)
             .setScale(1.2)
             .setInteractive();
 
-        this.spawnTime = scene.time.now;
-        this.fadeStart = 3000; // ms antes de empezar a desvanecer
-        this.lifetime = 5000; // ms total que permanece visible
-        this.isCollected = false;
+        // se actualiza el body tras el escalado
+        if (this.sprite.refreshBody) this.sprite.refreshBody();
 
-        // Efecto de fade out
-        this.scene.tweens.add({
-            targets: this.sprite,
-            alpha: 0,
-            delay: this.fadeStart,
-            duration: this.lifetime - this.fadeStart
-        });
+        // se guarda el tween para poder pararlo en destroy
+        const fadeDelay = Math.max(0, Math.min(this.fadeStart, this.lifetime));
+        const fadeDuration = Math.max(0, this.lifetime - fadeDelay);
 
-        // Colisión con jugadores
-        scene.players.forEach(player => {
-            scene.physics.add.overlap(player.sprite, this.sprite, () => this.collect(player), null, this);
-        });
+        if (fadeDuration > 0) {
+            this.fadeTween = scene.tweens.add({
+                targets: this.sprite,
+                alpha: 0,
+                delay: fadeDelay,
+                duration: fadeDuration
+            });
+        }
 
+        // overlaps con los jugadores
+        const players = scene.players;
+        if (players && typeof players.forEach === 'function') {
+            players.forEach(player => {
+                if (!player?.sprite) return;
+
+                const c = scene.physics.add.overlap(
+                    player.sprite,
+                    this.sprite,
+                    () => this.collect(player),
+                    null,
+                    this
+                );
+                this._overlaps.push(c);
+            });
+        }
+
+        // timer de vida
         this._lifetimeTimer = scene.time.delayedCall(this.lifetime, () => {
-            this.destroy(); // limpieza centralizada
+            this.destroy();
         });
     }
 
+    // Recoge el power-up
     collect(player) {
+        console.log('[PowerUp] overlap con', player.id, 'tipo', this.type);
+
+        if (this._destroyed) return;
         if (this.isCollected) return;
+
+        // si el inventario está lleno y el jugador se queda encima, se evita el spam
+        const now = this.scene.time.now;
+        if (this._cooldownUntil && now < this._cooldownUntil) return;
+
         this.isCollected = true;
 
-        this.scene.commandProcessor.process(
-            new ApplyPowerUpCommand(player, this.type)
-        );
+        const cmd = new ApplyPowerUpCommand(player, this.type);
+        this.scene.commandProcessor.process(cmd);
+
+        // si NO se puede guardar porque el inventario está lleno, NO se destruye
+        if (!cmd.stored) {
+            this.isCollected = false;
+            this._cooldownUntil = now + 300;
+            return;
+        }
 
         this.destroy();
-
-        if (this.scene.updatePlayerInventoryUI) {
-            this.scene.updatePlayerInventoryUI(player);
-        }
+        this.scene.updatePlayerInventoryUI?.(player);
     }
 
+    // Destruye el power-up
     destroy() {
-        // Evitar múltiples llamadas
         if (this._destroyed) return;
         this._destroyed = true;
 
-        // cancelar tween si existe
+        // colliders overlaps
+        if (Array.isArray(this._overlaps)) {
+            this._overlaps.forEach(c => {
+                try { c.destroy(); } catch {}
+            });
+            this._overlaps = [];
+        }
+
+        // tween
         if (this.fadeTween) {
-            this.fadeTween.stop();
+            try { this.fadeTween.stop(); } catch {}
             this.fadeTween = null;
         }
 
-        // cancelar timer si existe
+        // timer
         if (this._lifetimeTimer) {
             this._lifetimeTimer.remove(false);
             this._lifetimeTimer = null;
         }
 
-        // destruir sprite si existe y no está ya destruido
-        if (this.sprite && this.sprite.destroy) {
-            try {
-                this.sprite.destroy();
-            } catch (e) {
-                // ignore
-            }
+        // sprite
+        if (this.sprite) {
+            try { this.sprite.destroy(); } catch {}
             this.sprite = null;
         }
 
-        // quitar referencia del array scene.powerUps si existe
+        // finalmente, se quita del array
         if (Array.isArray(this.scene.powerUps)) {
             this.scene.powerUps = this.scene.powerUps.filter(p => p !== this);
         }

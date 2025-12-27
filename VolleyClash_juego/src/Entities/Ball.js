@@ -61,8 +61,8 @@ export class Ball {
         if (isReceiving) {
             // recepción: parábola larga y ancha (trayectoria defensiva)
             // menor velocidad horizontal, mayor velocidad vertical para el arco
-            const baseSpeedX = 180;
-            const verticalStrength = -350; // componente vertical mayor para el arco
+            const baseSpeedX = 160;
+            const verticalStrength = -310; // componente vertical mayor para el arco
 
             if (playerFacingDirection === 'left') {
                 velocityX = -baseSpeedX;
@@ -73,8 +73,8 @@ export class Ball {
         } else if (isJumping) {
             // salto/ataque: horizontal fuerte, vertical débil (remate/smash)
             // alta velocidad horizontal, baja velocidad vertical para trayectoria plana
-            const baseSpeedX = 220; // 300
-            const verticalStrength = -150; // componente vertical bajo para ataque plano
+            const baseSpeedX = 190;
+            const verticalStrength = -140; // componente vertical bajo para ataque plano
 
             if (playerFacingDirection === 'left') {
                 velocityX = -baseSpeedX;
@@ -84,7 +84,7 @@ export class Ball {
             velocityY = verticalStrength;
         } else {
             // golpe regular desde el suelo
-            const baseSpeedX = 200;
+            const baseSpeedX = 180;
 
             if (playerFacingDirection === 'left') {
                 velocityX = -baseSpeedX;
@@ -116,22 +116,20 @@ export class Ball {
 
     // Se llama cuando la pelota toca el suelo
     onGrounded() {
-if (!this.isBallLive) return;
+        if (!this.isBallLive) return;
 
-    const ballOnLeft = this.sprite.x < this.netX;
-    const ballOnRight = this.sprite.x > this.netX;
+        const ballOnLeft = this.sprite.x < this.netX;
+        const ballOnRight = this.sprite.x > this.netX;
 
-    // determinar quién anota
-    if (ballOnLeft) {
-        this.onRallyEnd('player2'); // player2 anota
-        this.resetRally('player1');
-    } else if (ballOnRight) {
-        this.onRallyEnd('player1'); // player1 anota
-        this.resetRally('player2');
-    }
-    }
-
-    
+        // determinar quién anota
+        if (ballOnLeft) {
+            this.onRallyEnd('player2'); // player2 anota
+            this.resetRally('player2');
+        } else if (ballOnRight) {
+            this.onRallyEnd('player1'); // player1 anota
+            this.resetRally('player1');
+        }
+    }    
 
     // Se llama cuando ocurre una falta (demasiados toques, pelota fuera de límites, etc.)
     onFalta(faltaType, faltingPlayer) {
@@ -141,7 +139,7 @@ if (!this.isBallLive) return;
         const scoringPlayerId = faltingPlayer.id === 'player1' ? 'player2' : 'player1';
 
         this.onRallyEnd(scoringPlayerId);
-        this.resetRally();
+        this.resetRally(scoringPlayerId);
     }
 
     // Se llama cuando finaliza un rally (alguien anota)
@@ -158,33 +156,40 @@ if (!this.isBallLive) return;
 
     // Reinicia el estado del rally y reposiciona la pelota para el saque
     resetRally(scoringPlayer) {
-            this.isBallLive = true;
-    this.lastTouchedBy = null;
-    this.touchCount = 0;
+        this.isBallLive = true;
+        this.lastTouchedBy = null;
+        this.touchCount = 0;
 
+        const spawnY = 100;
+        const sidePadding = 60;
+        const worldWidth = this.scene.worldWidth ?? this.scene.scale?.width ?? this.netX * 2;
+        const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
-        // se reposiciona la pelota al centro de la cancha, ligeramente sobre el suelo
-        this.sprite.setPosition(this.netX, 100);
+        let spawnX = this.netX;
+
+        if (this.isFirstServe) {
+            // primer saque: siempre en el lado de player1
+            spawnX = this.netX - 100;
+            this.isFirstServe = false;
+        } else if (scoringPlayer === 'player1' || scoringPlayer === 'player2') {
+            const player = this.scene.players?.get ? this.scene.players.get(scoringPlayer) : null;
+            if (player?.sprite) {
+                if (scoringPlayer === 'player1') {
+                    spawnX = clamp(player.sprite.x, sidePadding, this.netX - sidePadding);
+                } else {
+                    spawnX = clamp(player.sprite.x, this.netX + sidePadding, worldWidth - sidePadding);
+                }
+            } else {
+                spawnX = scoringPlayer === 'player1' ? this.netX - 100 : this.netX + 100;
+            }
+        }
+
+        this.sprite.setPosition(spawnX, spawnY);
         this.sprite.setVelocity(0, 0);
 
         // limpiar info de último golpe
         this.lastHitTime = 0;
         this.lastHitPlayerId = null;
-
-    if (this.isFirstServe) {
-        // primer saque: siempre en el lado de player1
-        this.sprite.setPosition(this.netX - 100, 100); // lado izquierdo
-        this.isFirstServe = false; // ya no será el primer saque
-    } else {
-        // rallies normales: la pelota aparece del lado del jugador que anotó
-        if (scoringPlayer === 'player1') {
-            this.sprite.setPosition(this.netX + 100, 100); // lado derecho
-        } else {
-            this.sprite.setPosition(this.netX - 100, 100); // lado izquierdo
-        }
-    }
-
-    this.sprite.setVelocity(0, 0);
     }
 
     // Actualiza el estado de la pelota cada frame (se rastrea el lado de la cancha según la posición)

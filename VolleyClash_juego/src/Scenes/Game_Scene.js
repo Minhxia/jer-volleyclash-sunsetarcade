@@ -103,7 +103,7 @@ export class Game_Scene extends Phaser.Scene {
         const style = this.game.globals.defaultTextStyle;
 
 
-        //Cronometro
+        // Cronómetro
         this.timerText = this.add.text(this.scale.width / 2, 30, "", {
             ...style,
             fontSize: '32px',
@@ -146,7 +146,7 @@ export class Game_Scene extends Phaser.Scene {
         .setDepth(9999)
         .setVisible(false);
 
-        // iniciar el contador
+        // iniciar el contador para el cronómetro
         this.timerEvent = this.time.addEvent({
             delay: 1000,
             callback: this.updateTimer,
@@ -193,7 +193,6 @@ export class Game_Scene extends Phaser.Scene {
             color: '#ffffffff'
         }).setOrigin(0.5).setDepth(9999);
 
-        // TODO: cambiar?
         // suelo de prueba: crear un cuerpo estático rectangular invisible
         // Configurable: altura y desplazamiento desde el fondo (`groundOffset`)
         const groundHeight = 20;
@@ -221,17 +220,37 @@ export class Game_Scene extends Phaser.Scene {
         // powerups
         this.powerUps = [];
         this.maxPowerUps = 2;
+        // la aparición de power-ups son menos frecuentes y con pesos, para que unos salgan
+        // más que otros (por ejemplo, se reduce la aparición de paralizar)
+        this.powerUpSpawnConfig = {
+            // entre 3.5 y 8 segundos
+            minDelayMs: 3500,
+            maxDelayMs: 8000,
+            weights: {
+                velocidad: 3,
+                ralentizar: 2,
+                paralizar: 1,
+                por2: 3,
+                por3: 2
+            },
+            cooldownMs: {
+                paralizar: 12000
+            }
+        };
+        this.powerUpLastSpawnAt = {};
 
         this.inventoryUI = {
             player1: [
-                this.add.image(50, 50, '').setScale(1.4).setVisible(false).setDepth(1),
-                this.add.image(110, 50, '').setScale(1.4).setVisible(false).setDepth(1)
+                this.add.image(50, 50, 'por2').setScale(1.4).setVisible(false).setDepth(1),
+                this.add.image(110, 50, 'por2').setScale(1.4).setVisible(false).setDepth(1)
             ],
             player2: [
-                this.add.image(this.worldWidth - 110, 50, '').setScale(1.4).setVisible(false).setDepth(1),
-                this.add.image(this.worldWidth - 50, 50, '').setScale(1.4).setVisible(false).setDepth(1)
+                this.add.image(this.worldWidth - 110, 50, 'por2').setScale(1.4).setVisible(false).setDepth(1),
+                this.add.image(this.worldWidth - 50, 50, 'por2').setScale(1.4).setVisible(false).setDepth(1)
             ]
         };
+
+        this.schedulePowerUpSpawn();
 
         // Marcos del inventario
         this.inventoryFrames = {
@@ -244,43 +263,6 @@ export class Game_Scene extends Phaser.Scene {
                 this.add.image(this.worldWidth - 50, 50, 'marcoPowerUp').setScale(1).setOrigin(0.5).setDepth(0)
             ]
         };
-
-        // cada 2-5s intentamos generar uno
-        this.time.addEvent({
-            delay: Phaser.Math.Between(2000, 5000),
-            loop: true,
-            callback: () => {
-                if (this.powerUps.length >= this.maxPowerUps) return;
-
-                const x = Phaser.Math.Between(80, this.worldWidth - 80);
-                const y = Phaser.Math.Between(this.worldHeight - 220, this.worldHeight - 120); // evitar la red y el suelo
-
-                const types = ['velocidad', 'ralentizar', 'paralizar', 'por2', 'por3'];
-                const type = Phaser.Utils.Array.GetRandom(types);
-
-                const powerUp = new PowerUp(this, x, y, type);
-                this.powerUps.push(powerUp);
-
-                // crear colisión con los jugadores
-                this.players.forEach(player => {
-                    this.physics.add.overlap(player.sprite, powerUp.sprite, () => {
-                        const stored = player.applyPowerUp(type);
-
-                        if (stored) {
-                            powerUp.destroy();
-                            this.powerUps = this.powerUps.filter(p => p !== powerUp);
-                            this.updatePlayerInventoryUI(player);
-                        }
-
-                    });
-                });
-
-                // limpiar de la lista cuando desaparece
-                this.time.delayedCall(powerUp.lifetime, () => {
-                    this.powerUps = this.powerUps.filter(p => p !== powerUp);
-                });
-            }
-        });
 
         // inicialización de la pelota
         this._createBall();
@@ -297,6 +279,64 @@ export class Game_Scene extends Phaser.Scene {
         this.events.on('resume', () => {
             this.timerEvent.paused = false;
         });
+    }
+
+    // Genera un nuevo power-up en una posición aleatoria cada cierto tiempo
+    schedulePowerUpSpawn() {
+        const { minDelayMs, maxDelayMs } = this.powerUpSpawnConfig;
+        const delay = Phaser.Math.Between(minDelayMs, maxDelayMs);
+
+        this.time.delayedCall(delay, () => {
+            if (this.powerUps.length < this.maxPowerUps) {
+                const x = Phaser.Math.Between(80, this.worldWidth - 80);
+                const y = Phaser.Math.Between(this.worldHeight - 220, this.worldHeight - 120);
+
+                const type = this._getWeightedPowerUpType();
+                if (type) {
+                    const powerUp = new PowerUp(this, x, y, type);
+                    this.powerUps.push(powerUp);
+                    this.powerUpLastSpawnAt[type] = this.time.now;
+                }
+            }
+
+            this.schedulePowerUpSpawn(); // siguiente con nuevo delay random
+        });
+    }
+
+    // Obtiene un tipo de power-up basado en los pesos configurados anteriormente
+    _getWeightedPowerUpType() {
+        const { weights, cooldownMs } = this.powerUpSpawnConfig;
+
+        const now = this.time.now;
+        const entries = Object.entries(weights).filter(([type, weight]) => {
+            // se filtran los tipos que no se pueden usar
+            // si el peso es 0
+            if (weight <= 0) return false;
+            // si todavía está en cooldown desde la última aparición
+            const cooldown = cooldownMs?.[type];
+            if (!cooldown) return true;
+            const last = this.powerUpLastSpawnAt?.[type] || 0;
+            return now - last >= cooldown;
+        });
+
+        // si no queda ningún tipo disponible, se devuelve null
+        if (!entries.length) return null;
+
+        // se suman todos los pesos, se elige un número aleatorio entre 1 y esa suma
+        const total = entries.reduce((sum, [, weight]) => sum + weight, 0);
+        let roll = Phaser.Math.Between(1, total);
+        // se van restando pesos hasta que el contador cae en un tipo
+        for (const [type, weight] of entries) {
+            roll -= weight;
+            // se devuelve el tipo
+            if (roll <= 0) {
+                console.log('[Game_Scene] Power-up aleatorio: ', type);
+                return type;
+            }
+        }
+
+        // si por alguna razón no cae en ninguno, se devuelve el último tipo válido
+        return entries[entries.length - 1][0];
     }
 
     updateTimer() {
@@ -572,20 +612,14 @@ export class Game_Scene extends Phaser.Scene {
     // Crea el suelo, la red, los límites, etc.
     _setupPhysicsWorld(ground) {
         this.players.forEach(player => {
-            this.physics.add.collider(player.sprite, ground);
-        });
-
-        this.players.forEach(player => {
-            // colisión jugador-red
-            this.physics.add.collider(player.sprite, this.red, () => {
-                // Se dispara si el jugador toca la red
-                console.log(`${player.id} tocó la red!`);
-                // Podrías detenerlo o empujarlo hacia atrás:
-                player.sprite.setVelocityX(0);
-            });
-
             // colisión jugador-suelo
             this.physics.add.collider(player.sprite, ground);
+
+            // colisión jugador-red
+            this.physics.add.collider(player.sprite, this.red, () => {
+                console.log(`${player.id} tocó la red!`);
+                player.sprite.setVelocityX(0);
+            });
         });
     }
 

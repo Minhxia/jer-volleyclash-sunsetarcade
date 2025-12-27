@@ -1,11 +1,12 @@
-// Commands/ApplyPowerUpCommand.js
 export class ApplyPowerUpCommand {
     constructor(player, powerUpType) {
         this.player = player;
         this.powerUpType = powerUpType;
+        this.stored = false;
     }
 
     execute() {
-        this.player.applyPowerUp(this.powerUpType);
+        this.stored = this.player.applyPowerUp(this.powerUpType);
+        return this.stored;
     }
 }

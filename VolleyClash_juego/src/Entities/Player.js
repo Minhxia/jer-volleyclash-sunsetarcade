@@ -1,5 +1,18 @@
 // Clase de la entidad "personaje", se tiene en cuenta que son 3 personajes distintos
 
+const POWERUP_DURATION_MS = {
+  velocidad: 4000,
+  ralentizar: 3500,
+  paralizar: 2000,
+  por2: 4000,
+  por3: 3500,
+};
+
+const SPEED_MULT = {
+  velocidad: 1.5,
+  ralentizar: 0.5,
+};
+
 export class Player {
 
     constructor(scene, id, x, y, characterType) {
@@ -8,7 +21,10 @@ export class Player {
         this.id = id;                       // identificador del jugador (P1, P2)
         this.characterType = characterType; // indica qué personaje se ha elegido
 
-        this.moveSpeed = 250;   // velocidad de movimiento (horizontal)
+        // velocidad de movimiento
+        this.baseMoveSpeed = 250;
+        this.moveSpeed = this.baseMoveSpeed;
+
         this.jumpSpeed = 275;   // fuerza de salto
 
         this.activePowerUps = {};   // powerups activos
@@ -389,88 +405,72 @@ export class Player {
         if (this.powerUpInventory.length === 0) return;
 
         const type = this.powerUpInventory.shift();
-        this._activatePowerUp(type);
+        this.activatePowerUp(type);
     }
 
-    _activatePowerUp(type) {
-        const now = this.scene.time.now;
-
-        switch(type) {
+    // Activa el efecto del power-up
+    activatePowerUp(type) {
+        switch (type) {
             case 'velocidad':
-                this.moveSpeed *= 1.5;
-                this.setSpeedEffect(true);
+                this.applyOrRefreshTimedEffect('velocidad', POWERUP_DURATION_MS.velocidad);
                 break;
-            case 'ralentizar':
+            case 'ralentizar': {
                 const opponent = this.getOpponent();
                 if (opponent) {
-                    opponent.moveSpeed *= 0.5;
-                    opponent.setSlowEffect(true);
+                    opponent.applyOrRefreshTimedEffect('ralentizar', POWERUP_DURATION_MS.ralentizar);
                 }
                 break;
-            case 'paralizar':
-                /*const opp = this.getOpponent();
-                if (opp) opp.isParalyzed = true;*/
-                const opp = this.getOpponent();
-                if (opp) opp.setParalyzed(true);
+            }
+            case 'paralizar': {
+                const opponent = this.getOpponent();
+                if (opponent) {
+                    opponent.applyOrRefreshTimedEffect('paralizar', POWERUP_DURATION_MS.paralizar);
+                }
                 break;
-            /*case 'por2':
-                this.scoreMultiplier = 2;
-                break;
-            case 'por3':
-                this.scoreMultiplier = 3;
-                break;*/
+            }
             case 'por2':
             case 'por3':
+                this.applyOrRefreshTimedEffect(type, POWERUP_DURATION_MS[type]);
                 break;
-        }
-
-        this.activePowerUps[type] = now + 10000;
-
-        // se calcula el multiplicador de puntuación si es por2/por3
-        if (type === 'por2' || type === 'por3') {
-            this.recalculateScoreEffect();
         }
     }
 
     // Actualiza los power-ups
     updatePowerUps() {
         const now = this.scene.time.now;
+
+        let speedNeedsRecalc = false;
         let scoreNeedsRecalc = false;
 
+        // se revisan todos los power-ups activos
         for (const type in this.activePowerUps) {
-            if (now > this.activePowerUps[type]) {
-                // restaurar el efecto
-                switch(type) {
-                    case 'velocidad':
-                        this.moveSpeed /= 1.5;
-                        this.setSpeedEffect(false);
-                        break;
-                    case 'ralentizar':
-                        const opponent = this.getOpponent();
-                        if (opponent) {
-                            opponent.moveSpeed /= 0.5;
-                            opponent.setSlowEffect(false);
-                        }
-                        break;
-                    case 'paralizar':
-                        /*const opp = this.getOpponent();
-                        if (opp) opp.isParalyzed = false;*/
-                        const opp = this.getOpponent();
-                        if (opp) opp.setParalyzed(false);
-                        break;
-                    case 'por2':
-                    case 'por3':
-                        //this.scoreMultiplier = 1;
-                        scoreNeedsRecalc = true;
-                        break;
-                }
-                delete this.activePowerUps[type];
+            if (now <= this.activePowerUps[type]) continue;
+
+            delete this.activePowerUps[type];
+
+            switch (type) {
+                case 'velocidad':
+                    this.setSpeedEffect(false);
+                    speedNeedsRecalc = true;
+                    break;
+                case 'ralentizar':
+                    this.setSlowEffect(false);
+                    speedNeedsRecalc = true;
+                    break;
+                case 'paralizar':
+                    this.setParalyzed(false);
+                    break;
+                case 'por2':
+                case 'por3':
+                    scoreNeedsRecalc = true;
+                    break;
             }
         }
-        if (scoreNeedsRecalc) {
-            this.recalculateScoreEffect();
-        }
+
+        if (speedNeedsRecalc) this.recalculateMoveSpeed();
+        if (scoreNeedsRecalc) this.recalculateScoreEffect();
     }
+
 
     //// EFECTOS VISUALES DE LOS POWER-UPS ////
     setParalyzed(isParalyzed) {
@@ -523,6 +523,16 @@ export class Player {
         this.slowEffectActive = active;
         this.refreshPowerUpVisuals();
     }
+    
+    // Recalcula la velocidad de movimiento según los power-ups que estén activos
+    recalculateMoveSpeed() {
+        let mult = 1;
+
+        if (this.activePowerUps.velocidad) mult *= SPEED_MULT.velocidad;
+        if (this.activePowerUps.ralentizar) mult *= SPEED_MULT.ralentizar;
+
+        this.moveSpeed = this.baseMoveSpeed * mult;
+    }
 
     // Recalcula el multiplicador de puntuación en función de por2/por3 activos
     recalculateScoreEffect() {
@@ -551,6 +561,24 @@ export class Player {
         this.refreshPowerUpVisuals();
     }
 
+    // Aplica o actualiza la duración de un power-up
+    applyOrRefreshTimedEffect(type, durationMs) {
+        const now = this.scene.time.now;
+        this.activePowerUps[type] = now + durationMs;
+
+        // se activa el feedback/estado
+        if (type === 'velocidad') this.setSpeedEffect(true);
+        if (type === 'ralentizar') this.setSlowEffect(true);
+        if (type === 'paralizar') this.setParalyzed(true);
+
+        // se recalculan los efectos si es necesario
+        if (type === 'velocidad' || type === 'ralentizar') {
+            this.recalculateMoveSpeed();
+        }
+        if (type === 'por2' || type === 'por3') {
+            this.recalculateScoreEffect();
+        }
+    }
 
     // Decide qué tinte mostrar según el estado actual
     refreshPowerUpVisuals() {
