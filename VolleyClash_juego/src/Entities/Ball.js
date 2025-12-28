@@ -23,7 +23,7 @@ export class Ball {
         this.lastHitTime = 0;
         this.lastHitPlayerId = null;
 		
-        this.isFirstServe = true;
+        //this.isFirstServe = true;
     }
 
     // Se llama cuando un jugador golpea la pelota
@@ -160,24 +160,28 @@ export class Ball {
         });
     }
 
-    // Reinicia el estado del rally y reposiciona la pelota para el saque
-    resetRally(scoringPlayer) {
-        this.isBallLive = true;
-        this.lastTouchedBy = null;
-        this.touchCount = 0;
+    // Empujon sutil al saque para evitar que caiga sobre la red
+    _getSubtleNudge(spawnX, sidePadding, worldWidth) {
+        const sign = Math.random() < 0.5 ? -1 : 1;
+        const offset = sign * 12;
+        const clampedX = Math.max(sidePadding, Math.min(worldWidth - sidePadding, spawnX + offset));
 
+        return { spawnX: clampedX, velocityX: offset };
+    }
+
+    // Coloca la pelota para el saque sin reiniciar el rally
+    setServePosition(scoringPlayer) {
         const spawnY = 100;
         const sidePadding = 60;
         const worldWidth = this.scene.worldWidth ?? this.scene.scale?.width ?? this.netX * 2;
         const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
         let spawnX = this.netX;
+        let nudgeVelocityX = 0;
 
-        if (this.isFirstServe) {
-            // primer saque: siempre en el lado de player1
-            spawnX = this.netX - 100;
-            this.isFirstServe = false;
-        } else if (scoringPlayer === 'player1' || scoringPlayer === 'player2') {
+        const hasScoringPlayer = scoringPlayer === 'player1' || scoringPlayer === 'player2';
+
+        if (hasScoringPlayer) {
             const player = this.scene.players?.get ? this.scene.players.get(scoringPlayer) : null;
             if (player?.sprite) {
                 if (scoringPlayer === 'player1') {
@@ -189,14 +193,28 @@ export class Ball {
                 spawnX = scoringPlayer === 'player1' ? this.netX - 100 : this.netX + 100;
             }
         }
+        else {
+            const nudge = this._getSubtleNudge(spawnX, sidePadding, worldWidth);
+            spawnX = nudge.spawnX;
+            nudgeVelocityX = nudge.velocityX;
+        }
 
         this.sprite.setPosition(spawnX, spawnY);
-        this.sprite.setVelocity(0, 0);
+        this.sprite.setVelocity(nudgeVelocityX, 0);
+    }
+
+    // Reinicia el estado del rally y reposiciona la pelota para el saque
+    resetRally(scoringPlayer) {
+        this.isBallLive = true;
+        this.lastTouchedBy = null;
+        this.touchCount = 0;
+        this.setServePosition(scoringPlayer);
 
         // limpiar info de último golpe
         this.lastHitTime = 0;
         this.lastHitPlayerId = null;
     }
+
 
     // Actualiza el estado de la pelota cada frame (se rastrea el lado de la cancha según la posición)
     update() {

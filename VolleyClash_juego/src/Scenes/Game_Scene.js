@@ -280,6 +280,8 @@ export class Game_Scene extends Phaser.Scene {
 
         // inicialización de la pelota
         this._createBall();
+        // empujon sutil para evitar que se quede sobre la red al inicio
+        this.ball.setServePosition();
         // colliders de la pelota
         this._setupBallCollisions();
         // eventos de la pelota
