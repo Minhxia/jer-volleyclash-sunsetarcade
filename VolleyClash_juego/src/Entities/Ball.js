@@ -49,11 +49,17 @@ export class Ball {
             this.touchCount = 1;
             this.lastTouchedBy = player.id;
         }
-
         if (this.touchCount > 3) {
             this.onFalta('toqueExcedido', player);
             return;
         }
+        // se reproduce el efecto de sonido según el tipo de golpe
+        if (isReceiving) {
+            this.scene?.playSfx?.(this.scene?.sfx?.receive);
+        } else if (isJumping) {
+            this.scene?.playSfx?.(this.scene?.sfx?.spike);
+        }
+
 
         // se calcula velocidad de la pelota según la dirección del jugador y si está saltando/recibiendo
         let velocityX, velocityY;

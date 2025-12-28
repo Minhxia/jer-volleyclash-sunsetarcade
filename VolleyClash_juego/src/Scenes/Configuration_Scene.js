@@ -1,13 +1,14 @@
 // Pantalla de Configuración
 import Phaser from 'phaser';
-import { getStoredVolume, setStoredVolume, applyStoredVolume } from '../UI/Audio.js';
+import { ensureStoredAudioSettings, getStoredMusicVolume, getStoredSfxVolume, setStoredMusicVolume, setStoredSfxVolume, applyStoredVolume } from '../UI/Audio.js';
 import { createIconButton } from '../UI/Buttons.js';
 
 export class Configuration_Scene extends Phaser.Scene {
     constructor() {
         super('Configuration_Scene');
 
-        this.volumeSlider = null;
+        this.musicVolumeSlider = null;
+        this.sfxVolumeSlider = null;
     }
 
     preload() {
@@ -41,33 +42,58 @@ export class Configuration_Scene extends Phaser.Scene {
             color: '#5f0000ff'
         }).setOrigin(0.5);
 
-        // Subtítulo de controles
+        // Subtitulo de musica
         this.add.text(centerX, height * 0.2, 'Volumen de la música', {
             ...style,
             fontSize: '24px',
             color: '#000'
         }).setOrigin(0.5);
 
-        //// VOLUMEN ////
-        const initialVolume = getStoredVolume();
-        
-        // se aplica el volumen nada más cargar
-        applyStoredVolume(this, initialVolume);
+        //// VOLUMENES ////
+        ensureStoredAudioSettings();
+        const initialMusicVolume = getStoredMusicVolume();
+        const initialSfxVolume = getStoredSfxVolume();
 
-        // barra de volumen (slider)
-        this.volumeSlider = this.add
+        // se aplica el volumen nada mas cargar
+        applyStoredVolume(this);
+
+        // barra de volumen (musica)
+        this.musicVolumeSlider = this.add
             .dom(centerX, height * 0.26)
-            .createFromHTML(`<input type="range" min="0" max="1" step="0.01" value="${initialVolume}"
+            .createFromHTML(`<input type="range" min="0" max="1" step="0.01" value="${initialMusicVolume}"
                 style="width:220px; height:20px; accent-color:#00aaff; border-radius:5px;"/>
             `);
 
-        this.volumeSlider.addListener('input');
-        this.volumeSlider.on('input', (event) => {
+        this.musicVolumeSlider.addListener('input');
+        this.musicVolumeSlider.on('input', (event) => {
             const target = event.target;
             if (!(target instanceof HTMLInputElement)) return;
 
-            const volume = setStoredVolume(target.value);
-            applyStoredVolume(this, volume);
+            setStoredMusicVolume(target.value);
+            applyStoredVolume(this);
+        });
+
+        // Subtitulo de efectos
+        this.add.text(centerX, height * 0.32, 'Volumen de efectos', {
+            ...style,
+            fontSize: '24px',
+            color: '#000'
+        }).setOrigin(0.5);
+
+        // barra de volumen (efectos)
+        this.sfxVolumeSlider = this.add
+            .dom(centerX, height * 0.38)
+            .createFromHTML(`<input type="range" min="0" max="1" step="0.01" value="${initialSfxVolume}"
+                style="width:220px; height:20px; accent-color:#00aaff; border-radius:5px;"/>
+            `);
+
+        this.sfxVolumeSlider.addListener('input');
+        this.sfxVolumeSlider.on('input', (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLInputElement)) return;
+
+            setStoredSfxVolume(target.value);
+            applyStoredVolume(this);
         });
         ////////
 
@@ -85,12 +111,12 @@ export class Configuration_Scene extends Phaser.Scene {
         const line = this.add.graphics();
             line.lineStyle(3, 0x000000, 1); // grosor, color, alpha
             line.beginPath();
-            line.moveTo(width * 0.1, height * 0.35);   // inicio (20% del ancho)
-            line.lineTo(width * 0.9, height * 0.35);   // final (80% del ancho)
+            line.moveTo(width * 0.1, height * 0.46);   // inicio (20% del ancho)
+            line.lineTo(width * 0.9, height * 0.46);   // final (80% del ancho)
             line.strokePath();
 
         // Controles
-        this.add.text(centerX, height * 0.4, 'Controles', {
+        this.add.text(centerX, height * 0.52, 'Controles', {
             ...style,
             fontSize: '32px',
             color: '#5f0000ff',
@@ -111,10 +137,15 @@ export class Configuration_Scene extends Phaser.Scene {
         // se limpia el slider al salir de la escena
         // (así se evita que se acumulen si entras y sales varias veces)
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-            if (this.volumeSlider) {
-                this.volumeSlider.removeAllListeners();
-                this.volumeSlider.destroy();
-                this.volumeSlider = null;
+            if (this.musicVolumeSlider) {
+                this.musicVolumeSlider.removeAllListeners();
+                this.musicVolumeSlider.destroy();
+                this.musicVolumeSlider = null;
+            }
+            if (this.sfxVolumeSlider) {
+                this.sfxVolumeSlider.removeAllListeners();
+                this.sfxVolumeSlider.destroy();
+                this.sfxVolumeSlider = null;
             }
         });
     }

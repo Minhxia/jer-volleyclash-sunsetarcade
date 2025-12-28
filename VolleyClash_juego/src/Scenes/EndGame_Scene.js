@@ -1,5 +1,6 @@
 //Pantalla de Fin
 import Phaser from 'phaser';
+import { createUIButton } from '../UI/Buttons.js';
 
 export class EndGame_Scene extends Phaser.Scene {
     constructor() {
@@ -7,16 +8,17 @@ export class EndGame_Scene extends Phaser.Scene {
     }
 
     init(data) {
-        this.winner = data.winner; // player1 o player2
+        this.winner = data.winner;
         this.player1 = data.player1;
         this.player2 = data.player2;
     }
     preload() {
+        // imágenes fondo y ui
         this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
         this.load.image('botonSeleccionado', 'ASSETS/UI/BOTONES/BOTON_BASE_G_SELECCIONADO.png');
         this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_BASE_G.png');
 
-        // Sonido
+        // sonido
         this.load.audio('sonidoClick', 'ASSETS/SONIDO/SonidoBoton.mp3');
     }
 
@@ -24,11 +26,10 @@ export class EndGame_Scene extends Phaser.Scene {
         const { width, height } = this.scale;
         const style = this.game.globals.defaultTextStyle;
 
-
         const charP1 = this.player1.name;
         const charP2 = this.player2.name;
 
-        // Fondo color crema
+        // Fondo (color crema)
         this.add.image(0, 0, 'fondo').setOrigin(0).setDepth(-1);
 
         // Título principal
@@ -50,44 +51,21 @@ export class EndGame_Scene extends Phaser.Scene {
             color: '#5f0000ff'
         }).setOrigin(0.5);
 
-        // Botón naranja para volver al menú
-
-        const volverButton = this.add
-            .sprite(width / 2,
-            height * 0.60, 'botonSinSeleccionar')
-            .setScale(3)
-            .setInteractive({ useHandCursor: true });
-
-        const menuText = this.add.text(0, 0 * 0.52, "Volver a inicio", {
+        // botón para volver al menú principal
+        const buttonTextStyle = {
             ...style,
             fontSize: '26px',
             color: '#000000'
-        });
-
-            Phaser.Display.Align.In.Center(menuText, volverButton);
-            
-        // Interacción del botón
-        volverButton.on("pointerdown", () => {
-            this.scene.start("Menu_Scene");
-        });
-
-        // Efecto hover
-        volverButton.on("pointerover", () => {
-            volverButton.setTexture('botonSeleccionado');
-        });
-        volverButton.on("pointerout", () => {
-            volverButton.setTexture('botonSinSeleccionar');
-        });
-
-
-        // Función para añadir sonido de clic con volumen global
-        const addClickSound = (button) => {
-            button.on('pointerdown', () => {
-                const volume = parseFloat(localStorage.getItem('volume')) || 1;
-                this.sound.play('sonidoClick', { volume });
-            });
         };
-
-        addClickSound(volverButton);
+        createUIButton(this, {
+            x: width / 2,
+            y: height * 0.60,
+            label: 'Volver a inicio',
+            textStyle: buttonTextStyle,
+            scale: 3,
+            onClick: () => {
+                this.scene.start('Menu_Scene');
+            }
+        });
     }
 }

@@ -203,6 +203,7 @@ export class Player {
             this.sprite.setVelocityY(-this.jumpSpeed);
             this.facing = 'left';
             this.playAnimation(this.config.jumpLeftAnim);
+            this.scene?.playSfx?.(this.scene?.sfx?.jump);
         }
     }
     // Salto/remate del personaje hacia la derecha
@@ -217,6 +218,7 @@ export class Player {
             this.sprite.setVelocityY(-this.jumpSpeed);
             this.facing = 'right';
             this.playAnimation(this.config.jumpRightAnim);
+            this.scene?.playSfx?.(this.scene?.sfx?.jump);
         }
     }
 

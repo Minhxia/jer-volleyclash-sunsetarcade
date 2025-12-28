@@ -6,6 +6,7 @@ import { PowerUp } from '../Entities/PowerUp.js';
 import { Ball } from '../Entities/Ball.js';
 import { CommandProcessor } from '../Commands/CommandProcessor.js';
 import { MovePlayerCommand } from '../Commands/MovePlayerCommand.js';
+import { getStoredSfxVolume } from '../UI/Audio.js';
 
 export class Game_Scene extends Phaser.Scene {
     tiempoTotal = 60; // para 2 min poner 120 segundos
@@ -44,7 +45,6 @@ export class Game_Scene extends Phaser.Scene {
             'ASSETS/PERSONAJES/ANIMACIONES/PERSONAJE_A/ANIMACION_REMATE.png',
             { frameWidth: 32, frameHeight: 44 }
         );
-
         // characterB
         this.load.spritesheet(
             'charB_move',
@@ -56,7 +56,6 @@ export class Game_Scene extends Phaser.Scene {
             'ASSETS/PERSONAJES/ANIMACIONES/PERSONAJE_B/ANIMACION_REMATE.png',
             { frameWidth: 32, frameHeight: 44 }
         );
-
         // characterC
         this.load.spritesheet(
             'charC_move',
@@ -82,17 +81,22 @@ export class Game_Scene extends Phaser.Scene {
         this.load.image('velocidad', 'ASSETS/ITEMS/POWER UPS/VELOCIDAD.png');
         this.load.image('marcoPowerUp', 'ASSETS/JUEGO/Base_powerUp.png');
 
-        // Ball
+        // Pelota
         this.load.image('ball', 'ASSETS/ITEMS/PELOTAS/P_NORMAL.png');
-
-        //Cronometro
-        this.load.image('reloj', 'ASSETS/JUEGO/TIMER.png');
-
-        // Marco
-        this.load.image('marcoGeneral', 'ASSETS/JUEGO/MARCADOR_SET.png');
-
         // Red
         this.load.image('red', 'ASSETS/JUEGO/RED.png');
+        // Cronómetro
+        this.load.image('reloj', 'ASSETS/JUEGO/TIMER.png');
+        // Marco
+        this.load.image('marcoGeneral', 'ASSETS/JUEGO/MARCADOR_SET.png');        
+
+        // Efectos de sonido
+        this.load.audio('sfx_silbato', 'ASSETS/SONIDO/Silbato_inicio_partido_1p4s.mp3');
+        this.load.audio('sfx_remate', 'ASSETS/SONIDO/Toque_pelota_remate_03s.mp3');
+        this.load.audio('sfx_recepcion', 'ASSETS/SONIDO/Toque_pelota_recepcion.mp3');
+        this.load.audio('sfx_salto', 'ASSETS/SONIDO/SonidoSalto_1p.mp3');
+        this.load.audio('sfx_punto', 'ASSETS/SONIDO/SonidoPunto.mp3');
+
     }
 
     create() {
@@ -102,6 +106,16 @@ export class Game_Scene extends Phaser.Scene {
         this.worldHeight = height;
         const style = this.game.globals.defaultTextStyle;
 
+        // se definen los efectos de sonido
+        this.sfx = {
+            whistle: 'sfx_silbato',
+            spike: 'sfx_remate',
+            receive: 'sfx_recepcion',
+            jump: 'sfx_salto',
+            point: 'sfx_punto'
+        };
+        // se reproduce el silbato de inicio de partido
+        this.playSfx(this.sfx.whistle);
 
         // Cronómetro
         this.timerText = this.add.text(this.scale.width / 2, 30, "", {
@@ -339,6 +353,37 @@ export class Game_Scene extends Phaser.Scene {
         return entries[entries.length - 1][0];
     }
 
+    // Reproduce un efecto de sonido
+    playSfx(key) {
+        if (!key) return;
+
+        this.sound.play(key, { volume: getStoredSfxVolume() });
+    }    
+
+    // Bucle principal del juego
+    update() {
+        // se procesan los inputs de los jugadores
+        this._handleInputForAllPlayers();
+        // se actualizan los power-ups
+        this.players.forEach(player => player.updatePowerUps());
+        // se actualiza el estado de la pelota
+        if (this.ball) {
+            this.ball.update();
+            // verificar si la pelota golpea el suelo (comparar con la posición del suelo)
+            // groundY es la parte superior del suelo
+            if (this.ball.isBallLive && this.ball.sprite.y > this.groundY) {
+                this.ball.onGrounded();
+            }
+            // verificar si la pelota cruza la red (red está en x = 480)
+            if (this.ball.sprite.x < 475 && this.ball.courtSide === 'right') {
+                this.ball.crossNet();
+            } else if (this.ball.sprite.x > 485 && this.ball.courtSide === 'left') {
+                this.ball.crossNet();
+            }
+        }
+    }
+
+    // Actualiza el temporizador cada segundo
     updateTimer() {
         this.tiempoRestante--;
 
@@ -362,28 +407,7 @@ export class Game_Scene extends Phaser.Scene {
         }
     }
 
-    update() {
-        // se procesan los inputs de los jugadores
-        this._handleInputForAllPlayers();
-        // se actualizan los power-ups
-        this.players.forEach(player => player.updatePowerUps());
-        // se actualiza el estado de la pelota
-        if (this.ball) {
-            this.ball.update();
-            // verificar si la pelota golpea el suelo (comparar con la posición del suelo)
-            // groundY es la parte superior del suelo
-            if (this.ball.isBallLive && this.ball.sprite.y > this.groundY) {
-                this.ball.onGrounded();
-            }
-            // verificar si la pelota cruza la red (red está en x = 480)
-            if (this.ball.sprite.x < 475 && this.ball.courtSide === 'right') {
-                this.ball.crossNet();
-            } else if (this.ball.sprite.x > 485 && this.ball.courtSide === 'left') {
-                this.ball.crossNet();
-            }
-        }
-    }
-
+    // Actualiza la UI del inventario de power-ups de un jugador
     updatePlayerInventoryUI(player) {
         const ui = this.inventoryUI[player.id];
 
@@ -793,13 +817,13 @@ export class Game_Scene extends Phaser.Scene {
 
                 this.scoreP2 += pointsToAdd;
             }
+            // se reproduce el efecto de sonido de punto
+            this.playSfx(this.sfx.point);
 
             // condición de 11 puntos con 2 de diferencia
             this._checkWinCondition();
         });
     }
-
-
 
     // Maneja colisión entre pelota y jugador
     _onBallPlayerCollision(ball, player) {
@@ -812,19 +836,19 @@ export class Game_Scene extends Phaser.Scene {
         ball.hit(player, playerDirection, isJumping, isReceiving);
     }
 
+    // Controla el final del juego
     _endGame(winner) {
-        // paramos el timer del set si sigue vivo
+        // se para el timer del set
         if (this.timerEvent) {
-            this.timerEvent.remove(false);   // elimina el evento
+            this.timerEvent.remove(false);
             this.timerEvent = null;
         }
 
-        // Opcional: detener la física de esta escena antes de salir
+        // se detiene la física de esta escena antes de salir
         if (this.physics && this.physics.world) {
             this.physics.world.pause();
         }
 
-        // NO llamar a this.scene.pause() aquí
         this.scene.start("EndGame_Scene", {
             winner: winner,
             player1: this.player1,
@@ -832,6 +856,7 @@ export class Game_Scene extends Phaser.Scene {
         });
     }
 
+    // Verifica si algún jugador ha ganado el set
     _checkWinCondition() {
         const scoreDiff = this.scoreP1 - this.scoreP2;
 
@@ -842,6 +867,7 @@ export class Game_Scene extends Phaser.Scene {
         }
     }
 
+    // Controla el final de un set
     _endSet(winner) {
         // actualizar sets ganados
         if (winner === 'player1') this.setsP1++;
@@ -876,8 +902,7 @@ export class Game_Scene extends Phaser.Scene {
         }
     }
 
-
-
+    // Reinicia el estado para un nuevo set
     _resetSet() {
         // se actualiza el texto del set actual
         this.setText.setText(`SET ${this.currentSet}`);
@@ -909,5 +934,7 @@ export class Game_Scene extends Phaser.Scene {
 
         p1.idleRight();
         p2.idleLeft();
+
+        this.playSfx(this.sfx.whistle);
     }
 }
