@@ -137,7 +137,7 @@ export class SelectScenario_Scene extends Phaser.Scene {
             hoverScale: 1.1,
             clickSoundKey: 'sonidoClick',
             onClick: () => {
-                this.scene.start('SelecPlayer_Scene', { mode: this.mode });
+                this.scene.start('SelectPlayer_Scene', { mode: this.mode });
             }
         });
     }

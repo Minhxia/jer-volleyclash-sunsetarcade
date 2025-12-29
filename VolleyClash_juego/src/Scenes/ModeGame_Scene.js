@@ -61,8 +61,8 @@ export class ModeGame_Scene extends Phaser.Scene {
         };
 
         const startMode = (mode) => {
-            // se pasa el modo a la siguiente escena
-            this.scene.start('SelecPlayer_Scene', { mode });
+            // Se pasa el modo a la siguiente escena
+            this.scene.start('SelectPlayer_Scene', { mode: mode });
         };
 
         // Botón LOCAL
@@ -83,7 +83,7 @@ export class ModeGame_Scene extends Phaser.Scene {
             x: startX + spacing,
             y: buttonY,
             label: 'Red',
-            onClick: () => startMode('network'),
+            onClick: () => startMode('online'),
             scale: 2,
             textureNormal: 'botonSinSeleccionar',
             textureHover: 'botonSeleccionado',
