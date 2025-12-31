@@ -28,12 +28,16 @@ export class SelectScenario_Scene extends Phaser.Scene {
 
         // Sonido
         this.load.audio('sonidoClick', 'ASSETS/SONIDO/SonidoBoton.mp3');
+
+        // Marco
+        this.load.image('marco', '/ASSETS/UI/MARCOS/VACIOS/MARCOS_ESCENARIO')
     }
 
     init(data) {
         this.player1 = data.player1;
         this.player2 = data.player2;
-        this.mode = data?.mode ?? 'local'; // opcional (a lo mejor hay que borrar esto)
+        this.mode = data.mode || 'local';
+        this.isHost = data.isHost || false;
     }
 
     create() {
@@ -108,18 +112,39 @@ export class SelectScenario_Scene extends Phaser.Scene {
         // se marca el escenario por defecto visualmente
         setSelectedScenario(this.selectedScenario);
 
+        // Marco
+        const frameY = 240; // Y de la imagen del escenario
+        const frame = this.add.image(width / 2, frameY, 'marco').setOrigin(0.5);
+        frame.texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+
+        // Ajuste del tamaño del marco
+        const targetFrameWidth = 500; 
+        const targetFrameHeight = 300;
+        frame.setDisplaySize(targetFrameWidth, targetFrameHeight);
+
         // botón Siguiente
         createUIButton(this, {
             x: width / 2,
             y: 500,
             label: 'Siguiente',
             onClick: () => {
-                this.scene.start('Game_Scene', {
-                    player1: this.player1,
-                    player2: this.player2,
-                    selectedScenario: this.selectedScenario,
-                    mode: this.mode,
-                });
+                if (this.mode === 'local'){
+                    this.scene.start('Game_Scene', {
+                        player1: this.player1,
+                        player2: this.player2,
+                        selectedScenario: this.selectedScenario,
+                        mode: this.mode,
+                        isHost: this.isHost
+                    });
+                } else {
+                    this.scene.start('Lobby_Scene', {
+                        player1: this.player1,
+                        player2: this.player2,
+                        selectedScenario: this.selectedScenario,
+                        mode: this.mode,
+                        isHost: this.isHost
+                    });
+                }
             },
             scale: 1.5,
             textureNormal: 'botonSimple',
@@ -137,7 +162,10 @@ export class SelectScenario_Scene extends Phaser.Scene {
             hoverScale: 1.1,
             clickSoundKey: 'sonidoClick',
             onClick: () => {
-                this.scene.start('SelectPlayer_Scene', { mode: this.mode });
+                this.scene.start('SelectPlayer_Scene', { 
+                    mode: this.mode,
+                    isHost: this.isHost
+                });
             }
         });
     }

@@ -17,7 +17,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
     init(data) {
         this.mode = data.mode;
         console.log('Modo de Juego:', this.mode);
-        this.isHost = data.isHost || false;
+        this.isHost = data.isHost;
         console.log('Host:', this.isHost);
     }
 
@@ -31,7 +31,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
 
         // fondo
         this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
-        this.load.image('marco', 'ASSETS/UI/MARCOS/VACIOS/MARCO_PERSONAJE_SELECCIONADO.png');
+        this.load.image('marcoJugador', 'ASSETS/UI/MARCOS/VACIOS/MARCO_PERSONAJE_SELECCIONADO.png');
 
         // personajes
         this.load.image('characterA', 'ASSETS/PERSONAJES/PERSONAJES_POSE/personajes_a.png');
@@ -124,7 +124,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
             textureNormal: 'botonSimple',
             textureHover: 'botonSimpleSeleccionado',
             textStyle: { ...style, fontSize: '14px', color: '#000' },
-            clickSoundKey: 'sonidoClick',
+            clickSoundKey: 'sonidoClick'
         });
     }
 
@@ -165,11 +165,6 @@ export class SelectPlayer_Scene extends Phaser.Scene {
     createPlayersUI() {
         const { width, height } = this.scale;
         const style = this.game.globals.defaultTextStyle;
-
-        // se suaviza un poco el marco
-        if (this.textures.exists('marco')) {
-            this.textures.get('marco').setFilter(Phaser.Textures.FilterMode.LINEAR);
-        }
 
         const positionsX = [width * 0.25, width * 0.75];
 
@@ -224,11 +219,14 @@ export class SelectPlayer_Scene extends Phaser.Scene {
             // “Slot” grande + marco
             player.bigImage = this.add.image(width * (0.25 + 0.5 * idx), height * 0.6, 'characterA')
                 .setScale(1.2)
+                .setOrigin(0.5)
                 .setVisible(false);
 
-            player.bigFrame = this.add.image(player.bigImage.x, player.bigImage.y, 'marco')
-                .setScale(2.8) 
+            player.bigFrame = this.add.image(player.bigImage.x, player.bigImage.y, 'marcoJugador')
+                .setScale(2.8)
+                .setOrigin(0.5)
                 .setVisible(true);
+            player.bigFrame.texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
 
             // Marco sobre miniatura (rectángulo)
             player.frame = this.add.rectangle(0, 0, 60, 120)
@@ -244,22 +242,20 @@ export class SelectPlayer_Scene extends Phaser.Scene {
     createPlayerOnlineUI() {
         const { width, height } = this.scale;
 
-        // se suaviza un poco el marco
-        if (this.textures.exists('marco')) {
-            this.textures.get('marco').setFilter(Phaser.Textures.FilterMode.LINEAR);
-        }
-
         const player = this.players[0];
         const centerX = width / 2;
 
         // “Slot” grande + marco
         player.bigImage = this.add.image(centerX - 150, height * 0.58, 'characterA')
             .setScale(1.2)
+            .setOrigin(0.5)
             .setVisible(false);
 
-        player.bigFrame = this.add.image(player.bigImage.x, player.bigImage.y, 'marco')
-            .setScale(2.8) 
+        player.bigFrame = this.add.image(player.bigImage.x, player.bigImage.y, 'marcoJugador')
+            .setScale(2.8)
+            .setOrigin(0.5)
             .setVisible(true);
+        player.bigFrame.texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
 
         // Marco sobre miniatura (rectángulo)
         player.frame = this.add.rectangle(0, 0, 60, 120)
@@ -311,6 +307,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
                 if (player.bigImage) player.bigImage.setTexture(characterName).setVisible(true);
                 if (player.frame) player.frame.setPosition(mini.x, mini.y).setVisible(true);
             }
+            this.updateTurnText();
             return; // Salimos para no ejecutar la lógica de turnos del modo local
         }
 
@@ -411,6 +408,8 @@ export class SelectPlayer_Scene extends Phaser.Scene {
                 return;
             }
 
+            this.registry.set('myCharacter', this.players[0].character);
+
             if (this.isHost) {
                 // Soy el admin: puedo pasar a elegir escenario
                 this.scene.start('SelectScenario_Scene', {
@@ -423,6 +422,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
                 this.scene.start('Lobby_Scene', {
                     mode: this.mode,
                     player2: this.players[0],
+                    isHost: false 
                 });
             }
         }
@@ -496,6 +496,8 @@ export class SelectPlayer_Scene extends Phaser.Scene {
 
             if (!p1HasChar) {
                 this.turnText.setText('Ningún personaje seleccionado');
+            } else {
+                this.turnText.setText('Listo: el jugador tiene personaje');
             }
         }
     }

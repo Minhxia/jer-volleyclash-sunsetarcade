@@ -63,6 +63,7 @@ export class Menu_Scene extends Phaser.Scene {
             label: 'Jugar',
             onClick: () => this.scene.start('ModeGame_Scene'),
             textStyle: buttonTextStyle,
+            clickSoundKey: 'sonidoClick',
         });
 
         // botón Configuración
@@ -72,6 +73,7 @@ export class Menu_Scene extends Phaser.Scene {
             label: 'Configuración',
             onClick: () => this.scene.start('Configuration_Scene'),
             textStyle: buttonTextStyle,
+            clickSoundKey: 'sonidoClick',
         });
 
         // botón Créditos
@@ -81,6 +83,17 @@ export class Menu_Scene extends Phaser.Scene {
             label: 'Créditos',
             onClick: () => this.scene.start('Credits_Scene'),
             textStyle: buttonTextStyle,
+            clickSoundKey: 'sonidoClick',
+        });
+
+        // botón de cerrar sesión
+        createUIButton(this, {
+            x: width - 100,
+            y: 50,
+            label: 'Cerrar Sesión',
+            onClick: () => { this.handleLogout() },
+            textStyle: buttonTextStyle,
+            clickSoundKey: 'sonidoClick',
         });
         /////////
 
@@ -88,5 +101,20 @@ export class Menu_Scene extends Phaser.Scene {
         this.add.image(this.scale.width - 20, this.scale.height - 20, 'logoEmpresa')
             .setScale(0.5)
             .setOrigin(1, 1);
+    }
+
+    async handleLogout() {
+        const username = this.registry.get('username');
+        
+        // Avisar al servidor para que deje libre el puesto de Host
+        await fetch('/api/logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username })
+        });
+
+        // Limpiar local
+        localStorage.removeItem('voley_username');
+        localStorage.removeItem('voley_session_token');
     }
 }

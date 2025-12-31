@@ -62,7 +62,11 @@ export class ModeGame_Scene extends Phaser.Scene {
 
         const startMode = (mode) => {
             // Se pasa el modo a la siguiente escena
-            this.scene.start('SelectPlayer_Scene', { mode: mode });
+            if (mode === 'local') {
+                this.scene.start('SelectPlayer_Scene', { mode: mode });
+            } else {
+                this.scene.start('Logging_Scene', { mode: mode });
+            }
         };
 
         // Botón LOCAL

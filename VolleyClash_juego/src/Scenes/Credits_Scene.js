@@ -54,7 +54,6 @@ export class Credits_Scene extends Phaser.Scene {
         ];
 
         // marco centrado
-        this.textures.get('marco').setFilter(Phaser.Textures.FilterMode.LINEAR);
         const frameY = height * 0.42;
         const frame = this.add.image(centerX, frameY, 'marco').setOrigin(0.5);
 
