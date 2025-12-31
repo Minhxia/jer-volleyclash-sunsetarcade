@@ -2,6 +2,7 @@
 import Phaser from "phaser";
 import { Menu_Scene } from "./Scenes/Menu_Scene.js";
 import { Game_Scene } from "./Scenes/Game_Scene.js";
+import { Tutorial_Scene } from "./Scenes/Tutorial_Scene.js";
 import { Configuration_Scene } from "./Scenes/Configuration_Scene.js";
 import { Credits_Scene } from "./Scenes/Credits_Scene.js";
 import { EndGame_Scene } from "./Scenes/EndGame_Scene.js";
@@ -43,7 +44,7 @@ import { Logging_Scene } from "./Scenes/Logging_Scene.js";
                 game.globals = globals;
             }
         },
-        scene: [Menu_Scene, Game_Scene, Configuration_Scene, Credits_Scene, EndGame_Scene, Pause_Scene, ModeGame_Scene, SelectPlayer_Scene, SelectScenario_Scene, Lobby_Scene, Logging_Scene],
+        scene: [Menu_Scene, Game_Scene, Tutorial_Scene, Configuration_Scene, Credits_Scene, EndGame_Scene, Pause_Scene, ModeGame_Scene, SelectPlayer_Scene, SelectScenario_Scene, Lobby_Scene, Logging_Scene],
         backgroundColor:'#8675f1',
     };
 

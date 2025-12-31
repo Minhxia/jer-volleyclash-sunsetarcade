@@ -66,10 +66,20 @@ export class Menu_Scene extends Phaser.Scene {
             clickSoundKey: 'sonidoClick',
         });
 
-        // botón Configuración
+        // botón Tutorial
         createUIButton(this, {
             x: rightHalfX,
             y: firstButtonY + buttonSpacing,
+            label: 'Tutorial',
+            onClick: () => this.scene.start('Tutorial_Scene'),
+            textStyle: buttonTextStyle,
+            clickSoundKey: 'sonidoClick',
+        });
+
+        // botón Configuración
+        createUIButton(this, {
+            x: rightHalfX,
+            y: firstButtonY + buttonSpacing * 2,
             label: 'Configuración',
             onClick: () => this.scene.start('Configuration_Scene'),
             textStyle: buttonTextStyle,
@@ -79,7 +89,7 @@ export class Menu_Scene extends Phaser.Scene {
         // botón Créditos
         createUIButton(this, {
             x: rightHalfX,
-            y: firstButtonY + buttonSpacing * 2,
+            y: firstButtonY + buttonSpacing * 3,
             label: 'Créditos',
             onClick: () => this.scene.start('Credits_Scene'),
             textStyle: buttonTextStyle,
