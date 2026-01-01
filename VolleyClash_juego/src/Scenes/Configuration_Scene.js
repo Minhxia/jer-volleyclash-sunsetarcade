@@ -1,6 +1,6 @@
 // Pantalla de Configuración
 import Phaser from 'phaser';
-import { ensureStoredAudioSettings, getStoredMusicVolume, getStoredSfxVolume, setStoredMusicVolume, setStoredSfxVolume, applyStoredVolume } from '../UI/Audio.js';
+import { ensureStoredAudioSettings, getStoredMusicVolume, getStoredSfxVolume, getStoredGlobalVolume, setStoredMusicVolume, setStoredSfxVolume, setStoredGlobalVolume, applyStoredVolume, playClick } from '../UI/Audio.js';
 import { createIconButton } from '../UI/Buttons.js';
 
 export class Configuration_Scene extends Phaser.Scene {
@@ -9,16 +9,13 @@ export class Configuration_Scene extends Phaser.Scene {
 
         this.musicVolumeSlider = null;
         this.sfxVolumeSlider = null;
+        this.globalVolumeSlider = null;
     }
 
     preload() {
         // imágenes fondo y ui
         this.load.image('botonVolver', 'ASSETS/UI/BOTONES/FLECHA_VOLVER.png');
         this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
-
-        // controles
-        this.load.image('derTeclas', 'ASSETS/UI/CONTROLES/der.png');
-        this.load.image('izqTeclas', 'ASSETS/UI/CONTROLES/izq.png');
 
         // sonido
         this.load.audio('sonidoClick', 'ASSETS/SONIDO/SonidoBoton.mp3');
@@ -42,24 +39,45 @@ export class Configuration_Scene extends Phaser.Scene {
             color: '#5f0000ff'
         }).setOrigin(0.5);
 
-        // Subtitulo de musica
-        this.add.text(centerX, height * 0.2, 'Volumen de la música', {
-            ...style,
-            fontSize: '24px',
-            color: '#000'
-        }).setOrigin(0.5);
-
         //// VOLUMENES ////
         ensureStoredAudioSettings();
+        const initialGlobalVolume = getStoredGlobalVolume();
         const initialMusicVolume = getStoredMusicVolume();
         const initialSfxVolume = getStoredSfxVolume();
 
         // se aplica el volumen nada mas cargar
         applyStoredVolume(this);
 
+        // Subtitulo global
+        this.add.text(centerX, height * 0.18, 'Volumen General', {
+            ...style, 
+            fontSize: '24px', 
+            color: '#000'
+        }).setOrigin(0.5);
+
+        // barra de volumen (global)
+        this.globalVolumeSlider = this.add.dom(centerX, height * 0.24)
+            .createFromHTML(`<input type="range" min="0" max="1" step="0.01" value="${initialGlobalVolume}" 
+                style="width:220px; height:20px; accent-color:#00aaff; border-radius:5px;"/>`);
+
+        this.globalVolumeSlider.addListener('input');
+        this.globalVolumeSlider.on('input', (event) => {
+            if (!(event.target instanceof HTMLInputElement)) return;
+            setStoredGlobalVolume(event.target.value);
+            applyStoredVolume(this);
+        });
+
+
+        // Subtitulo de musica
+        this.add.text(centerX, height * 0.32, 'Volumen de la Música', {
+            ...style,
+            fontSize: '24px',
+            color: '#000'
+        }).setOrigin(0.5);
+
         // barra de volumen (musica)
         this.musicVolumeSlider = this.add
-            .dom(centerX, height * 0.26)
+            .dom(centerX, height * 0.38)
             .createFromHTML(`<input type="range" min="0" max="1" step="0.01" value="${initialMusicVolume}"
                 style="width:220px; height:20px; accent-color:#00aaff; border-radius:5px;"/>
             `);
@@ -74,7 +92,7 @@ export class Configuration_Scene extends Phaser.Scene {
         });
 
         // Subtitulo de efectos
-        this.add.text(centerX, height * 0.32, 'Volumen de efectos', {
+        this.add.text(centerX, height * 0.46, 'Volumen de Efectos', {
             ...style,
             fontSize: '24px',
             color: '#000'
@@ -82,7 +100,7 @@ export class Configuration_Scene extends Phaser.Scene {
 
         // barra de volumen (efectos)
         this.sfxVolumeSlider = this.add
-            .dom(centerX, height * 0.38)
+            .dom(centerX, height * 0.52)
             .createFromHTML(`<input type="range" min="0" max="1" step="0.01" value="${initialSfxVolume}"
                 style="width:220px; height:20px; accent-color:#00aaff; border-radius:5px;"/>
             `);
@@ -94,6 +112,11 @@ export class Configuration_Scene extends Phaser.Scene {
 
             setStoredSfxVolume(target.value);
             applyStoredVolume(this);
+        });
+
+        this.sfxVolumeSlider.addListener('change');
+        this.sfxVolumeSlider.on('change', (event) => {
+            playClick(this, 'sonidoClick'); // se reproduce al soltar
         });
         ////////
 
@@ -107,33 +130,6 @@ export class Configuration_Scene extends Phaser.Scene {
             onClick: () => this.scene.start('Menu_Scene'),
         });
 
-        // Separador visual
-        const line = this.add.graphics();
-            line.lineStyle(3, 0x000000, 1); // grosor, color, alpha
-            line.beginPath();
-            line.moveTo(width * 0.1, height * 0.46);   // inicio (20% del ancho)
-            line.lineTo(width * 0.9, height * 0.46);   // final (80% del ancho)
-            line.strokePath();
-
-        // Controles
-        this.add.text(centerX, height * 0.52, 'Controles', {
-            ...style,
-            fontSize: '32px',
-            color: '#5f0000ff',
-        }).setOrigin(0.5);
-
-        const separation = 400;
-
-        // Mini-tutorial
-        // TECLAS DERECHA
-        this.add.image(width / 2 + separation / 2, 380, 'derTeclas')
-            .setScale(0.35)
-            .setOrigin(0.5);
-        // TECLAS IZQUIERDA
-        this.add.image(width / 2 - separation / 2, 380, 'izqTeclas')
-            .setScale(0.35)
-            .setOrigin(0.5);
-
         // se limpia el slider al salir de la escena
         // (así se evita que se acumulen si entras y sales varias veces)
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -146,6 +142,11 @@ export class Configuration_Scene extends Phaser.Scene {
                 this.sfxVolumeSlider.removeAllListeners();
                 this.sfxVolumeSlider.destroy();
                 this.sfxVolumeSlider = null;
+            }
+            if (this.globalVolumeSlider) {
+                this.globalVolumeSlider.removeAllListeners();
+                this.globalVolumeSlider.destroy();
+                this.globalVolumeSlider = null;
             }
         });
     }

@@ -7,11 +7,10 @@ export class Logging_Scene extends Phaser.Scene {
         super('Logging_Scene');
         this.isPlayerReady = false;
         this.apiUrl = '/api';
+        this.isRegistering = false;
     }
 
     async init(data) {
-        this.mode = data.mode;
-
         const savedName = localStorage.getItem('voley_username');
         const savedPass = localStorage.getItem('voley_password'); // Guarda la pass (o un token) para re-loguear
 
@@ -30,7 +29,7 @@ export class Logging_Scene extends Phaser.Scene {
                 if (response.ok) {
                     this.registry.set('username', resData.username);
                     this.registry.set('isHost', resData.isHost);
-                    this.scene.start('SelectPlayer_Scene', { mode: this.mode, isHost: resData.isHost });
+                    this.scene.start('Menu_Scene');
                 }
             } catch (e) {
                 console.error("Auto-login fallido");
@@ -101,17 +100,6 @@ export class Logging_Scene extends Phaser.Scene {
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
         this.toggleText.on('pointerdown', () => this.toggleMode());
-
-        // Botón Volver
-        createIconButton(this, {
-            x: width * 0.06,
-            y: height * 0.08,
-            texture: 'botonVolver',
-            scale: 1,
-            hoverScale: 1.1,
-            clickSoundKey: 'sonidoClick',
-            onClick: () => this.scene.start('ModeGame_Scene')
-        });
     }
 
     createHtmlInput(x, y, placeholder, style, isPassword = false) {
@@ -184,10 +172,7 @@ export class Logging_Scene extends Phaser.Scene {
                     localStorage.setItem('voley_username', usernameValue);
 
                     console.log(`Login correcto. Usuario: ${usernameValue} | Host: ${data.isHost}`);
-                    this.scene.start('SelectPlayer_Scene', { 
-                        mode: this.mode, 
-                        isHost: data.isHost
-                    });
+                    this.scene.start('Menu_Scene');
                 }
             } else {
                 alert(data.error || 'Error en la autenticación');

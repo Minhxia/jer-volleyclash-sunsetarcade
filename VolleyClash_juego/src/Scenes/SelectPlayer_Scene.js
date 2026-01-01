@@ -15,9 +15,9 @@ export class SelectPlayer_Scene extends Phaser.Scene {
     }
 
     init(data) {
-        this.mode = data.mode;
+        this.mode = this.registry.get('mode');
         console.log('Modo de Juego:', this.mode);
-        this.isHost = data.isHost;
+        this.isHost = this.registry.get('isHost');
         console.log('Host:', this.isHost);
     }
 

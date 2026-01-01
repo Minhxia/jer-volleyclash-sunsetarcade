@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 
 const SFX_VOLUME_KEY = 'sfxVolume';
 const MUSIC_VOLUME_KEY = 'musicVolume';
+const GLOBAL_VOLUME_KEY = 'globalVolume';
 const LEGACY_VOLUME_KEY = 'volume';
 
 function parseStoredVolume(raw, defaultValue) {
@@ -55,6 +56,18 @@ export function getStoredMusicVolume(defaultValue = 1) {
     return getStoredVolumeByKey(MUSIC_VOLUME_KEY, LEGACY_VOLUME_KEY, defaultValue);
 }
 
+// Obtiene el volumen global
+export function getStoredGlobalVolume(defaultValue = 1) {
+    return getStoredVolumeByKey(GLOBAL_VOLUME_KEY, null, defaultValue);
+}
+
+// Almacena el volumen global
+export function setStoredGlobalVolume(volume) {
+    const v = Phaser.Math.Clamp(Number(volume), 0, 1);
+    localStorage.setItem(GLOBAL_VOLUME_KEY, String(v));
+    return v;
+}
+
 // Almacena el volumen para los efectos de sonido
 export function setStoredSfxVolume(volume) {
     const v = Phaser.Math.Clamp(Number(volume), 0, 1);
@@ -74,6 +87,7 @@ export function setStoredMusicVolume(volume) {
 
 // Aplica el volumen al SoundManager y a la música global
 export function applyStoredVolume(scene, options = {}) {
+    let globalVol = getStoredGlobalVolume();
     let sfxVolume = getStoredSfxVolume();
     let musicVolume = getStoredMusicVolume();
 
@@ -86,11 +100,11 @@ export function applyStoredVolume(scene, options = {}) {
     }
 
     // Mantener el sound manager en 1 para que musica y efectos sean independientes.
-    scene.sound.volume = 1;
+    scene.sound.volume = globalVol * sfxVolume;
 
     const music = scene.game.globals.music;
     if (music && 'setVolume' in music) {
-        music.setVolume(musicVolume);
+        music.setVolume(musicVolume * globalVol);
     }
 }
 
@@ -102,15 +116,17 @@ export function playClick(scene, key = 'sonidoClick') {
 // Reproduce la música de fondo en bucle
 export function ensureLoopingMusic(scene, soundKey, { loop = true } = {}) {
     const volume = getStoredMusicVolume();
+    const globalVol = getStoredGlobalVolume();
+    const finalVolume = volume * globalVol;
 
     let music = scene.game.globals.music;
     if (!music) {
-        music = scene.sound.add(soundKey, { loop, volume });
+        music = scene.sound.add(soundKey, { loop, finalVolume });
         scene.game.globals.music = music;
     }
 
     // se actualiza volumen si el tipo lo soporta
-    if (music && 'setVolume' in music) music.setVolume(volume);
+    if (music && 'setVolume' in music) music.setVolume(finalVolume);
 
     const tryPlay = () => {
         if (!music || !('play' in music)) return;

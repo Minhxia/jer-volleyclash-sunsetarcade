@@ -1,7 +1,7 @@
 // Pantalla del Menú Principal
 import Phaser from 'phaser';
 import { createUIButton } from '../UI/Buttons.js';
-import { ensureLoopingMusic } from '../UI/Audio.js';
+import { ensureLoopingMusic, applyStoredVolume } from '../UI/Audio.js';
 
 export class Menu_Scene extends Phaser.Scene {
     constructor() {
@@ -24,6 +24,7 @@ export class Menu_Scene extends Phaser.Scene {
 
     create() {
         // música de fondo
+        applyStoredVolume(this);
         ensureLoopingMusic(this, 'sonidoGeneral', { loop: true });
 
         // estilo base del texto
@@ -126,5 +127,13 @@ export class Menu_Scene extends Phaser.Scene {
         // Limpiar local
         localStorage.removeItem('voley_username');
         localStorage.removeItem('voley_session_token');
+
+        // Limpiar registry
+        this.registry.remove('username');
+        this.registry.remove('userToken');
+        this.registry.remove('isHost');
+
+        // Volver a la pantalla de login
+        this.scene.start('Logging_Scene');
     }
 }

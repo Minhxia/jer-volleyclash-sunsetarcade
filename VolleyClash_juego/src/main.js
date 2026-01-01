@@ -48,7 +48,7 @@ import { Logging_Scene } from "./Scenes/Logging_Scene.js";
                 game.globals = globals;
             }
         },
-        scene: [Menu_Scene, Game_Scene, Tutorial_Scene, Configuration_Scene, Credits_Scene, EndGame_Scene, Pause_Scene, ModeGame_Scene, SelectPlayer_Scene, SelectScenario_Scene, Lobby_Scene, Logging_Scene],
+        scene: [Logging_Scene, Menu_Scene, Game_Scene, Tutorial_Scene, Configuration_Scene, Credits_Scene, EndGame_Scene, Pause_Scene, ModeGame_Scene, SelectPlayer_Scene, SelectScenario_Scene, Lobby_Scene],
         backgroundColor:'#8675f1',
     };
 
