@@ -14,12 +14,12 @@ module.exports = {
     static: { directory: path.join(__dirname, 'public') },
     hot: true,
     open: true,
-    port: 8080,
+    port: 3000,
 
     proxy: [
       {
         context: ['/api', '/socket.io'],
-        target: 'http://localhost:3000',
+        target: 'http://localhost:8080',
         ws: true
       }
     ]
