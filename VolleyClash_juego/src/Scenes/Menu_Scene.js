@@ -47,14 +47,14 @@ export class Menu_Scene extends Phaser.Scene {
         // título del juego
         this.add.text(rightHalfX, 100, 'Volley Clash', {
             ...style,
-            fontSize: '32px',
+            fontSize: '68px',
             color: '#ffffff'
         }).setOrigin(0.5);
 
         //// BOTONES ////
         const firstButtonY = height / 2 - 60;
         const buttonSpacing = 70;
-        const buttonTextStyle = { ...style, fontSize: '20px', color: '#000000' };
+        const buttonTextStyle = { ...style, fontSize: '28px', color: '#000000' };
 
         // botón Jugar
         createUIButton(this, {

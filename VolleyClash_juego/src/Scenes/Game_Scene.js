@@ -860,13 +860,21 @@ export class Game_Scene extends Phaser.Scene {
 
     // Verifica si algún jugador ha ganado el set
     _checkWinCondition() {
+        const minPoints = 11;   // puntos mínimos para ganar
+        const minDiff = 2;      // diferencia mínima de puntos para ganar
+        
+        // diferencia de puntos
         const scoreDiff = this.scoreP1 - this.scoreP2;
+        const maxScore = Math.max(this.scoreP1, this.scoreP2);
 
-        if (this.scoreP1 >= 11 && scoreDiff >= 2) {
-            this._endSet("player1");
-        } else if (this.scoreP2 >= 11 && scoreDiff <= -2) {
-            this._endSet("player2");
+        // si no se cumple alguna de las condiciones, no se termina el set
+        if (maxScore < minPoints || Math.abs(scoreDiff) < minDiff) {
+            return;
         }
+
+        // sino, se determina el ganador del set
+        const winner = scoreDiff > 0 ? "player1" : "player2";
+        this._endSet(winner);
     }
 
     // Controla el final de un set

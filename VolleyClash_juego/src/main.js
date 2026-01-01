@@ -15,7 +15,11 @@ import { Logging_Scene } from "./Scenes/Logging_Scene.js";
 
 (async () => {
     // fallback para evitar problemas con las fuentes personalizadas
-    if (document.fonts && document.fonts.ready) {
+    if (document.fonts && document.fonts.load) {
+        await Promise.all([
+            document.fonts.load('20px "MiFuente"'),
+            document.fonts.load('20px "VT323"')
+        ]);
         await document.fonts.ready;
     }
 
@@ -33,7 +37,7 @@ import { Logging_Scene } from "./Scenes/Logging_Scene.js";
             default: 'arcade',
             arcade: {
                 gravity: {x: 0, y: 300},
-                debug: true // poner a true para ver las líneas de los cuerpos físicos
+                debug: false // poner a true para ver las líneas de los cuerpos físicos
             }
         },
         dom: {

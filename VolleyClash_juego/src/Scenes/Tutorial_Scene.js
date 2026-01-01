@@ -18,8 +18,14 @@ export class Tutorial_Scene extends Phaser.Scene {
     }
 
     preload() {
-        // imágenes, fondo y ui
-        this.load.image('tut1_partido', 'ASSETS/TUTORIAL/TUT1_PARTIDO.png');
+        // imágenes del tutorial
+        this.load.image('tut0_controles', 'ASSETS/TUTORIAL/TUT0_Controles.png');
+        this.load.image('tut1_set', 'ASSETS/TUTORIAL/TUT1_Set.png');
+        this.load.image('tut2_pelota', 'ASSETS/TUTORIAL/TUT2_Pelota.png');
+        this.load.image('tut3_powerup', 'ASSETS/TUTORIAL/TUT3_Powerup.png');
+        this.load.image('tut4_lista', 'ASSETS/TUTORIAL/TUT4_Lista.png');
+
+        // fondo y ui
         this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
         this.load.image('botonVolver', 'ASSETS/UI/BOTONES/FLECHA_VOLVER.png');
     }
@@ -28,10 +34,12 @@ export class Tutorial_Scene extends Phaser.Scene {
         const { width, height } = this.scale;
         const centerX = width / 2;
 
-        const style = this.game.globals?.defaultTextStyle ?? {
-            fontFamily: 'Arial',
-            fontSize: '20px',
-            color: '#000000',
+        const style = {
+            ...(this.game.globals?.defaultTextStyle ?? {
+                fontFamily: 'VT323',
+                fontSize: '20px',
+                color: '#000000',
+            })
         };
 
         applyStoredVolume(this);
@@ -44,10 +52,10 @@ export class Tutorial_Scene extends Phaser.Scene {
             .setDisplaySize(width, height);
 
         // título
-        this.add
-            .text(centerX, height * 0.15, 'Tutorial', {
+        this.mainTitleText = this.add
+            .text(centerX, height * 0.1, 'Tutorial', {
                 ...style,
-                fontSize: '32px',
+                fontSize: '42px',
                 color: '#5f0000ff',
             })
             .setOrigin(0.5);
@@ -65,76 +73,50 @@ export class Tutorial_Scene extends Phaser.Scene {
         // contenido del tutorial (slides o páginas)
         this.pageIndex = 0;
         this.pages = [
-            { key: 'tut1_partido', title: 'Objetivo', body: 'Gana el punto cuando el rival no devuelve el balon.' },
-            { key: 'tut_2', title: 'Controles', body: 'Mover, saltar, recibir y golpear.' },
-            { key: 'tut_3', title: 'Golpes', body: 'Recepcion, remate y rebotes.' }
+            { key: 'tut0_controles', title: 'Controles' },
+            { key: 'tut1_set', title: 'Reglas básicas: set' },
+            { key: 'tut2_pelota', title: 'Reglas básicas: pelota' },
+            { key: 'tut3_powerup', title: 'Reglas básicas: power-ups' },
+            { key: 'tut4_lista', title: 'Lista de power-ups' }
         ];
 
-        // layout for image (left) + text (right)
-        const contentWidth = width * 0.85;
-        const contentLeft = centerX - contentWidth / 2;
-        const contentTop = height * 0.25;
-        const contentHeight = height * 0.5;
-        const leftColWidth = contentWidth * 0.48;
-        const colGap = contentWidth * 0.03;
-        const rightColWidth = contentWidth - leftColWidth - colGap;
+        // panel para imagenes: maximo tamano con margenes
+        const panelMargin = Math.max(8, Math.round(Math.min(width, height) * 0.015));
+        const panelGap = Math.max(6, Math.round(height * 0.012));
+        const navY = height * 0.91;
+
+        const panelTop = this.mainTitleText.y + this.mainTitleText.height + panelGap;
+        const panelBottom = navY - panelGap;
+        const panelHeight = Math.max(0, panelBottom - panelTop);
+        const panelWidth = Math.max(0, width - panelMargin * 2);
 
         this.layout = {
-            contentTop,
-            contentHeight,
-            leftColWidth,
-            rightColWidth,
-            contentLeft,
-            colGap,
+            panelTop,
+            panelHeight,
+            panelWidth,
         };
-
-        // ELEMENTOS DE LA PAGINA
-        // titulo
-        this.titleText = this.add.text(
-            contentLeft + leftColWidth + colGap,
-            contentTop,
-            '',
-            {
-                ...style,
-                fontSize: '28px',
-                color: '#000'
-            }
-        ).setOrigin(0, 0);
-
-        // cuerpo del texto
-        this.bodyText = this.add.text(
-            contentLeft + leftColWidth + colGap,
-            contentTop + 50,
-            '',
-            {
-                ...style,
-                color: '#000',
-                align: 'left',
-                wordWrap: { width: rightColWidth }
-            }
-        ).setOrigin(0, 0);
 
         // imagen de la pagina
         this.slideImage = this.add.image(
-            contentLeft + leftColWidth / 2,
-            contentTop + contentHeight / 2,
+            centerX,
+            panelTop + panelHeight / 2,
             this.pages[0].key
         );
-        this._fitImage(this.slideImage, leftColWidth * 0.9, contentHeight * 0.9);
+        this._fitImage(this.slideImage, panelWidth, panelHeight);
 
         // indicador de pagina
-        this.pageIndicator = this.add.text(centerX, height * 0.9, '', {
+        this.pageIndicator = this.add.text(centerX, navY + 20, '', {
             ...style,
-            fontSize: '20px',
+            fontSize: '28px',
             color: '#000'
         }).setOrigin(0.5);
 
         // BOTONES DE NAVEGACIÓN
-        const buttonTextStyle = { ...style, fontSize: '20px', color: '#000000' };
+        const buttonTextStyle = { ...style, fontSize: '28px', color: '#000000' };
         // botón Anterior
         createUIButton(this, {
-            x: centerX - 160,
-            y: height * 0.9,
+            x: centerX - 165,
+            y: navY + 20,
             label: 'Anterior',
             onClick: () => this.prev(),
             textStyle: buttonTextStyle,
@@ -142,8 +124,8 @@ export class Tutorial_Scene extends Phaser.Scene {
         });
         // botón Siguiente
         createUIButton(this, {
-            x: centerX + 160,
-            y: height * 0.9,
+            x: centerX + 165,
+            y: navY + 20,
             label: 'Siguiente',
             onClick: () => this.next(),
             textStyle: buttonTextStyle,
@@ -160,14 +142,9 @@ export class Tutorial_Scene extends Phaser.Scene {
 
     renderPage() {
         const p = this.pages[this.pageIndex];
-        this.titleText.setText(p.title);
-        this.bodyText.setText(p.body);
+        this.mainTitleText.setText(p.title ?? 'Tutorial');
         this.slideImage.setTexture(p.key);
-        this._fitImage(
-            this.slideImage,
-            this.layout.leftColWidth * 0.9,
-            this.layout.contentHeight * 0.9
-        );
+        this._fitImage(this.slideImage, this.layout.panelWidth, this.layout.panelHeight);
         this.pageIndicator.setText(`${this.pageIndex + 1} de ${this.pages.length}`);
     }
 
