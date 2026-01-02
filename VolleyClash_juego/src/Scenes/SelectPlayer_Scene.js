@@ -1,4 +1,4 @@
-//Pantalla de Seleccion de jugador
+// Pantalla de Selección de jugador
 import Phaser from 'phaser';
 import { applyStoredVolume, playClick } from '../UI/Audio.js';
 import { createUIButton, createIconButton } from '../UI/Buttons.js';
@@ -8,9 +8,9 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         super('SelectPlayer_Scene');
 
         this.players = [];
-        this.currentTurn = 0;       // 0 -> jugador1, 1 -> jugador2, null -> ambos completos
-        this.playerInputs = [];     // DOMElements Phaser
-        this.playerInputEls = [];   // HTMLInputElement
+        this.currentTurn = 0;    // turnos: 0 -> jugador1, 1 -> jugador2, null -> ambos listos
+        this.playerInputs = [];
+        this.playerInputEls = [];
         this.turnText = null;
     }
 
@@ -66,10 +66,12 @@ export class SelectPlayer_Scene extends Phaser.Scene {
 
         // Título
         this.add.text(width / 2, 50, 'Selecciona Personaje', {
-            ...style, fontSize: '40px', color: '#000', fontStyle: 'bold',
+            ...style,
+            fontSize: '42px',
+            color: '#5f0000ff'
         }).setOrigin(0.5);
 
-        // Segun el modo se crea una UI u otra
+        // según el modo se crea una UI u otra
         if (this.mode === 'local') {
             this.createLocalUI(width, height, style);
         } 
@@ -105,13 +107,18 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         ];
 
         // Texto de turno
-        this.turnText = this.add.text(width / 2, 90, 'Turno: Jugador 1', {
-            ...style, fontSize: '18px', color: '#000',
+        this.turnText = this.add.text(width / 2, 95, 'TURNO: Jugador 1', {
+            ...style,
+            fontFamily: 'VT323',
+            fontSize: '28px',
+            color: '#000',
         }).setOrigin(0.5);
 
+        const selectionOffsetY = 25;
+
         // UI jugadores + miniaturas
-        this.createPlayersUI();
-        this.createCharacterMiniatures(0, 0);
+        this.createPlayersUI(selectionOffsetY);
+        this.createCharacterMiniatures(0, selectionOffsetY);
         this.updateTurnText();
 
         // Botón Siguiente
@@ -123,7 +130,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
             scale: 1.5,
             textureNormal: 'botonSimple',
             textureHover: 'botonSimpleSeleccionado',
-            textStyle: { ...style, fontSize: '14px', color: '#000' },
+            textStyle: { ...style, fontSize: '18px', color: '#000' },
             clickSoundKey: 'sonidoClick'
         });
     }
@@ -134,7 +141,9 @@ export class SelectPlayer_Scene extends Phaser.Scene {
             { name: this.registry.get('username') || 'JugadorX', character: null, color: 0x00aaff, bigImage: null, bigFrame: null, frame: null }
         ];
 
-        this.add.text(width / 2, 100, `${this.players[0].name}`, { 
+        const selectionOffsetY = 40;
+
+        this.add.text(width / 2, 100 + selectionOffsetY, `${this.players[0].name}`, { 
             ...style, fontSize: '28px', color: '#000', fontStyle: 'bold' 
         }).setOrigin(0.5);
         
@@ -144,8 +153,8 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         // UI jugadores + miniaturas
-        this.createPlayerOnlineUI();
-        this.createCharacterMiniatures(150, 0);
+        this.createPlayerOnlineUI(selectionOffsetY);
+        this.createCharacterMiniatures(150, selectionOffsetY);
 
         // Botón Siguiente
         createUIButton(this, {
@@ -156,13 +165,13 @@ export class SelectPlayer_Scene extends Phaser.Scene {
             scale: 1.5,
             textureNormal: 'botonSimple',
             textureHover: 'botonSimpleSeleccionado',
-            textStyle: { ...style, fontSize: '14px', color: '#000' },
+            textStyle: { ...style, fontSize: '18px', color: '#000' },
             clickSoundKey: 'sonidoClick',
         });
     }
 
     // Crea la UI de selección de jugadores
-    createPlayersUI() {
+    createPlayersUI(offsetY = 0) {
         const { width, height } = this.scale;
         const style = this.game.globals.defaultTextStyle;
 
@@ -172,11 +181,11 @@ export class SelectPlayer_Scene extends Phaser.Scene {
             const x = positionsX[idx];
 
             // Label nombre
-            this.add.text(x, 100, 'Nombre:', { ...style, fontSize: '24px', color: '#000' })
+            this.add.text(x, 100 + offsetY, 'Nombre:', { ...style, fontSize: '24px', color: '#000' })
                 .setOrigin(0.5);
 
             // Input nombre
-            const dom = this.add.dom(x, 140).createFromHTML(`
+            const dom = this.add.dom(x, 140 + offsetY).createFromHTML(`
                 <input type="text" placeholder="Nombre jugador" maxlength="10"
                 style="
                     width:150px;
@@ -217,7 +226,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
             this.playerInputEls[idx] = inputEl;
 
             // “Slot” grande + marco
-            player.bigImage = this.add.image(width * (0.25 + 0.5 * idx), height * 0.6, 'characterA')
+            player.bigImage = this.add.image(width * (0.25 + 0.5 * idx), height * 0.6 + offsetY, 'characterA')
                 .setScale(1.2)
                 .setOrigin(0.5)
                 .setVisible(false);
@@ -239,14 +248,14 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         this.updateTurnText();
     }
 
-    createPlayerOnlineUI() {
+    createPlayerOnlineUI(offsetY = 0) {
         const { width, height } = this.scale;
 
         const player = this.players[0];
         const centerX = width / 2;
 
         // “Slot” grande + marco
-        player.bigImage = this.add.image(centerX - 150, height * 0.58, 'characterA')
+        player.bigImage = this.add.image(centerX - 150, height * 0.58 + offsetY, 'characterA')
             .setScale(1.2)
             .setOrigin(0.5)
             .setVisible(false);
@@ -402,7 +411,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
             const p1HasChar = !!this.players?.[0]?.character;
 
             if (!p1HasChar) {
-                // Solo avisamos si no ha elegido personaje
+                // solo se avisa si no ha elegido personaje
                 this.flashTurnText('#b00000', 900);
                 this.turnText.setText('Debes elegir un personaje primero');
                 return;
@@ -461,23 +470,23 @@ export class SelectPlayer_Scene extends Phaser.Scene {
 
             // si todo está completo
             if (allChars && allNames) {
-                this.turnText.setText('Listo: ambos jugadores tienen nombre y personaje');
+                this.turnText.setText('¡Listo para continuar!');
                 return;
             }
 
             // si faltan NOMBRES (y ya están los personajes), especifica quién
             if (allChars && !allNames) {
                 if (!p1HasName && !p2HasName) this.turnText.setText('Faltan los nombres de Jugador 1 y Jugador 2');
-                else if (!p1HasName) this.turnText.setText('Falta el nombre del Jugador 1');
-                else this.turnText.setText('Falta el nombre del Jugador 2');
+                else if (!p1HasName) this.turnText.setText('Falta el nombre de Jugador 1');
+                else this.turnText.setText('Falta el nombre de Jugador 2');
                 return;
             }
 
             // si faltan PERSONAJES (y ya están los nombres), especifica quién
             if (allNames && !allChars) {
-                if (!p1HasChar && !p2HasChar) this.turnText.setText('Faltan los personajes del Jugador 1 y Jugador 2');
-                else if (!p1HasChar) this.turnText.setText('Falta el personaje del Jugador 1');
-                else this.turnText.setText('Falta el personaje del Jugador 2');
+                if (!p1HasChar && !p2HasChar) this.turnText.setText('Faltan los personajes de Jugador 1 y Jugador 2');
+                else if (!p1HasChar) this.turnText.setText('Falta el personaje de Jugador 1');
+                else this.turnText.setText('Falta el personaje de Jugador 2');
                 return;
             }
 
@@ -487,7 +496,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
                 return;
             }
 
-            this.turnText.setText(`Turno: Jugador ${this.currentTurn + 1}`);
+            this.turnText.setText(`TURNO: Jugador ${this.currentTurn + 1}`);
         }
 
         if (this.mode === 'online') {

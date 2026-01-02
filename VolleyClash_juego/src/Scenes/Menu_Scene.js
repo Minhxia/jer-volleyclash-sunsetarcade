@@ -46,14 +46,14 @@ export class Menu_Scene extends Phaser.Scene {
         background.setDisplaySize(width, height);
         
         // título del juego
-        this.add.text(rightHalfX, 100, 'Volley Clash', {
+        this.add.text(rightHalfX, 115, 'Volley Clash', {
             ...style,
             fontSize: '68px',
             color: '#ffffff'
         }).setOrigin(0.5);
 
         //// BOTONES ////
-        const firstButtonY = height / 2 - 60;
+        const firstButtonY = height / 2 - 63;
         const buttonSpacing = 70;
         const buttonTextStyle = { ...style, fontSize: '28px', color: '#000000' };
 
@@ -72,7 +72,7 @@ export class Menu_Scene extends Phaser.Scene {
             x: rightHalfX,
             y: firstButtonY + buttonSpacing,
             label: 'Tutorial',
-            onClick: () => this.scene.start('Tutorial_Scene'),
+            onClick: () => this.scene.start('Tutorial_Scene', { returnScene: 'Menu_Scene' }),
             textStyle: buttonTextStyle,
             clickSoundKey: 'sonidoClick',
         });
@@ -99,8 +99,8 @@ export class Menu_Scene extends Phaser.Scene {
 
         // botón de cerrar sesión
         createUIButton(this, {
-            x: width - 100,
-            y: 50,
+            x: width - 115,
+            y: 40,
             label: 'Cerrar Sesión',
             onClick: () => { this.handleLogout() },
             textStyle: buttonTextStyle,
@@ -110,7 +110,7 @@ export class Menu_Scene extends Phaser.Scene {
 
         // logo de la empresa
         this.add.image(this.scale.width - 20, this.scale.height - 20, 'logoEmpresa')
-            .setScale(0.5)
+            .setScale(0.42)
             .setOrigin(1, 1);
     }
 

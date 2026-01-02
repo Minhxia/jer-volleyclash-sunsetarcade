@@ -39,15 +39,16 @@ export class Credits_Scene extends Phaser.Scene {
             .setOrigin(0)
             .setDepth(-1);
 
-        // nombres del equipo
+        // nombre y miembros del equipo
         const nombresEquipo = [
             'GRUPO 5 - SUNSET ARCADE',
             'Sara Bueno Esteban',
-            'Antonio Morín Barrera',
+            'Antonio Morán Barrera',
             'Cristine Nioka Tewo',
             'Alvaro Ibáñez Montero',
         ];
 
+        //tarjeta donde se muestra el nombre del equipo y los miembros
         const cardWidth = width * 0.38;
         const cardHeight = height * 0.46;
         const cardX = width * 0.75;
@@ -83,11 +84,11 @@ export class Credits_Scene extends Phaser.Scene {
 
         // logo empresa
         const logoX = cardX;
-        const logoY = cardY + (cardHeight / 2) + height * 0.16;
+        const logoY = cardY + (cardHeight / 2) + height * 0.16 - 3;
         this.add
             .image(logoX, logoY, 'logo')
             .setOrigin(0.5)
-            .setScale(0.6);
+            .setScale(0.7);
 
         // botón Volver atrás
         createIconButton(this, {

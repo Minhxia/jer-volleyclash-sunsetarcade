@@ -67,10 +67,10 @@ export class Tutorial_Scene extends Phaser.Scene {
             texture: 'botonVolver',
             scale: 1,
             hoverScale: 1.1,
-            onClick: () => this.scene.start('Menu_Scene'),
+            onClick: () => this.scene.start(this.returnScene),
         });
 
-        // contenido del tutorial (slides o páginas)
+        // contenido del tutorial (slides)
         this.pageIndex = 0;
         this.pages = [
             { key: 'tut0_controles', title: 'Controles' },
@@ -80,7 +80,7 @@ export class Tutorial_Scene extends Phaser.Scene {
             { key: 'tut4_lista', title: 'Lista de power-ups' }
         ];
 
-        // panel para imagenes: maximo tamano con margenes
+        // panel para las imágenes
         const panelMargin = Math.max(8, Math.round(Math.min(width, height) * 0.015));
         const panelGap = Math.max(6, Math.round(height * 0.012));
         const navY = height * 0.91;

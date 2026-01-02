@@ -31,6 +31,7 @@ export class Game_Scene extends Phaser.Scene {
         this.setsP2 = 0;
         this.maxSets = 3; // mejor de 3
         this.currentSet = 1; // set actual
+        this.isGoldenPoint = false;
     }
 
     preload() {
@@ -148,10 +149,43 @@ export class Game_Scene extends Phaser.Scene {
         .setOrigin(0.5)
         .setDepth(9999);
 
-        // texto para mostrar el ganador del set
-        this.setWinnerText = this.add.text(this.scale.width / 2, 185, '', {
+        const setFrameWidth = this.setFrame.displayWidth;
+        const setFrameHeight = this.setFrame.displayHeight;
+        const setScoreY = this.setFrame.y + Math.round(setFrameHeight / 2) + 13;
+        const setScoreOffsetX = Math.round(setFrameWidth * 0.22);
+        const setScoreFrameScaleX = 0.4;
+        const setScoreFrameScaleY = 0.38;
+
+        this.setScoreFrameLeft = this.add.image(this.scale.width / 2 - setScoreOffsetX, setScoreY, 'marcoGeneral')
+            .setOrigin(0.5)
+            .setScale(setScoreFrameScaleX, setScoreFrameScaleY)
+            .setDepth(9998);
+
+        this.setScoreFrameRight = this.add.image(this.scale.width / 2 + setScoreOffsetX, setScoreY, 'marcoGeneral')
+            .setOrigin(0.5)
+            .setScale(setScoreFrameScaleX, setScoreFrameScaleY)
+            .setDepth(9998);
+
+        this.setScoreLeft = this.add.text(this.scale.width / 2 - setScoreOffsetX, setScoreY, `${this.setsP1}`, {
             ...style,
-            fontSize: '24px',
+            fontSize: '28px',
+            color: '#ffffff'
+        })
+        .setOrigin(0.5)
+        .setDepth(9999);
+
+        this.setScoreRight = this.add.text(this.scale.width / 2 + setScoreOffsetX, setScoreY, `${this.setsP2}`, {
+            ...style,
+            fontSize: '28px',
+            color: '#ffffff'
+        })
+        .setOrigin(0.5)
+        .setDepth(9999);
+
+        // texto para mostrar el ganador del set
+        this.setWinnerText = this.add.text(this.scale.width / 2, 205, '', {
+            ...style,
+            fontSize: '28px',
             color: '#ffffff',
             stroke: '#000000',
             strokeThickness: 3
@@ -282,7 +316,7 @@ export class Game_Scene extends Phaser.Scene {
 
         // inicialización de la pelota
         this._createBall();
-        // empujon sutil para evitar que se quede sobre la red al inicio
+        // empujón sutíl para evitar que se quede sobre la red al inicio
         this.ball.setServePosition();
         // colliders de la pelota
         this._setupBallCollisions();
@@ -290,9 +324,10 @@ export class Game_Scene extends Phaser.Scene {
         this._setupBallEvents();
 
         this.input.keyboard.on("keydown-ESC", () => {
-            this.scene.pause();               // detiene el game loop
+            // se detiene el game loop
+            this.scene.pause();               
             this.timerEvent.paused = true;
-            this.scene.launch("Pause_Scene"); // muestra la escena de pausa
+            this.scene.launch("Pause_Scene");
         });
         this.events.on('resume', () => {
             this.timerEvent.paused = false;
@@ -406,9 +441,18 @@ export class Game_Scene extends Phaser.Scene {
             else if (this.scoreP2 > this.scoreP1) this._endSet("player2");
             else {
                 console.log("Empate en el set");
-                this._resetSet();
+                this.isGoldenPoint = true;
+                if (this.setWinnerText) {
+                    this.setWinnerText.setText('EMPATE: punto de oro');
+                    this.setWinnerText.setVisible(true);
+                }
             }
         }
+    }
+
+    updateSetScoreUI() {
+        if (this.setScoreLeft) this.setScoreLeft.setText(this.setsP1.toString());
+        if (this.setScoreRight) this.setScoreRight.setText(this.setsP2.toString());
     }
 
     // Actualiza la UI del inventario de power-ups de un jugador
@@ -824,6 +868,13 @@ export class Game_Scene extends Phaser.Scene {
             // se reproduce el efecto de sonido de punto
             this.playSfx(this.sfx.point);
 
+            if (this.isGoldenPoint) {
+                this.isGoldenPoint = false;
+                this._endSet(scorerId);
+                return;
+            }
+
+
             // condición de 11 puntos con 2 de diferencia
             this._checkWinCondition();
         });
@@ -887,6 +938,8 @@ export class Game_Scene extends Phaser.Scene {
 
         console.log(`Set terminado. Score sets: P1=${this.setsP1}, P2=${this.setsP2}`);
 
+        this.updateSetScoreUI();
+
         // mostrar mensaje de ganador de set
         const winnerLabel = (winner === 'player1') ? 'Jugador 1' : 'Jugador 2';
         this.setWinnerText.setText(`Set para ${winnerLabel}`);
@@ -916,6 +969,7 @@ export class Game_Scene extends Phaser.Scene {
 
     // Reinicia el estado para un nuevo set
     _resetSet() {
+        this.isGoldenPoint = false;
         // se actualiza el texto del set actual
         this.setText.setText(`SET ${this.currentSet}`);
 

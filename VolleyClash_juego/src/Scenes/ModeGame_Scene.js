@@ -43,9 +43,8 @@ export class ModeGame_Scene extends Phaser.Scene {
         this.add
             .text(width / 2, height * 0.18, 'Modo de Juego', {
                 ...style,
-                fontSize: '40px',
-                color: '#000000',
-                fontStyle: 'bold',
+                fontSize: '42px',
+                color: '#5f0000ff'
             })
             .setOrigin(0.5);
 
@@ -56,7 +55,7 @@ export class ModeGame_Scene extends Phaser.Scene {
 
         const buttonTextStyle = {
             ...style,
-            fontSize: '24px',
+            fontSize: '28px',
             color: '#000000',
         };
 

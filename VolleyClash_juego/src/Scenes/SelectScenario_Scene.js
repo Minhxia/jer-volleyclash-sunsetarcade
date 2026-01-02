@@ -56,9 +56,8 @@ export class SelectScenario_Scene extends Phaser.Scene {
         // Título
         this.add.text(width / 2, 50, 'Selecciona Escenario', {
             ...style,
-            fontSize: '40px',
-            color: '#000',
-            fontStyle: 'bold'
+            fontSize: '42px',
+            color: '#5f0000ff'
         }).setOrigin(0.5);
 
         // Imagen del escenario seleccionado
@@ -91,7 +90,7 @@ export class SelectScenario_Scene extends Phaser.Scene {
             scenarioButtons[nombre] = boton;
 
             // texto en el centro
-            const texto = this.add.text(0, 0, nombre, { ...style, fontSize: '24px', color: '#000' });
+            const texto = this.add.text(0, 0, nombre, { ...style, fontSize: '28px', color: '#000' });
             Phaser.Display.Align.In.Center(texto, boton);
 
             // hover
@@ -149,7 +148,7 @@ export class SelectScenario_Scene extends Phaser.Scene {
             scale: 1.5,
             textureNormal: 'botonSimple',
             textureHover: 'botonSimpleSeleccionado',
-            textStyle: { ...style, fontSize: '12px', color: '#000' },
+            textStyle: { ...style, fontSize: '18px', color: '#000' },
             clickSoundKey: 'sonidoClick',
         });
 

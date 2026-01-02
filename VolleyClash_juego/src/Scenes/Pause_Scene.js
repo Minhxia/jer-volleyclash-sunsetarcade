@@ -23,25 +23,30 @@ export class Pause_Scene extends Phaser.Scene {
         const { width, height } = this.scale;
         const centerX = width / 2;
 
-        this.add.image(0, 0, 'fondo').setOrigin(0).setDepth(-1);
+        this.add.rectangle(0, 0, width, height, 0x000000, 0.88)
+            .setOrigin(0)
+            .setDepth(-1);
 
         // Título
-        this.add.text(centerX, height * 0.18, 'PAUSA', {
+        this.add.text(centerX, height * 0.18, 'Pausa', {
             ...style,
-            fontSize: '32px',
-            color: '#5f0000ff'
+            fontSize: '42px',
+            color: '#ffffff'
         }).setOrigin(0.5);
 
         const buttonTextStyle = {
             ...style,
-            fontSize: '20px',
+            fontSize: '28px',
             color: '#000000'
         };
+
+        const buttonStartY = height * 0.46;
+        const buttonSpacing = height * 0.14;
 
         // botón Continuar
         createUIButton(this, {
             x: centerX,
-            y: height * 0.52,
+            y: buttonStartY,
             label: 'Continuar',
             textStyle: buttonTextStyle,
             scale: 2,
@@ -51,10 +56,22 @@ export class Pause_Scene extends Phaser.Scene {
             }
         });
 
+        // boton Tutorial
+        createUIButton(this, {
+            x: centerX,
+            y: buttonStartY + buttonSpacing,
+            label: 'Tutorial',
+            textStyle: buttonTextStyle,
+            scale: 2,
+            onClick: () => {
+                this.scene.start('Tutorial_Scene', { returnScene: 'Pause_Scene' });
+            }
+        });
+
         // botón Menú Principal
         createUIButton(this, {
             x: centerX,
-            y: height * 0.66,
+            y: buttonStartY + buttonSpacing * 2,
             label: 'Menú Principal',
             textStyle: buttonTextStyle,
             scale: 2,
