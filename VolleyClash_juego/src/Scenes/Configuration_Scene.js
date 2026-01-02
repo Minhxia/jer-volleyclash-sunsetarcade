@@ -32,10 +32,10 @@ export class Configuration_Scene extends Phaser.Scene {
             .setDepth(-1)
             .setDisplaySize(width, height);
 
-        // Título de la escena
+        // Título
         this.add.text(centerX, height * 0.1, 'Configuración', {
             ...style,
-            fontSize: '32px',
+            fontSize: '42px',
             color: '#5f0000ff'
         }).setOrigin(0.5);
 
@@ -48,15 +48,29 @@ export class Configuration_Scene extends Phaser.Scene {
         // se aplica el volumen nada mas cargar
         applyStoredVolume(this);
 
-        // Subtitulo global
-        this.add.text(centerX, height * 0.18, 'Volumen General', {
+        // layout de los sliders
+        const sections = 3;
+        const sectionGap = height * 0.18;
+        const labelToSliderGap = height * 0.05;
+        const groupHeight = (sections - 1) * sectionGap + labelToSliderGap;
+        const groupTopY = (height / 2) - (groupHeight / 2);
+
+        const globalLabelY = groupTopY;
+        const globalSliderY = globalLabelY + labelToSliderGap;
+        const musicLabelY = groupTopY + sectionGap;
+        const musicSliderY = musicLabelY + labelToSliderGap;
+        const sfxLabelY = groupTopY + (sectionGap * 2);
+        const sfxSliderY = sfxLabelY + labelToSliderGap;
+
+        // Subtítulo global
+        this.add.text(centerX, globalLabelY, 'Volumen General', {
             ...style, 
-            fontSize: '24px', 
+            fontSize: '28px', 
             color: '#000'
         }).setOrigin(0.5);
 
         // barra de volumen (global)
-        this.globalVolumeSlider = this.add.dom(centerX, height * 0.24)
+        this.globalVolumeSlider = this.add.dom(centerX, globalSliderY)
             .createFromHTML(`<input type="range" min="0" max="1" step="0.01" value="${initialGlobalVolume}" 
                 style="width:220px; height:20px; accent-color:#00aaff; border-radius:5px;"/>`);
 
@@ -68,16 +82,16 @@ export class Configuration_Scene extends Phaser.Scene {
         });
 
 
-        // Subtitulo de musica
-        this.add.text(centerX, height * 0.32, 'Volumen de la Música', {
+        // Subtítulo de música
+        this.add.text(centerX, musicLabelY, 'Volumen Música', {
             ...style,
-            fontSize: '24px',
+            fontSize: '28px',
             color: '#000'
         }).setOrigin(0.5);
 
-        // barra de volumen (musica)
+        // barra de volumen (música)
         this.musicVolumeSlider = this.add
-            .dom(centerX, height * 0.38)
+            .dom(centerX, musicSliderY)
             .createFromHTML(`<input type="range" min="0" max="1" step="0.01" value="${initialMusicVolume}"
                 style="width:220px; height:20px; accent-color:#00aaff; border-radius:5px;"/>
             `);
@@ -91,16 +105,16 @@ export class Configuration_Scene extends Phaser.Scene {
             applyStoredVolume(this);
         });
 
-        // Subtitulo de efectos
-        this.add.text(centerX, height * 0.46, 'Volumen de Efectos', {
+        // Subtítulo de efectos
+        this.add.text(centerX, sfxLabelY, 'Volumen Efectos', {
             ...style,
-            fontSize: '24px',
+            fontSize: '28px',
             color: '#000'
         }).setOrigin(0.5);
 
         // barra de volumen (efectos)
         this.sfxVolumeSlider = this.add
-            .dom(centerX, height * 0.52)
+            .dom(centerX, sfxSliderY)
             .createFromHTML(`<input type="range" min="0" max="1" step="0.01" value="${initialSfxVolume}"
                 style="width:220px; height:20px; accent-color:#00aaff; border-radius:5px;"/>
             `);
@@ -116,7 +130,8 @@ export class Configuration_Scene extends Phaser.Scene {
 
         this.sfxVolumeSlider.addListener('change');
         this.sfxVolumeSlider.on('change', (event) => {
-            playClick(this, 'sonidoClick'); // se reproduce al soltar
+            // se reproduce al soltar para dar feedback
+            playClick(this, 'sonidoClick');
         });
         ////////
 

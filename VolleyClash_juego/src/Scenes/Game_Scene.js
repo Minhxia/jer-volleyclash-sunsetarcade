@@ -237,9 +237,9 @@ export class Game_Scene extends Phaser.Scene {
         // la aparición de power-ups son menos frecuentes y con pesos, para que unos salgan
         // más que otros (por ejemplo, se reduce la aparición de paralizar)
         this.powerUpSpawnConfig = {
-            // entre 3.5 y 8 segundos
+            // entre 3.5 y 7 segundos
             minDelayMs: 3500,
-            maxDelayMs: 8000,
+            maxDelayMs: 7000,
             weights: {
                 velocidad: 3,
                 ralentizar: 2,
@@ -248,7 +248,9 @@ export class Game_Scene extends Phaser.Scene {
                 por3: 2
             },
             cooldownMs: {
-                paralizar: 12000
+                // para evitar que salgan muy seguidos y un jugador no pueda moverse
+                // durante mucho tiempo
+                paralizar: 10000
             }
         };
         this.powerUpLastSpawnAt = {};
@@ -315,7 +317,7 @@ export class Game_Scene extends Phaser.Scene {
                 }
             }
 
-            this.schedulePowerUpSpawn(); // siguiente con nuevo delay random
+            this.schedulePowerUpSpawn(); // recursivo
         });
     }
 

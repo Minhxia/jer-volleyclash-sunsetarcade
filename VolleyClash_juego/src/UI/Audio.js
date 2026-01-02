@@ -99,12 +99,12 @@ export function applyStoredVolume(scene, options = {}) {
         musicVolume = options.musicVolume ?? musicVolume;
     }
 
-    // Mantener el sound manager en 1 para que musica y efectos sean independientes.
-    scene.sound.volume = globalVol * sfxVolume;
+    // se usa el volumen global como master
+    scene.sound.volume = globalVol;
 
     const music = scene.game.globals.music;
     if (music && 'setVolume' in music) {
-        music.setVolume(musicVolume * globalVol);
+        music.setVolume(musicVolume);
     }
 }
 
@@ -116,17 +116,14 @@ export function playClick(scene, key = 'sonidoClick') {
 // Reproduce la música de fondo en bucle
 export function ensureLoopingMusic(scene, soundKey, { loop = true } = {}) {
     const volume = getStoredMusicVolume();
-    const globalVol = getStoredGlobalVolume();
-    const finalVolume = volume * globalVol;
-
     let music = scene.game.globals.music;
     if (!music) {
-        music = scene.sound.add(soundKey, { loop, finalVolume });
+        music = scene.sound.add(soundKey, { loop, volume });
         scene.game.globals.music = music;
     }
 
     // se actualiza volumen si el tipo lo soporta
-    if (music && 'setVolume' in music) music.setVolume(finalVolume);
+    if (music && 'setVolume' in music) music.setVolume(volume);
 
     const tryPlay = () => {
         if (!music || !('play' in music)) return;

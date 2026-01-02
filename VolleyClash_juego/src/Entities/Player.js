@@ -2,10 +2,10 @@
 
 const POWERUP_DURATION_MS = {
   velocidad: 4000,
-  ralentizar: 3500,
-  paralizar: 2000,
+  ralentizar: 4000,
+  paralizar: 2500,
   por2: 4000,
-  por3: 3500,
+  por3: 4000,
 };
 
 const SPEED_MULT = {
@@ -475,6 +475,7 @@ export class Player {
 
 
     //// EFECTOS VISUALES DE LOS POWER-UPS ////
+    // paralizar -> rojo + parpadeo
     setParalyzed(isParalyzed) {
         this.isParalyzed = isParalyzed;
 
@@ -514,7 +515,7 @@ export class Player {
         }
     }    
 
-    // velocidad -> cian/verde
+    // velocidad -> naranja
     setSpeedEffect(active) {
         this.speedEffectActive = active;
         this.refreshPowerUpVisuals();
@@ -589,17 +590,17 @@ export class Player {
             return;
         }
 
-        // Phaser solo permite un color/tint a la vez por sprite, por eso la
-        // prioridad visual es: ralentizado > velocidad > multiplicador
+        // Phaser solo permite un color a la vez por sprite, por eso la
+        // prioridad visual es: ralentizar > velocidad > multiplicador
         if (this.slowEffectActive) {
-            // azul oscuro para "pesado / lento"
+            // azul oscuro para ralentizar
             this.sprite.setTint(0x5555ff);
         } else if (this.speedEffectActive) {
-            // cian/verde para "rápido"
-            this.sprite.setTint(0x55ffdd);
+            // naranja para velocidad
+            this.sprite.setTint(0xff8c00);
         } else if (this.scoreMultiplier > 1) {
-            // dorado para "x2 / x3 puntos"
-            this.sprite.setTint(0xffdd55);
+            // verde para x2 / x3
+            this.sprite.setTint(0x32cd32);
         } else {
             // sin efectos
             this.sprite.clearTint();
