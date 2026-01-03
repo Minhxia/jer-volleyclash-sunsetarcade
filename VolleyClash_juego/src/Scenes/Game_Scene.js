@@ -325,9 +325,15 @@ export class Game_Scene extends Phaser.Scene {
 
         this.input.keyboard.on("keydown-ESC", () => {
             // se detiene el game loop
-            this.scene.pause();               
+            this.scene.pause();
             this.timerEvent.paused = true;
             this.scene.launch("Pause_Scene");
+        });
+
+        // acceso directo a la escena de fin de partida
+        this.input.keyboard.on("keydown-F", () => {
+            const winner = this.scoreP1 >= this.scoreP2 ? "player1" : "player2";
+            this._endGame(winner);
         });
         this.events.on('resume', () => {
             this.timerEvent.paused = false;
@@ -903,8 +909,9 @@ export class Game_Scene extends Phaser.Scene {
         }
 
         const facingRight = player.facing === 'right';
-        const reachForward = body.width * (isReceiving ? 0.9 : 0.75);
-        const reachBack = body.width * (isReceiving ? 0.25 : 0.15);
+        const wideHit = isReceiving || isJumping;
+        const reachForward = body.width * (wideHit ? 0.9 : 0.75);
+        const reachBack = body.width * (wideHit ? 0.25 : 0.15);
         const minX = facingRight ? bodyCenterX - reachBack : bodyCenterX - reachForward;
         const maxX = facingRight ? bodyCenterX + reachForward : bodyCenterX + reachBack;
 

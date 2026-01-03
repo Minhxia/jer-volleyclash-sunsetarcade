@@ -72,7 +72,7 @@ export class Ball {
         if (isReceiving) {
             // recepción: parábola larga y ancha (trayectoria defensiva)
             // menor velocidad horizontal, mayor velocidad vertical para el arco
-            const baseSpeedX = 160;
+            const baseSpeedX = 180;
             const verticalStrength = -310; // componente vertical mayor para el arco
             const randomFactorX = this._getRandomFactor();
             const randomFactorY = this._getRandomFactor();

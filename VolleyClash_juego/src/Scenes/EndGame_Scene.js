@@ -29,43 +29,53 @@ export class EndGame_Scene extends Phaser.Scene {
         const charP1 = this.player1.name;
         const charP2 = this.player2.name;
 
-        // Fondo (color crema)
+        // Fondo
         this.add.image(0, 0, 'fondo').setOrigin(0).setDepth(-1);
 
-        // Título principal
-        this.add.text(width / 2, height * 0.18, "¡FIN DEL PARTIDO!", {
+        // Título
+        this.add.text(width / 2, height * 0.18, "¡Fin del partido!", {
             ...style,
-            fontSize: '64px',
+            fontSize: '42px',
             color: '#5f0000ff'
         }).setOrigin(0.5);
 
-        // Texto del ganador
+        const winnerTextY = height * 0.36;
+        const spriteRowY = height * 0.52;
+        const buttonY = height * 0.90;
+        const spriteOffsetX = width * 0.2;
+
+        // Texto indicando el ganador
         const winnerText =
             this.winner === "player1"
-                ? "Ganador: " + charP1
-                : "Ganador: " + charP2;
+                ? "Victoria de: " + charP1
+                : "Victoria de: " + charP2;
 
-        this.add.text(width / 2, height * 0.40, winnerText, {
+        this.add.text(width / 2, winnerTextY, winnerText, {
             ...style,
             fontSize: '32px',
             color: '#5f0000ff'
         }).setOrigin(0.5);
 
+        // Huecos para sprites de ganador y perdedor (animaciones futuras)
+        this.winnerSpriteSlot = this.add.container(width / 2 - spriteOffsetX, spriteRowY);
+        this.loserSpriteSlot = this.add.container(width / 2 + spriteOffsetX, spriteRowY);
+
+
         // botón para volver al menú principal
         const buttonTextStyle = {
             ...style,
-            fontSize: '26px',
+            fontSize: '28px',
             color: '#000000'
         };
         createUIButton(this, {
             x: width / 2,
-            y: height * 0.60,
-            label: 'Volver a inicio',
-            textStyle: buttonTextStyle,
-            scale: 3,
+            y: buttonY,
+            label: 'Menú Principal',
             onClick: () => {
                 this.scene.start('Menu_Scene');
-            }
+            },
+            textStyle: buttonTextStyle,
+            clickSoundKey: 'sonidoClick',
         });
     }
 }
