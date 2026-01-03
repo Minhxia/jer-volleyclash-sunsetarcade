@@ -10,8 +10,6 @@ import { ModeGame_Scene } from "./Scenes/ModeGame_Scene.js";
 import { Pause_Scene } from "./Scenes/Pause_Scene.js";
 import { SelectPlayer_Scene } from "./Scenes/SelectPlayer_Scene.js";
 import { SelectScenario_Scene } from "./Scenes/SelectScenario_Scene.js";
-import { Lobby_Scene } from "./Scenes/Lobby_Scene.js";
-import { Logging_Scene } from "./Scenes/Logging_Scene.js";
 
 (async () => {
     // fallback para evitar problemas con las fuentes personalizadas
@@ -36,7 +34,7 @@ import { Logging_Scene } from "./Scenes/Logging_Scene.js";
         physics: {
             default: 'arcade',
             arcade: {
-                gravity: {x: 0, y: 300},
+                gravity: { x: 0, y: 300 },
                 debug: false // poner a true para ver las líneas de los cuerpos físicos
             }
         },
@@ -48,18 +46,9 @@ import { Logging_Scene } from "./Scenes/Logging_Scene.js";
                 game.globals = globals;
             }
         },
-        scene: [Logging_Scene, Menu_Scene, Game_Scene, Tutorial_Scene, Configuration_Scene, Credits_Scene, EndGame_Scene, Pause_Scene, ModeGame_Scene, SelectPlayer_Scene, SelectScenario_Scene, Lobby_Scene],
-        backgroundColor:'#8675f1',
+        scene: [Menu_Scene, Game_Scene, Tutorial_Scene, Configuration_Scene, Credits_Scene, EndGame_Scene, Pause_Scene, ModeGame_Scene, SelectPlayer_Scene, SelectScenario_Scene],
+        backgroundColor: '#8675f1',
     };
 
-    const game =new Phaser.Game(config);
-
-    window.addEventListener('beforeunload', () => {
-        const username = game.registry.get('username');
-        if (username) {
-            const data = JSON.stringify({ username });
-            const blob = new Blob([data], { type: 'application/json' });
-            navigator.sendBeacon('/api/logout', blob);
-        }
-    });
+    const game = new Phaser.Game(config);
 })();

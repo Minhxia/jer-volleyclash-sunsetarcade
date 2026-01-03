@@ -73,7 +73,7 @@ export class Ball {
             // recepción: parábola larga y ancha (trayectoria defensiva)
             // menor velocidad horizontal, mayor velocidad vertical para el arco
             const baseSpeedX = 180;
-            const verticalStrength = -310; // componente vertical mayor para el arco
+            const verticalStrength = -350; // componente vertical mayor para el arco
             const randomFactorX = this._getRandomFactor();
             const randomFactorY = this._getRandomFactor();
 
@@ -87,7 +87,7 @@ export class Ball {
             // salto/ataque: horizontal fuerte, vertical débil (remate/smash)
             // alta velocidad horizontal, baja velocidad vertical para trayectoria plana
             const baseSpeedX = 220;
-            const verticalStrength = -140; // componente vertical bajo para ataque plano
+            const verticalStrength = -150; // componente vertical bajo para ataque plano
             const randomFactorX = this._getRandomFactor();
             const randomFactorY = this._getRandomFactor();
 

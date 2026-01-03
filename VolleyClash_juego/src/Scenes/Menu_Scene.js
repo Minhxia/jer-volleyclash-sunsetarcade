@@ -96,44 +96,11 @@ export class Menu_Scene extends Phaser.Scene {
             textStyle: buttonTextStyle,
             clickSoundKey: 'sonidoClick',
         });
-
-        // botón de cerrar sesión
-        createUIButton(this, {
-            x: width - 115,
-            y: 40,
-            label: 'Cerrar Sesión',
-            onClick: () => { this.handleLogout() },
-            textStyle: buttonTextStyle,
-            clickSoundKey: 'sonidoClick',
-        });
         /////////
 
         // logo de la empresa
         this.add.image(this.scale.width - 20, this.scale.height - 20, 'logoEmpresa')
             .setScale(0.42)
             .setOrigin(1, 1);
-    }
-
-    async handleLogout() {
-        const username = this.registry.get('username');
-        
-        // Avisar al servidor para que deje libre el puesto de Host
-        await fetch('/api/logout', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username })
-        });
-
-        // Limpiar local
-        localStorage.removeItem('voley_username');
-        localStorage.removeItem('voley_session_token');
-
-        // Limpiar registry
-        this.registry.remove('username');
-        this.registry.remove('userToken');
-        this.registry.remove('isHost');
-
-        // Volver a la pantalla de login
-        this.scene.start('Logging_Scene');
     }
 }

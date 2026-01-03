@@ -1,4 +1,4 @@
-// Pantalla para elegir Modo de Juego
+﻿// Pantalla para elegir Modo de Juego
 import Phaser from 'phaser';
 import { createUIButton, createIconButton } from '../UI/Buttons.js';
 import { applyStoredVolume } from '../UI/Audio.js';
@@ -23,7 +23,7 @@ export class ModeGame_Scene extends Phaser.Scene {
 
     create() {
         const { width, height } = this.scale;
-        
+
         const style = this.game.globals?.defaultTextStyle ?? {
             fontFamily: 'Arial',
             fontSize: '20px',
@@ -79,17 +79,30 @@ export class ModeGame_Scene extends Phaser.Scene {
         });
 
         // Botón RED
-        createUIButton(this, {
+        const redButton = createUIButton(this, {
             x: startX + spacing,
             y: buttonY,
             label: 'Red',
-            onClick: () => startMode('online'),
+            onClick: null,
             scale: 2,
             textureNormal: 'botonSinSeleccionar',
             textureHover: 'botonSeleccionado',
             textStyle: buttonTextStyle,
             clickSoundKey: 'sonidoClick',
         });
+
+        redButton.button.disableInteractive();
+        redButton.button.setAlpha(0.5);
+        redButton.text.setAlpha(0.5);
+        redButton.text.setAlign('center');
+
+        // texto "No disponible" debajo del botón
+        this.add.text(
+            redButton.button.x,
+            redButton.button.y + Math.round(redButton.button.displayHeight * 0.55) + 12,
+            'No disponible',
+            { ...buttonTextStyle, fontFamily: 'VT323', fontSize: '24px', color: '#ff0000' }
+        ).setOrigin(0.5);
 
         // Botón volver
         createIconButton(this, {
@@ -103,3 +116,6 @@ export class ModeGame_Scene extends Phaser.Scene {
         });
     }
 }
+
+
+
