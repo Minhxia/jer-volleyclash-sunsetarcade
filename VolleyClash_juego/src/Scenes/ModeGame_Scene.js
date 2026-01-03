@@ -6,6 +6,7 @@ import { applyStoredVolume } from '../UI/Audio.js';
 export class ModeGame_Scene extends Phaser.Scene {
     constructor() {
         super('ModeGame_Scene');
+        this.serverActive = false; // inicializar
     }
 
     preload() {
@@ -62,7 +63,7 @@ export class ModeGame_Scene extends Phaser.Scene {
         const startMode = (mode) => {
             this.registry.set('mode', mode);
             console.log('Modo seleccionado:', mode);
-            this.scene.start('SelectPlayer_Scene', { mode: mode });
+            this.scene.start('SelectPlayer_Scene', { mode });
         };
 
         // Botón LOCAL
@@ -83,13 +84,20 @@ export class ModeGame_Scene extends Phaser.Scene {
             x: startX + spacing,
             y: buttonY,
             label: 'Red',
-            onClick: () => startMode('online'),
+            onClick: () => {
+                if (this.serverActive) {
+                    startMode('online');
+                } else {
+                    console.log('Servidor no disponible');
+                }
+            },
             scale: 2,
             textureNormal: 'botonSinSeleccionar',
             textureHover: 'botonSeleccionado',
             textStyle: buttonTextStyle,
             clickSoundKey: 'sonidoClick',
         });
+
 
         // Botón volver
         createIconButton(this, {
@@ -101,5 +109,62 @@ export class ModeGame_Scene extends Phaser.Scene {
             clickSoundKey: 'sonidoClick',
             onClick: () => this.scene.start('Menu_Scene'),
         });
+
+        // CONEXIÓN A SERVIDOR Y JUGADORES CONECTADOS
+        // Textos
+        this.serverStatusText = this.add.text(width / 2, height * 0.30, 'Estado del servidor: comprobando...', {
+            ...style,
+            fontSize: '22px',
+            color: '#555555'
+        }).setOrigin(0.5);
+
+        this.playersCountText = this.add.text(width / 2, height * 0.36, 'Jugadores conectados: 0', {
+            ...style,
+            fontSize: '22px',
+            color: '#555555'
+        }).setOrigin(0.5);
+
+        // Llamadas iniciales
+        this.baseUrl = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
+        this.checkServerStatus();
+        this.updatePlayersCount();
+
+        // Timer para actualizar cada 3s
+        this.playersCountTimer = this.time.addEvent({
+            delay: 3000,
+            callback: () => this.updatePlayersCount(),
+            loop: true
+        });
     }
+    updatePlayersCount() {
+        fetch(`${this.baseUrl}/api/players/count`)
+            .then(res => res.json())
+            .then(data => {
+                this.playersCountText.setText(`Jugadores conectados: ${data.count}`);
+            })
+            .catch(() => {
+                this.playersCountText.setText('Jugadores conectados: -');
+            });
+    }
+
+    // Estado del servidor
+    checkServerStatus() {
+        fetch(`${this.baseUrl}/status`)
+            .then(res => res.text())
+            .then(data => {
+                const active = data === 'active';
+                this.serverActive = active;
+
+                this.serverStatusText
+                    .setText(`Estado del servidor: ${active ? 'ACTIVO' : 'INACTIVO'}`)
+                    .setColor(active ? '#00AA00' : '#AA0000');
+            })
+            .catch(() => {
+                this.serverActive = false;
+                this.serverStatusText
+                    .setText('Estado del servidor: NO DISPONIBLE')
+                    .setColor('#AA0000');
+            });
+    }
+
 }

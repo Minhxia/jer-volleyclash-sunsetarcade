@@ -84,7 +84,7 @@ export class Logging_Scene extends Phaser.Scene {
         // Botón Principal
         this.mainBtn = createUIButton(this, {
             x: centerX,
-            y: height * 0.65,
+            y: height * 0.63,
             label: 'ENTRAR',
             onClick: () => this.handleSubmit(),
             scale: 1.6,
@@ -94,8 +94,20 @@ export class Logging_Scene extends Phaser.Scene {
             clickSoundKey: 'sonidoClick'
         });
 
+        this.deleteBtn = createUIButton(this, {
+            x: centerX,
+            y: height * 0.75,
+            label: 'ELIMINAR CUENTA',
+            onClick: () => this.handleDeleteUser(),
+            scale: 1.6,
+            textureNormal: 'botonSimple',
+            textureHover: 'botonSimpleSeleccionado',
+            textStyle: { ...style, fontSize: '14px', color: '#FF0000' },
+            clickSoundKey: 'sonidoClick'
+        });
+        
         // Texto para alternar entre Login y Registro
-        this.toggleText = this.add.text(centerX, height * 0.75, '¿Aún no tienes cuenta? Regístrate aquí', {
+        this.toggleText = this.add.text(centerX, height * 0.65, '¿Aún no tienes cuenta? Regístrate aquí', {
             ...style, fontSize: '16px', color: '#0000EE', fontStyle: 'italic'
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
@@ -119,10 +131,19 @@ export class Logging_Scene extends Phaser.Scene {
     }
 
     toggleMode() {
-        this.isRegistering = !this.isRegistering;
-        this.titleText.setText(this.isRegistering ? 'REGISTRARSE' : 'INICIAR SESIÓN');
-        this.mainBtn.text.setText(this.isRegistering ? 'CREAR CUENTA' : 'ENTRAR');
-        this.toggleText.setText(this.isRegistering ? '¿Ya tienes cuenta? Inicia sesión' : '¿Aún no tienes cuenta? Regístrate aquí');
+        this.isRegistering = !this.isRegistering; // alterna entre login y registro
+
+        if (this.isRegistering) {
+            this.titleText.setText('REGISTRARSE');
+            this.mainBtn.text.setText('CREAR CUENTA');
+            this.toggleText.setText('¿Ya tienes cuenta? Inicia sesión');
+            this.deleteBtn.container.setVisible(false); // oculta el botón en registro
+        } else {
+            this.titleText.setText('INICIAR SESIÓN');
+            this.mainBtn.text.setText('ENTRAR');
+            this.toggleText.setText('¿Aún no tienes cuenta? Regístrate aquí');
+            this.deleteBtn.container.setVisible(true); // muestra el botón en login
+        }
     }
 
     async handleSubmit() {
@@ -182,4 +203,37 @@ export class Logging_Scene extends Phaser.Scene {
             alert("No se pudo conectar con el servidor.");
         }
     }
+
+    async handleDeleteUser() {
+        const username = this.userInput.value.trim();
+        const password = this.passInput.value.trim();
+
+        if (!username || !password) {
+            alert("Introduce usuario y contraseña para eliminar");
+            return;
+        }
+
+        if (!confirm(`¿Seguro que quieres eliminar "${username}"?`)) return;
+
+        try {
+            const response = await fetch(`${this.apiUrl}/users/${username}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password })
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                alert(`Usuario "${username}" eliminado`);
+                this.userInput.value = "";
+                this.passInput.value = "";
+            } else {
+                alert(data.error || 'Error eliminando el usuario');
+            }
+        } catch (err) {
+            console.error("Error conectando a la API:", err);
+            alert("No se pudo conectar con el servidor.");
+        }
+    }
+
 }

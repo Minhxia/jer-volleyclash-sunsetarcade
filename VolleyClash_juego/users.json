@@ -14,5 +14,19 @@
   {
     "username": "sara",
     "password": "1234"
+  },
+  {
+    "username": "aaaa",
+    "password": "1234",
+    "partidaJugadas": 0,
+    "partidasGanadas": 0,
+    "partidasPerdidas": 0
+  },
+  {
+    "username": "qqqq",
+    "password": "1234",
+    "partidaJugadas": 0,
+    "partidasGanadas": 0,
+    "partidasPerdidas": 0
   }
 ]
