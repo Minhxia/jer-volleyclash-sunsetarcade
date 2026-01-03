@@ -24,7 +24,10 @@ export class ModeGame_Scene extends Phaser.Scene {
 
     create() {
         const { width, height } = this.scale;
-        
+        this.serverCheck = setInterval(() => {
+            this.checkServerStatus();
+        }, 5000);
+
         const style = this.game.globals?.defaultTextStyle ?? {
             fontFamily: 'Arial',
             fontSize: '20px',
@@ -167,4 +170,9 @@ export class ModeGame_Scene extends Phaser.Scene {
             });
     }
 
+    shutdown() {
+        if (this.serverCheck) {
+            clearInterval(this.serverCheck);
+        }
+    }
 }

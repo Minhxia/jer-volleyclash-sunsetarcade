@@ -384,7 +384,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
     // Controla que pasa al hacer click en el botón Siguiente
     handleNext() {
         if (this.mode === 'local') {
-             const name1 = this.playerInputEls?.[0]?.value?.trim() ?? '';
+            const name1 = this.playerInputEls?.[0]?.value?.trim() ?? '';
             const p1HasChar = !!this.players?.[0]?.character;
 
             const name2 = this.playerInputEls?.[1]?.value?.trim() ?? '';

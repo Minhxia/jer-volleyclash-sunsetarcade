@@ -338,6 +338,7 @@ export class Game_Scene extends Phaser.Scene {
         this.events.on('resume', () => {
             this.timerEvent.paused = false;
         });
+
     }
 
     // Genera un nuevo power-up en una posición aleatoria cada cierto tiempo
@@ -951,6 +952,8 @@ export class Game_Scene extends Phaser.Scene {
             this.physics.world.pause();
         }
 
+        this.updateUserStats(winner);
+
         this.scene.start("EndGame_Scene", {
             winner: winner,
             player1: this.player1,
@@ -1050,4 +1053,30 @@ export class Game_Scene extends Phaser.Scene {
 
         this.playSfx(this.sfx.whistle);
     }
+
+    //actualizaciones a servidor
+    updateUserStats(winner) {
+    const username = this.registry.get('username');
+    if (!username) return;
+
+    const baseUrl = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
+
+    fetch(`${baseUrl}/api/game/finish`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            username: username,
+            winner: winner
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log('Estadísticas actualizadas:', data);
+    })
+    .catch(err => {
+        console.error('Error actualizando estadísticas', err);
+    });
+}
 }

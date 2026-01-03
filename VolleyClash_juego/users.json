@@ -30,9 +30,9 @@
   {
     "username": "aaaa",
     "password": "1234",
-    "partidaJugadas": 0,
-    "partidasGanadas": 0,
-    "partidasPerdidas": 0
+    "partidaJugadas": 3,
+    "partidasGanadas": 1,
+    "partidasPerdidas": 2
   },
   {
     "username": "qqqq",

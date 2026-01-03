@@ -177,10 +177,10 @@ app.put('/api/game/finish', (req, res) => {
 
     if (winner === "player1") {
         user.partidasGanadas++;
-        console.log(`🏆 ${username} ha GANADO la partida`);
+        console.log(`${username} ha GANADO la partida`);
     } else if (winner === "player2") {
         user.partidasPerdidas++;
-        console.log(`❌ ${username} ha PERDIDO la partida`);
+        console.log(`${username} ha PERDIDO la partida`);
     } else {
         return res.status(400).json({ error: 'Winner inválido' });
     }
