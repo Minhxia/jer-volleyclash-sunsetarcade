@@ -26,6 +26,11 @@ export class Ball {
         //this.isFirstServe = true;
     }
 
+    // Genera un número aleatorio para variar levemente la velocidad de la pelota
+    _getRandomFactor(min = 0.95, max = 1.05) {
+        return min + (max - min) * Math.random();
+    }
+
     // Se llama cuando un jugador golpea la pelota
     hit(player, playerFacingDirection, isJumping, isReceiving = false) {
         if (!this.isBallLive) return;
@@ -69,25 +74,29 @@ export class Ball {
             // menor velocidad horizontal, mayor velocidad vertical para el arco
             const baseSpeedX = 160;
             const verticalStrength = -310; // componente vertical mayor para el arco
+            const randomFactorX = this._getRandomFactor();
+            const randomFactorY = this._getRandomFactor();
 
             if (playerFacingDirection === 'left') {
-                velocityX = -baseSpeedX;
+                velocityX = -baseSpeedX * randomFactorX;
             } else {
-                velocityX = baseSpeedX;
+                velocityX = baseSpeedX * randomFactorX;
             }
-            velocityY = verticalStrength;
+            velocityY = verticalStrength * randomFactorY;
         } else if (isJumping) {
             // salto/ataque: horizontal fuerte, vertical débil (remate/smash)
             // alta velocidad horizontal, baja velocidad vertical para trayectoria plana
-            const baseSpeedX = 190;
+            const baseSpeedX = 220;
             const verticalStrength = -140; // componente vertical bajo para ataque plano
+            const randomFactorX = this._getRandomFactor();
+            const randomFactorY = this._getRandomFactor();
 
             if (playerFacingDirection === 'left') {
-                velocityX = -baseSpeedX;
+                velocityX = -baseSpeedX * randomFactorX;
             } else {
-                velocityX = baseSpeedX;
+                velocityX = baseSpeedX * randomFactorX;
             }
-            velocityY = verticalStrength;
+            velocityY = verticalStrength * randomFactorY;
         } else {
             // golpe regular desde el suelo
             const baseSpeedX = 180;

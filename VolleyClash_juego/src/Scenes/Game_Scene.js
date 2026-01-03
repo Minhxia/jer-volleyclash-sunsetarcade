@@ -880,6 +880,39 @@ export class Game_Scene extends Phaser.Scene {
         });
     }
 
+    // Verifica si la pelota está en la zona válida para golpearla
+    _isBallInHitZone(ballSprite, player, isJumping, isReceiving) {
+        const body = player.sprite.body;
+        if (!body) return false;
+
+        const ballX = ballSprite.x;
+        const ballY = ballSprite.y;
+        const bodyTop = body.y;
+        const bodyHeight = body.height;
+        const bodyCenterX = body.x + body.width * 0.5;
+
+        const zone = isJumping
+            ? { top: -0.1, bottom: 0.6 }
+            : (isReceiving ? { top: 0.35, bottom: 0.85 } : { top: 0.25, bottom: 0.85 });
+
+        const zoneTop = bodyTop + bodyHeight * zone.top;
+        const zoneBottom = bodyTop + bodyHeight * zone.bottom;
+
+        if (ballY < zoneTop || ballY > zoneBottom) {
+            return false;
+        }
+
+        const facingRight = player.facing === 'right';
+        const reachForward = body.width * (isReceiving ? 0.9 : 0.75);
+        const reachBack = body.width * (isReceiving ? 0.25 : 0.15);
+        const minX = facingRight ? bodyCenterX - reachBack : bodyCenterX - reachForward;
+        const maxX = facingRight ? bodyCenterX + reachForward : bodyCenterX + reachBack;
+
+        if (ballX < minX || ballX > maxX) return false;
+
+        return true;
+    }
+
     // Maneja colisión entre pelota y jugador
     _onBallPlayerCollision(ball, player) {
         if (!ball.isBallLive) return;
@@ -887,6 +920,10 @@ export class Game_Scene extends Phaser.Scene {
         const isJumping = !player.sprite.body.blocked.down;
         const isReceiving = player.isReceiving;
         const playerDirection = player.facing;
+
+        if (!this._isBallInHitZone(ball.sprite, player, isJumping, isReceiving)) {
+            return;
+        }
 
         ball.hit(player, playerDirection, isJumping, isReceiving);
     }
@@ -898,6 +935,9 @@ export class Game_Scene extends Phaser.Scene {
             this.timerEvent.remove(false);
             this.timerEvent = null;
         }
+
+        // silbato de final de partido
+        this.playSfx(this.sfx.whistle);
 
         // se detiene la física de esta escena antes de salir
         if (this.physics && this.physics.world) {
@@ -942,7 +982,7 @@ export class Game_Scene extends Phaser.Scene {
 
         // mostrar mensaje de ganador de set
         const winnerLabel = (winner === 'player1') ? 'Jugador 1' : 'Jugador 2';
-        this.setWinnerText.setText(`Set para ${winnerLabel}`);
+        this.setWinnerText.setText(`SET para ${winnerLabel}`);
         this.setWinnerText.setVisible(true);
 
         // Avanzar número de set
