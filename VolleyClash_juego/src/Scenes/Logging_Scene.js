@@ -1,6 +1,7 @@
 //Pantalla de Logging
 import Phaser from 'phaser';
 import { createUIButton, createIconButton } from '../UI/Buttons.js';
+import { flatMap } from 'lodash';
 
 export class Logging_Scene extends Phaser.Scene {
     constructor() {
@@ -83,23 +84,24 @@ export class Logging_Scene extends Phaser.Scene {
         // --- BOTONES ---
         // Botón Principal
         this.mainBtn = createUIButton(this, {
-            x: centerX,
-            y: height * 0.63,
+            x: centerX - 80,
+            y: height * 0.7,
             label: 'ENTRAR',
             onClick: () => this.handleSubmit(),
-            scale: 1.6,
+            scale: 2,
             textureNormal: 'botonSimple',
             textureHover: 'botonSimpleSeleccionado',
             textStyle: { ...style, fontSize: '14px', color: '#000' },
             clickSoundKey: 'sonidoClick'
         });
 
+        // Boton de Borrado
         this.deleteBtn = createUIButton(this, {
-            x: centerX,
-            y: height * 0.75,
+            x: centerX + 80,
+            y: height * 0.7,
             label: 'ELIMINAR CUENTA',
             onClick: () => this.handleDeleteUser(),
-            scale: 1.6,
+            scale: 2,
             textureNormal: 'botonSimple',
             textureHover: 'botonSimpleSeleccionado',
             textStyle: { ...style, fontSize: '14px', color: '#FF0000' },
@@ -107,7 +109,7 @@ export class Logging_Scene extends Phaser.Scene {
         });
         
         // Texto para alternar entre Login y Registro
-        this.toggleText = this.add.text(centerX, height * 0.65, '¿Aún no tienes cuenta? Regístrate aquí', {
+        this.toggleText = this.add.text(centerX, height * 0.62, '¿Aún no tienes cuenta? Regístrate aquí', {
             ...style, fontSize: '16px', color: '#0000EE', fontStyle: 'italic'
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
@@ -131,18 +133,28 @@ export class Logging_Scene extends Phaser.Scene {
     }
 
     toggleMode() {
-        this.isRegistering = !this.isRegistering; // alterna entre login y registro
+        this.isRegistering = !this.isRegistering;
+        const { width } = this.scale;
+        const centerX = width / 2;
+
+        this.titleText.setText(this.isRegistering ? 'REGISTRARSE' : 'INICIAR SESIÓN');
+        this.mainBtn.text.setText(this.isRegistering ? 'CREAR CUENTA' : 'ENTRAR');
+        this.toggleText.setText(this.isRegistering ? '¿Ya tienes cuenta? Inicia sesión' : '¿Aún no tienes cuenta? Regístrate aquí');
 
         if (this.isRegistering) {
-            this.titleText.setText('REGISTRARSE');
-            this.mainBtn.text.setText('CREAR CUENTA');
-            this.toggleText.setText('¿Ya tienes cuenta? Inicia sesión');
-            this.deleteBtn.container.setVisible(false); // oculta el botón en registro
+            // MODO REGISTRO: Botón principal al centro y ocultamos borrar
+            this.mainBtn.button.setX(centerX);
+            this.mainBtn.text.setX(centerX);
+
+            this.deleteBtn.button.setVisible(false);
+            this.deleteBtn.text.setVisible(false);
         } else {
-            this.titleText.setText('INICIAR SESIÓN');
-            this.mainBtn.text.setText('ENTRAR');
-            this.toggleText.setText('¿Aún no tienes cuenta? Regístrate aquí');
-            this.deleteBtn.container.setVisible(true); // muestra el botón en login
+            // MODO LOGIN: Volvemos a la posición original
+            this.mainBtn.button.setX(centerX - 80);
+            this.mainBtn.text.setX(centerX - 80);
+            
+            this.deleteBtn.button.setVisible(true);
+            this.deleteBtn.text.setVisible(true);
         }
     }
 

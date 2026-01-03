@@ -113,8 +113,9 @@ export class Tutorial_Scene extends Phaser.Scene {
 
         // BOTONES DE NAVEGACIÓN
         const buttonTextStyle = { ...style, fontSize: '28px', color: '#000000' };
+        
         // botón Anterior
-        createUIButton(this, {
+        this.prevBtn = createUIButton(this, {
             x: centerX - 165,
             y: navY + 20,
             label: 'Anterior',
@@ -122,8 +123,9 @@ export class Tutorial_Scene extends Phaser.Scene {
             textStyle: buttonTextStyle,
             clickSoundKey: 'sonidoClick',
         });
+
         // botón Siguiente
-        createUIButton(this, {
+        this.nextBtn = createUIButton(this, {
             x: centerX + 165,
             y: navY + 20,
             label: 'Siguiente',
@@ -146,6 +148,14 @@ export class Tutorial_Scene extends Phaser.Scene {
         this.slideImage.setTexture(p.key);
         this._fitImage(this.slideImage, this.layout.panelWidth, this.layout.panelHeight);
         this.pageIndicator.setText(`${this.pageIndex + 1} de ${this.pages.length}`);
+
+        // Botón Anterior: se deshabilita si estamos en la página 0
+        const isFirstPage = this.pageIndex === 0;
+        this.toggleButtonState(this.prevBtn, !isFirstPage);
+
+        // Botón Siguiente: se deshabilita si estamos en la última página
+        const isLastPage = this.pageIndex === this.pages.length - 1;
+        this.toggleButtonState(this.nextBtn, !isLastPage);
     }
 
     next() {
@@ -162,4 +172,18 @@ export class Tutorial_Scene extends Phaser.Scene {
         }
     }
 
+    toggleButtonState(btnObj, enabled) {
+        const sprite = btnObj.button;
+        const text = btnObj.text;
+
+        if (enabled) {
+            sprite.setInteractive();
+            sprite.setAlpha(1);
+            text.setAlpha(1);
+        } else {
+            sprite.disableInteractive();
+            sprite.setAlpha(0);
+            text.setAlpha(0);
+        }
+    }
 }

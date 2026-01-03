@@ -1,6 +1,7 @@
 //Pantalla de Lobby
 import Phaser from 'phaser';
 import { createUIButton, createIconButton } from '../UI/Buttons.js';
+import { io } from 'socket.io-client';
 
 export class Lobby_Scene extends Phaser.Scene {
     constructor() {
@@ -103,19 +104,52 @@ export class Lobby_Scene extends Phaser.Scene {
             clickSoundKey: 'sonidoClick',
             onClick: () => this.handleBack()
         });
+
+        // Conexión al WebSockets
+        this.socket = io();
+
+        // Unirse al lobby
+        this.socket.emit('join_lobby', {
+            username: this.registry.get('username'),
+            character: this.registry.get('myCharacter')
+        });
+
+        // Actualizaciones del lobby
+        this.socket.on('lobby_update', (players) => {
+            this.updateLobbyUI(players);
+        });
+
+        // Escuchar orden de inicio
+        this.socket.on('start_game', () => {
+            this.scene.start('Game_Scene', { mode: 'online', socket: this.socket });
+        });
+    }
+
+    updateLobbyUI(players) {
+        // Buscamos al Host (p0) y al Invitado (p1) en el array que envía el servidor
+        const p1Data = players.find(p => p.isHost);
+        const p2Data = players.find(p => !p.isHost);
+
+        if (p1Data) {
+            const emoji = p1Data.ready ? '✅' : '❌';
+            this.p1StatusText.setText(`${p1Data.username} --- ${emoji}`);
+        }
+
+        if (p2Data) {
+            const emoji = p2Data.ready ? '✅' : '❌';
+            this.p2StatusText.setText(`${p2Data.username} --- ${emoji}`);
+        } else {
+            this.p2StatusText.setText('Esperando rival...');
+        }
     }
 
     toggleReady() {
         this.isPlayerReady = !this.isPlayerReady;
-        const emoji = this.isPlayerReady ? '✅' : '❌';
         
-        // Actualizamos visualmente NUESTRO estado
-        if (this.isHost) {
-            this.p1StatusText.setText(`${this.player1.name} --- ${emoji}`);
-        } else {
-            this.p2StatusText.setText(`${this.player2.name} --- ${emoji}`);
-        }
+        // Enviamos el estado al servidor vía WebSocket
+        this.socket.emit('player_ready', this.isPlayerReady);
 
+        // Actualizar botón
         const nuevoTextoBoton = this.isPlayerReady ? 'CANCELAR' : 'LISTO?';
         
         if (this.btnListo.setLabel) {
@@ -123,23 +157,14 @@ export class Lobby_Scene extends Phaser.Scene {
         } else if (this.btnListo.text) {
             this.btnListo.text.setText(nuevoTextoBoton);
         }
-        
-        // Bloquear/Desbloquear botón volver
-        if (this.isPlayerReady) {
-            this.btnVolver.disableInteractive();
-            this.btnVolver.setAlpha(0.3);
-        } else {
-            this.btnVolver.setInteractive();
-            this.btnVolver.setAlpha(1);
-        }
 
-        // Aquí es donde envia al servidor
-        // socket.emit('player_ready_status', this.isPlayerReady);
+        this.btnVolver.setAlpha(this.isPlayerReady ? 0.3 : 1);
+        this.isPlayerReady ? this.btnVolver.disableInteractive() : this.btnVolver.setInteractive();
     }
 
     handleBack() {
+        if (this.socket) this.socket.disconnect();
         const targetScene = this.isHost ? 'SelectScenario_Scene' : 'SelectPlayer_Scene';
-        const data = this.isHost ? { mode: this.mode, player1: this.player1, isHost: true } : { mode: this.mode, isHost: false };
-        this.scene.start(targetScene, data);
+        this.scene.start(targetScene, { mode: this.mode, isHost: this.isHost });
     }
 }

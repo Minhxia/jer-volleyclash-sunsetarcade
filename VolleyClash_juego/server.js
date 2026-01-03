@@ -1,8 +1,13 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const http = require('http');
+const { Server } = require('socket.io');
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+
 const PORT = process.env.PORT || 8080;
 
 // Ruta del archivo para la base de datos
@@ -26,14 +31,16 @@ const saveUsers = (users) => {
     fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
 };
 
+// ----- API REST -----
+
 ///////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////// USUARIOS ///////////////////////////////////
+/////////////////////////////////// USUARIOS //////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
 //LISTA DE SARIOS CONECTADOS
 let activePlayers = [];
 
-//CREAR USUSARIO
+//REGISTRAR USUSARIO
 app.post('/api/register', (req, res) => {
     const { username, password } = req.body;
     const users = readUsers();
@@ -112,7 +119,7 @@ app.post('/api/login', (req, res) => {
     }
 });
 
-// CERRAR SESION DE UN USARIO
+// CERRAR SESION DE UN USUARIO
 app.post('/api/logout', (req, res) => {
     const { username } = req.body;
     activePlayers = activePlayers.filter(u => u !== username);
@@ -120,12 +127,12 @@ app.post('/api/logout', (req, res) => {
     res.json({ success: true });
 });
 
-// NUMERO DE JGADORES CONECTADOS
+// NUMERO DE JUGADORES CONECTADOS
 app.get('/api/players/count', (req, res) => {
     res.json({ count: activePlayers.length });
 });
 
-// LISTA DE JUUGADORES CONECTADOS
+// LISTA DE JUGADORES CONECTADOS
 app.get('/api/players/list', (req, res) => {
     res.json({ activePlayers });
 });
@@ -151,7 +158,7 @@ app.get('/api/users/profile/:username', (req, res) => {
     });
 });
 
-//ACTALIZAR LAS PARTIDAS DEL USUARIO AL ACABAR PARTIDA
+//ACTUALIZAR LAS PARTIDAS DEL USUARIO AL ACABAR PARTIDA
 app.put('/api/game/finish', (req, res) => {
     const { username, winner } = req.body;
 
@@ -205,13 +212,63 @@ app.get('/status', (req, res) => {
     res.status(200).send('active');
 });
 
+// ----- WEBSOCKETS -----
 
+let roomPlayers = [];
+
+io.on('connection', (socket) => {
+    console.log('Nueva conexión WebSocket:', socket.id);
+
+    // Cuando un jugador entra a la escena Lobby_Scene
+    socket.on('join_lobby', (userData) => {
+        const player = {
+            id: socket.id,
+            username: userData.username,
+            character: userData.character,
+            ready: false,
+            isHost: activePlayers[0] === userData.username
+        };
+
+        // Evitar duplicados
+        roomPlayers = roomPlayers.filter(p => p.username !== userData.username);
+        roomPlayers.push(player);
+
+        // Notificar a todos en la sala la nueva lista
+        io.emit('lobby_update', roomPlayers);
+    });
+
+    // Cuando un jugador pulsa el botón "Listo"
+    socket.on('player_ready', (isReady) => {
+        const player = roomPlayers.find(p => p.id === socket.id);
+        if (player) {
+            player.ready = isReady;
+            console.log(`Jugador ${player.username} está listo: ${isReady}`);
+
+            io.emit('lobby_update', roomPlayers);
+        }
+
+        // Si hay 2 y ambos están listos, el servidor da la orden de empezar
+        if (roomPlayers.length === 2 && roomPlayers.every(p => p.ready)) {
+            console.log("¡Todos listos! Iniciando partida...");
+            io.emit('start_game');
+        }
+    });
+
+    // salida del lobby
+    socket.on('disconnect', () => {
+        console.log('Usuario desconectado:', socket.id);
+        roomPlayers = roomPlayers.filter(p => p.id !== socket.id);
+        io.emit('lobby_update', roomPlayers);
+    });
+});
+
+// -------------------------
 
 // Esto asegura que si se refresca la página, se cargue el index.html
 app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+server.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

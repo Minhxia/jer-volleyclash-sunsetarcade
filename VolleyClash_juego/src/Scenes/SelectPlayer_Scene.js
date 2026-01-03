@@ -143,13 +143,20 @@ export class SelectPlayer_Scene extends Phaser.Scene {
 
         const selectionOffsetY = 40;
 
-        this.add.text(width / 2, 100 + selectionOffsetY, `${this.players[0].name}`, { 
-            ...style, fontSize: '28px', color: '#000', fontStyle: 'bold' 
+        this.add.text(width / 2, 60 + selectionOffsetY, `${this.players[0].name}`, { 
+            ...style,
+            fontFamily: 'VT323',
+            fontSize: '32px',
+            color: '#000',
+            fontStyle: 'bold' 
         }).setOrigin(0.5);
         
         // Texto de turno (Estado en este caso, pero con el mismo nombre para manterner la misma funcionalidad)
         this.turnText = this.add.text(width / 2, 130, 'Ningún personaje seleccionado', {
-            ...style, fontSize: '18px', color: '#000',
+            ...style,
+            fontFamily: 'VT323',
+            fontSize: '28px',
+            color: '#000',
         }).setOrigin(0.5);
 
         // UI jugadores + miniaturas
@@ -255,7 +262,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         const centerX = width / 2;
 
         // “Slot” grande + marco
-        player.bigImage = this.add.image(centerX - 150, height * 0.58 + offsetY, 'characterA')
+        player.bigImage = this.add.image(centerX - 150, height * 0.5 + offsetY, 'characterA')
             .setScale(1.2)
             .setOrigin(0.5)
             .setVisible(false);
@@ -279,7 +286,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         const personajes = ['characterA', 'characterB', 'characterC'];
         const spacing = 150;
         const startX = width / 2 - spacing / 2;
-        const startY = height * 0.5;
+        const startY = height * 0.4;
 
         const positions = [
             { x: startX + x, y: startY + y },
@@ -425,7 +432,6 @@ export class SelectPlayer_Scene extends Phaser.Scene {
                     mode: this.mode,
                     player1: this.players[0],
                     isHost: true
-                    // No pasamos player2 porque se unirá en red
                 });
             } else {
                 this.scene.start('Lobby_Scene', {

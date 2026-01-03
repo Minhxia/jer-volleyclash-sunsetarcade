@@ -1,19 +1,31 @@
 [
   {
     "username": "Antonio",
-    "password": "Antonio"
+    "password": "Antonio",
+    "partidaJugadas": 0,
+    "partidasGanadas": 0,
+    "partidasPerdidas": 0
   },
   {
     "username": "Marco",
-    "password": "Marco"
+    "password": "Marco",
+    "partidaJugadas": 0,
+    "partidasGanadas": 0,
+    "partidasPerdidas": 0
   },
   {
     "username": "Prueba",
-    "password": "Prueba"
+    "password": "Prueba",
+    "partidaJugadas": 0,
+    "partidasGanadas": 0,
+    "partidasPerdidas": 0
   },
   {
     "username": "sara",
-    "password": "1234"
+    "password": "1234",
+    "partidaJugadas": 0,
+    "partidasGanadas": 0,
+    "partidasPerdidas": 0
   },
   {
     "username": "aaaa",
