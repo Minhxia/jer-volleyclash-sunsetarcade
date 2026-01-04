@@ -145,8 +145,8 @@ export class Menu_Scene extends Phaser.Scene {
         } catch (e) { console.error("Error en logout"); }
 
         // Limpiar local
-        localStorage.removeItem('voley_username');
-        localStorage.removeItem('voley_session_token');
+        sessionStorage.removeItem('voley_username');
+        sessionStorage.removeItem('voley_session_token');
 
         // Limpiar registry
         this.registry.destroy();

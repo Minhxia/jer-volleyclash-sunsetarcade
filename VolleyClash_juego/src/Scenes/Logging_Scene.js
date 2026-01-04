@@ -12,8 +12,8 @@ export class Logging_Scene extends Phaser.Scene {
     }
 
     async init(data) {
-        const savedName = localStorage.getItem('voley_username');
-        const savedPass = localStorage.getItem('voley_password'); // Guarda la pass (o un token) para re-loguear
+        const savedName = sessionStorage.getItem('voley_username');
+        const savedPass = sessionStorage.getItem('voley_password'); // Guarda la pass (o un token) para re-loguear
 
         if (savedName && savedPass) {
             console.log("Intentando auto-login para:", savedName);
@@ -202,9 +202,9 @@ export class Logging_Scene extends Phaser.Scene {
                     this.registry.set('isHost', data.isHost);
 
                     // Persistencia local para auto-login
-                    localStorage.setItem('voley_session_token', data.token);
-                    localStorage.setItem('voley_username', usernameValue);
-                    localStorage.setItem('voley_password', passwordValue);
+                    sessionStorage.setItem('voley_session_token', data.token);
+                    sessionStorage.setItem('voley_username', usernameValue);
+                    sessionStorage.setItem('voley_password', passwordValue);
 
                     console.log(`Login correcto. Usuario: ${usernameValue} | Host: ${data.isHost}`);
                     this.scene.launch('ConnectionManager_Scene');

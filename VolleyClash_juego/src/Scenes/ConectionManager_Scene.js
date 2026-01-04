@@ -39,7 +39,7 @@ export class ConnectionManager_Scene extends Phaser.Scene {
     }
 
     async handleReconnection(username) {
-        const password = localStorage.getItem('voley_password');
+        const password = sessionStorage.getItem('voley_password');
         if (password) {
             await fetch('/api/login', {
                 method: 'POST',

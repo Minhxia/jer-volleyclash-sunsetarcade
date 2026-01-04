@@ -36,8 +36,8 @@ export class NoConnection_Scene extends Phaser.Scene {
             if (res.ok) {
                 console.log("Servidor recuperado. Intentando re-login automático...");
 
-                const savedName = localStorage.getItem('voley_username');
-                const savedPass = localStorage.getItem('voley_password');
+                const savedName = sessionStorage.getItem('voley_username');
+                const savedPass = sessionStorage.getItem('voley_password');
 
                 if (savedName && savedPass) {
                     const loginRes = await fetch('/api/login', {
