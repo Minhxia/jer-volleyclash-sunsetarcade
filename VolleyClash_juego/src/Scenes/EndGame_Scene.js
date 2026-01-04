@@ -11,7 +11,9 @@ export class EndGame_Scene extends Phaser.Scene {
         this.winner = data.winner;
         this.player1 = data.player1;
         this.player2 = data.player2;
+        this.isOnline = data.isOnline;
     }
+
     preload() {
         // imágenes fondo y ui
         this.load.image('fondo', 'ASSETS/FONDOS/FONDO_BASE.png');
@@ -67,6 +69,7 @@ export class EndGame_Scene extends Phaser.Scene {
             fontSize: '28px',
             color: '#000000'
         };
+
         createUIButton(this, {
             x: width / 2,
             y: buttonY,
@@ -76,6 +79,35 @@ export class EndGame_Scene extends Phaser.Scene {
             },
             textStyle: buttonTextStyle,
             clickSoundKey: 'sonidoClick',
+        });
+
+        if (this.isOnline) {
+            this.updateUserStats(this.winner);
+        }
+    }
+
+    updateUserStats(winner) {
+        const username = this.registry.get('username');
+        if (!username) return;
+
+        const baseUrl = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
+
+        fetch(`${baseUrl}/api/game/finish`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username,
+                winner: winner
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log('Estadísticas actualizadas:', data);
+        })
+        .catch(err => {
+            console.error('Error actualizando estadísticas', err);
         });
     }
 }
