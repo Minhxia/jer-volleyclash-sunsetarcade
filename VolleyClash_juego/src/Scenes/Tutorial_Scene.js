@@ -114,7 +114,7 @@ export class Tutorial_Scene extends Phaser.Scene {
         // BOTONES DE NAVEGACIÓN
         const buttonTextStyle = { ...style, fontSize: '28px', color: '#000000' };
         // botón Anterior
-        createUIButton(this, {
+        this.prevBtn = createUIButton(this, {
             x: centerX - 165,
             y: navY + 20,
             label: 'Anterior',
@@ -123,7 +123,7 @@ export class Tutorial_Scene extends Phaser.Scene {
             clickSoundKey: 'sonidoClick',
         });
         // botón Siguiente
-        createUIButton(this, {
+        this.nextBtn = createUIButton(this, {
             x: centerX + 165,
             y: navY + 20,
             label: 'Siguiente',
@@ -135,19 +135,30 @@ export class Tutorial_Scene extends Phaser.Scene {
         this.renderPage();
     }
 
+    // Ajusta la imagen al tamaño máximo permitido
     _fitImage(img, maxW, maxH) {
         const scale = Math.min(maxW / img.width, maxH / img.height);
         img.setScale(scale);
     }
 
+    // Renderiza la página actual
     renderPage() {
         const p = this.pages[this.pageIndex];
         this.mainTitleText.setText(p.title ?? 'Tutorial');
         this.slideImage.setTexture(p.key);
         this._fitImage(this.slideImage, this.layout.panelWidth, this.layout.panelHeight);
         this.pageIndicator.setText(`${this.pageIndex + 1} de ${this.pages.length}`);
+    
+         // Botón Anterior: se deshabilita si estamos en la página 0
+        const isFirstPage = this.pageIndex === 0;
+        this.toggleButtonState(this.prevBtn, !isFirstPage);
+
+        // Botón Siguiente: se deshabilita si estamos en la última página
+        const isLastPage = this.pageIndex === this.pages.length - 1;
+        this.toggleButtonState(this.nextBtn, !isLastPage);
     }
 
+    // Ir a la página siguiente
     next() {
         if (this.pageIndex < this.pages.length - 1) {
             this.pageIndex++;
@@ -155,10 +166,27 @@ export class Tutorial_Scene extends Phaser.Scene {
         }
     }
 
+    // Ir a la página anterior
     prev() {
         if (this.pageIndex > 0) {
             this.pageIndex--;
             this.renderPage();
+        }
+    }
+
+    // Helper para activar/desactivar botones
+    toggleButtonState(btnObj, enabled) {
+        const sprite = btnObj.button;
+        const text = btnObj.text;
+
+        if (enabled) {
+            sprite.setInteractive();
+            sprite.setAlpha(1);
+            text.setAlpha(1);
+        } else {
+            sprite.disableInteractive();
+            sprite.setAlpha(0);
+            text.setAlpha(0);
         }
     }
 

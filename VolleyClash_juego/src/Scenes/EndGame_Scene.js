@@ -24,15 +24,15 @@ export class EndGame_Scene extends Phaser.Scene {
         //Animaciones de victoria
         this.load.spritesheet(
             'victoria_A', 
-            'ASSETS/PERSONAJES/ANIMACIONES/PERSONAJES_A/A_VICTORIA.png', 
+            'ASSETS/PERSONAJES/ANIMACIONES/PERSONAJE_A/A_VICTORIA.png', 
             {frameWidth:128,frameHeight: 128});
         this.load.spritesheet(
             'victoria_B', 
-            'ASSETS/PERSONAJES/ANIMACIONES/PERSONAJES_B/A_VICTORIA.png', 
+            'ASSETS/PERSONAJES/ANIMACIONES/PERSONAJE_B/A_VICTORIA.png', 
             {frameWidth:128,frameHeight: 128});
         this.load.spritesheet(
             'victoria_C', 
-            'ASSETS/PERSONAJES/ANIMACIONES/PERSONAJES_C/A_VICTORIA.png', 
+            'ASSETS/PERSONAJES/ANIMACIONES/PERSONAJE_C/A_VICTORIA.png', 
             {frameWidth:128,frameHeight: 128});
     }
 
@@ -56,10 +56,10 @@ export class EndGame_Scene extends Phaser.Scene {
             color: '#5f0000ff'
         }).setOrigin(0.5);
 
-        const winnerTextY = height * 0.36;
-        const spriteRowY = height * 0.52;
+        const winnerTextY = height * 0.33;
         const buttonY = height * 0.90;
-        const spriteOffsetX = width * 0.2;
+        const spritePadding = height * 0.04;
+        const spriteCenterY = (winnerTextY + buttonY) / 2 - height * 0.02;
 
         // Texto indicando el ganador
         const winnerText =
@@ -72,27 +72,30 @@ export class EndGame_Scene extends Phaser.Scene {
             fontSize: '32px',
             color: '#5f0000ff'
         }).setOrigin(0.5);
-        let winnerCharacter;
+        const winnerCharacter = this.winner === "player1" ? spriteP1 : spriteP2;
 
-        if (this.winner === "player1") {
-            winnerCharacter = spriteP1; // 'A', 'B' o 'C'
-        } else {
-            winnerCharacter = spriteP2;
-        }
-        const animKey = `victoria_${winnerCharacter}`;
+        const victoryConfig = {
+            characterA: { spriteKey: 'victoria_A', animKey: 'charA_victory' },
+            characterB: { spriteKey: 'victoria_B', animKey: 'charB_victory' },
+            characterC: { spriteKey: 'victoria_C', animKey: 'charC_victory' }
+        };
 
-        // Huecos para sprites de ganador y perdedor (animaciones futuras)
-        this.winnerSpriteSlot = this.add.container(width / 2 - spriteOffsetX, spriteRowY);
+        const { spriteKey, animKey } = victoryConfig[winnerCharacter] || victoryConfig.characterA;
 
-        const winnerSprite = this.add.sprite(0, 0, `victoria_${winnerCharacter}`);
-        winnerSprite.setScale(0.5);
+        // hueco para los sprites del ganador
+        this.winnerSpriteSlot = this.add.container(width / 2, spriteCenterY);
+
+        const winnerSprite = this.add.sprite(0, 0, spriteKey);
+        const availableHeight = (buttonY - winnerTextY) - spritePadding * 2;
+        const availableWidth = width * 0.6;
+        const scale = Math.min(
+            availableHeight / winnerSprite.height,
+            availableWidth / winnerSprite.width
+        ) * 0.85;
+        winnerSprite.setScale(Math.max(0.2, scale));
         winnerSprite.play(animKey);
-
-        // Añadir al contenedor del ganador
         this.winnerSpriteSlot.add(winnerSprite);
         
-
-
         // botón para volver al menú principal
         const buttonTextStyle = {
             ...style,
