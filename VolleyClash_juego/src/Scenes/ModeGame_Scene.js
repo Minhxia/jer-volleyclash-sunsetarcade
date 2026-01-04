@@ -1,4 +1,4 @@
-// Pantalla para elegir Modo de Juego
+﻿// Pantalla para elegir Modo de Juego
 import Phaser from 'phaser';
 import { createUIButton, createIconButton } from '../UI/Buttons.js';
 import { applyStoredVolume } from '../UI/Audio.js';
@@ -24,9 +24,12 @@ export class ModeGame_Scene extends Phaser.Scene {
 
     create() {
         const { width, height } = this.scale;
-        this.serverCheck = setInterval(() => {
-            this.checkServerStatus();
-        }, 5000);
+        this.serverCheckTimer = this.time.addEvent({
+            delay: 5000,
+            callback: this.checkServerStatus,
+            callbackScope: this,
+            loop: true
+        });
 
         const style = this.game.globals?.defaultTextStyle ?? {
             fontFamily: 'Arial',
@@ -138,8 +141,15 @@ export class ModeGame_Scene extends Phaser.Scene {
             callback: () => this.updatePlayersCount(),
             loop: true
         });
+
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            if (this.serverCheckTimer) this.serverCheckTimer.remove();
+            if (this.playersCountTimer) this.playersCountTimer.remove();
+        });
     }
     updatePlayersCount() {
+        if (!this.playersCountText || !this.playersCountText.active) return;
+
         fetch(`${this.baseUrl}/api/players/count`)
             .then(res => res.json())
             .then(data => {
@@ -152,6 +162,8 @@ export class ModeGame_Scene extends Phaser.Scene {
 
     // Estado del servidor
     checkServerStatus() {
+        if (!this.serverStatusText || !this.serverStatusText.active) return;
+
         fetch(`${this.baseUrl}/status`)
             .then(res => res.text())
             .then(data => {
@@ -168,11 +180,5 @@ export class ModeGame_Scene extends Phaser.Scene {
                     .setText('Estado del servidor: NO DISPONIBLE')
                     .setColor('#AA0000');
             });
-    }
-
-    shutdown() {
-        if (this.serverCheck) {
-            clearInterval(this.serverCheck);
-        }
     }
 }

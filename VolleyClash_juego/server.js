@@ -255,12 +255,16 @@ app.get('/status', (req, res) => {
 // ----- WEBSOCKETS -----
 
 let roomPlayers = [];
+let roomScenario = null;
 
 io.on('connection', (socket) => {
     console.log('Nueva conexión WebSocket:', socket.id);
 
     // Cuando un jugador entra a la escena Lobby_Scene
     socket.on('join_lobby', (userData) => {
+        if (userData.selectedScenario) {
+            roomScenario = userData.selectedScenario;
+        }
         const player = {
             id: socket.id,
             username: userData.username,
@@ -290,7 +294,7 @@ io.on('connection', (socket) => {
         // Si hay 2 y ambos están listos, el servidor da la orden de empezar
         if (roomPlayers.length === 2 && roomPlayers.every(p => p.ready)) {
             console.log("¡Todos listos! Iniciando partida...");
-            io.emit('start_game');
+            io.emit('start_game', { players: roomPlayers, selectedScenario: roomScenario });
         }
     });
 
@@ -308,6 +312,9 @@ io.on('connection', (socket) => {
         }
         
         roomPlayers = roomPlayers.filter(p => p.id !== socket.id);
+        if (roomPlayers.length === 0) {
+            roomScenario = null;
+        }
         io.emit('lobby_update', roomPlayers);
     });
 

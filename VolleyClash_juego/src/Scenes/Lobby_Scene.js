@@ -7,6 +7,7 @@ export class Lobby_Scene extends Phaser.Scene {
     constructor() {
         super('Lobby_Scene');
         this.isPlayerReady = false;
+        this.lobbyPlayers = [];
     }
 
     init(data) {
@@ -15,6 +16,7 @@ export class Lobby_Scene extends Phaser.Scene {
         this.isHost = data.isHost;
         this.player1 = data.player1; // Si es Host
         this.player2 = data.player2; // Si es Invitado
+        this.selectedScenario = data.selectedScenario;
         
         console.log('Lobby iniciado como:', this.isHost ? 'Host' : 'Invitado');
     }
@@ -111,17 +113,37 @@ export class Lobby_Scene extends Phaser.Scene {
         // Unirse al lobby
         this.socket.emit('join_lobby', {
             username: this.registry.get('username'),
-            character: this.registry.get('myCharacter')
+            character: this.registry.get('myCharacter'),
+            selectedScenario: this.selectedScenario
         });
 
         // Actualizaciones del lobby
         this.socket.on('lobby_update', (players) => {
+            this.lobbyPlayers = players;
             this.updateLobbyUI(players);
         });
 
         // Escuchar orden de inicio
-        this.socket.on('start_game', () => {
-            this.scene.start('GameOnline_Scene', { mode: 'online', socket: this.socket });
+        this.socket.on('start_game', (data) => {
+            const players = data?.players ?? this.lobbyPlayers;
+            const selectedScenario = data?.selectedScenario ?? this.selectedScenario ?? 'Gym';
+            const host = players.find(p => p.isHost);
+            const guest = players.find(p => !p.isHost);
+
+            if (!host || !guest) {
+                console.error('Lobby sin jugadores listos');
+                return;
+            }
+
+            const player1 = { name: host.username, character: host.character };
+            const player2 = { name: guest.username, character: guest.character };
+
+            this.scene.start('GameOnline_Scene', {
+                mode: 'online',
+                player1,
+                player2,
+                selectedScenario
+            });
         });
     }
 
