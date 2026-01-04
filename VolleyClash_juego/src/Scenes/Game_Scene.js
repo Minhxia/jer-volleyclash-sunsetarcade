@@ -32,6 +32,7 @@ export class Game_Scene extends Phaser.Scene {
         this.maxSets = 3; // mejor de 3
         this.currentSet = 1; // set actual
         this.isGoldenPoint = false;
+        this.isSetEnding = false;
     }
 
     preload() {
@@ -847,6 +848,7 @@ export class Game_Scene extends Phaser.Scene {
     // Configura los event listeners de la pelota
     _setupBallEvents() {
         this.events.on('rallyConcluded', (data) => {
+            if (this.isSetEnding) return;
             console.log(`Rally concluded: ${data.scoringPlayerId} scores!`);
             const scorerId = data.scoringPlayerId;
 
@@ -979,6 +981,12 @@ export class Game_Scene extends Phaser.Scene {
 
     // Controla el final de un set
     _endSet(winner) {
+        if (this.isSetEnding) return;
+        this.isSetEnding = true;
+        if (this.ball?.sprite) {
+            this.ball.isBallLive = false;
+            this.ball.sprite.setVelocity(0, 0);
+        }
         // actualizar sets ganados
         if (winner === 'player1') this.setsP1++;
         else if (winner === 'player2') this.setsP2++;
@@ -1016,6 +1024,7 @@ export class Game_Scene extends Phaser.Scene {
 
     // Reinicia el estado para un nuevo set
     _resetSet() {
+        this.isSetEnding = false;
         this.isGoldenPoint = false;
         // se actualiza el texto del set actual
         this.setText.setText(`SET ${this.currentSet}`);
