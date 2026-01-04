@@ -45,7 +45,7 @@ export class Credits_Scene extends Phaser.Scene {
             'Sara Bueno Esteban',
             'Antonio Morán Barrera',
             'Cristine Nioka Tewo',
-            'Alvaro Ibáñez Montero',
+            'Álvaro Ibáñez Montero',
         ];
 
         //tarjeta donde se muestra el nombre del equipo y los miembros
