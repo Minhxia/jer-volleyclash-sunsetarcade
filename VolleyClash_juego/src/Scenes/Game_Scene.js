@@ -958,7 +958,6 @@ export class Game_Scene extends Phaser.Scene {
             winner: winner,
             player1: this.player1,
             player2: this.player2,
-            isOnline: false
         });
     }
 

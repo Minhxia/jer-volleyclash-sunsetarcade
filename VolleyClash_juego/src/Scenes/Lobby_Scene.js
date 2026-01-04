@@ -121,7 +121,7 @@ export class Lobby_Scene extends Phaser.Scene {
 
         // Escuchar orden de inicio
         this.socket.on('start_game', () => {
-            this.scene.start('Game_Scene', { mode: 'online', socket: this.socket });
+            this.scene.start('GameOnline_Scene', { mode: 'online', socket: this.socket });
         });
     }
 

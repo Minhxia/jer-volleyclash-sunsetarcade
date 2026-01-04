@@ -1,4 +1,4 @@
-// Clase de la escena de juego
+// Clase de la escena de juego online
 
 import Phaser from 'phaser';
 import { Player } from '../Entities/Player.js';
@@ -7,23 +7,32 @@ import { Ball } from '../Entities/Ball.js';
 import { CommandProcessor } from '../Commands/CommandProcessor.js';
 import { MovePlayerCommand } from '../Commands/MovePlayerCommand.js';
 import { getStoredSfxVolume } from '../UI/Audio.js';
+import { io } from 'socket.io-client';
 
-export class Game_Scene extends Phaser.Scene {
+export class GameOnline_Scene extends Phaser.Scene {
     tiempoTotal = 60; // para 2 min poner 120 segundos
     tiempoRestante = this.tiempoTotal;
     timerText;
     timerEvent;
     constructor() {
-        super('Game_Scene');
+        super('GameOnline_Scene');
     }
 
     init(data) {
+        this.socket = io();
+        
         this.players = new Map();
+        this.player1Data = data.player1;
+        this.player2Data = data.player2;
+        this.selectedScenario = data.selectedScenario;
+
         this.inputMappings = [];
         this.commandProcessor = new CommandProcessor();
-        this.player1 = data.player1;
-        this.player2 = data.player2;
-        this.selectedScenario = data.selectedScenario;
+        
+        this.myUsername = this.registry.get('username');
+        this.myRole = (this.player1Data.name === this.myUsername) ? 'player1' : 'player2';
+        this.opponentRole = (this.myRole === 'player1') ? 'player2' : 'player1';
+
         this.ball = null;
         this.scoreP1 = 0;
         this.scoreP2 = 0;
@@ -339,6 +348,67 @@ export class Game_Scene extends Phaser.Scene {
             this.timerEvent.paused = false;
         });
 
+        // ------- WEBSOCKETS -------
+
+        // Movimiento del rival
+        this.socket.on('opponent_move', (data) => {
+            const opponent = this.players.get(this.opponentRole);
+            if (opponent) {
+                opponent.sprite.setPosition(data.x, data.y);
+                if (data.anim) opponent.sprite.play(data.anim, true);
+                opponent.sprite.setFlipX(data.flipX);
+            }
+        });
+
+        // Sincronización de pelota (El Host envía, el Invitado recibe)
+        this.socket.on('ball_update', (data) => {
+            if (this.myRole === 'player2' && this.ball) {
+                this.ball.sprite.setPosition(data.x, data.y);
+                this.ball.sprite.setVelocity(data.vx, data.vy);
+            }
+        });
+
+        // Puntuación sincronizada (10 pts)
+        this.socket.on('score_sync', (data) => {
+            this.scoreP1 = data.p1;
+            this.scoreP2 = data.p2;
+            this.scoreLeft.setText(this.scoreP1.toString());
+            this.rightScore.setText(this.scoreP2.toString());
+        });
+
+        // Gestión de desconexiones (15 pts)
+        this.socket.on('player_abandoned', () => {
+            alert("El oponente se ha desconectado. Partida finalizada.");
+            this.scene.start('Menu_Scene');
+        });
+
+        // Fin de partida comunicado por el servidor
+        this.socket.on('match_finished', (data) => {
+            this._endGame(data.winner);
+        });
+
+        // Aplicacion de powerUps
+        this.socket.on('apply_powerup', (data) => {
+            // data: { type: 'paralizar', attacker: 'player1' }
+            console.log(`El rival (${data.attacker}) ha usado: ${data.type}`);
+            
+            const targetId = (data.attacker === 'player1') ? 'player2' : 'player1';
+            const targetPlayer = this.players.get(targetId);
+
+            if (targetPlayer) {
+                // Aplicas el efecto visual y lógico en tu pantalla
+                targetPlayer.applyPowerUpEffect(data.type); 
+                this.updatePlayerInventoryUI(targetPlayer);
+            }
+        });
+
+        // Spawn de power ups
+        this.socket.on('force_spawn_powerup', (data) => {
+            // Si soy el Invitado, obedezco lo que el Host ha decidido
+            if (this.myRole === 'player2') {
+                this._createPowerUpLocal(data.x, data.y, data.type);
+            }
+        });
     }
 
     // Genera un nuevo power-up en una posición aleatoria cada cierto tiempo
@@ -347,20 +417,33 @@ export class Game_Scene extends Phaser.Scene {
         const delay = Phaser.Math.Between(minDelayMs, maxDelayMs);
 
         this.time.delayedCall(delay, () => {
-            if (this.powerUps.length < this.maxPowerUps) {
-                const x = Phaser.Math.Between(80, this.worldWidth - 80);
-                const y = Phaser.Math.Between(this.worldHeight - 220, this.worldHeight - 120);
+            // --- SOLO EL HOST (P1) TOMA LA DECISIÓN ---
+            if (this.myRole === 'player1') {
+                if (this.powerUps.length < this.maxPowerUps) {
+                    const x = Phaser.Math.Between(80, this.worldWidth - 80);
+                    const y = Phaser.Math.Between(this.worldHeight - 220, this.worldHeight - 120);
+                    const type = this._getWeightedPowerUpType();
 
-                const type = this._getWeightedPowerUpType();
-                if (type) {
-                    const powerUp = new PowerUp(this, x, y, type);
-                    this.powerUps.push(powerUp);
-                    this.powerUpLastSpawnAt[type] = this.time.now;
+                    if (type) {
+                        // 1. Lo creamos en nuestra pantalla (Host)
+                        this._createPowerUpLocal(x, y, type);
+
+                        // 2. Avisamos al rival para que lo cree exactamente igual
+                        this.socket.emit('spawn_powerup', { x, y, type });
+                    }
                 }
             }
-
-            this.schedulePowerUpSpawn(); // recursivo
+            // El bucle sigue corriendo para el Host
+            this.schedulePowerUpSpawn(); 
         });
+    }
+
+    // Método auxiliar para no repetir código
+    _createPowerUpLocal(x, y, type) {
+        const powerUp = new PowerUp(this, x, y, type);
+        this.powerUps.push(powerUp);
+        this.powerUpLastSpawnAt[type] = this.time.now;
+        console.log(`[Online] Power-up creado: ${type} en ${x},${y}`);
     }
 
     // Obtiene un tipo de power-up basado en los pesos configurados anteriormente
@@ -409,23 +492,23 @@ export class Game_Scene extends Phaser.Scene {
     // Bucle principal del juego
     update() {
         // se procesan los inputs de los jugadores
-        this._handleInputForAllPlayers();
-        // se actualizan los power-ups
-        this.players.forEach(player => player.updatePowerUps());
-        // se actualiza el estado de la pelota
-        if (this.ball) {
-            this.ball.update();
-            // verificar si la pelota golpea el suelo (comparar con la posición del suelo)
-            // groundY es la parte superior del suelo
-            if (this.ball.isBallLive && this.ball.sprite.y > this.groundY) {
-                this.ball.onGrounded();
-            }
-            // verificar si la pelota cruza la red (red está en x = 480)
-            if (this.ball.sprite.x < 475 && this.ball.courtSide === 'right') {
-                this.ball.crossNet();
-            } else if (this.ball.sprite.x > 485 && this.ball.courtSide === 'left') {
-                this.ball.crossNet();
-            }
+        this._handleMyLocalInput();
+
+        const myPlayer = this.players.get(this.myRole);
+        this.socket.emit('player_move', {
+            x: myPlayer.sprite.x,
+            y: myPlayer.sprite.y,
+            anim: myPlayer.sprite.anims.currentAnim ? myPlayer.sprite.anims.currentAnim.key : null,
+            flipX: myPlayer.sprite.flipX
+        });
+
+        if (this.myRole === 'player1' && this.ball) {
+            this.socket.emit('ball_sync', {
+                x: this.ball.sprite.x,
+                y: this.ball.sprite.y,
+                vx: this.ball.sprite.body.velocity.x,
+                vy: this.ball.sprite.body.velocity.y
+            });
         }
     }
 
@@ -644,8 +727,8 @@ export class Game_Scene extends Phaser.Scene {
 
     // Crea los personajes de cada jugador
     _createPlayers() {
-        const charP1 = this.player1.character;
-        const charP2 = this.player2.character;
+        const charP1 = this.player1Data.character;
+        const charP2 = this.player2Data.character;
 
         const p1 = new Player(
             this,
@@ -747,68 +830,75 @@ export class Game_Scene extends Phaser.Scene {
         });
     }
 
-    // Procesa el input de los dos jugadores
-    _handleInputForAllPlayers() {
-        this.inputMappings.forEach(mapping => {
-            const player = this.players.get(mapping.playerId);
-            if (!player) return;
+    // Procesa el input del jugador
+    _handleMyLocalInput() {
+        const player = this.players.get(this.myRole);
+        if (!player) return;
 
-            // si está paralizado, se deja en idle
-            if (player.isParalyzed) {
-                const idleDir = (player.facing === 'left') ? 'idleLeft' : 'idleRight';
-                this.commandProcessor.process(
-                    new MovePlayerCommand(player, idleDir)
-                );
-                return;
-            }
+        // 1. Si está paralizado (por un PowerUp), no procesamos input de movimiento
+        if (player.isParalyzed) {
+            const idleDir = (player.facing === 'left') ? 'idleLeft' : 'idleRight';
+            this.commandProcessor.process(new MovePlayerCommand(player, idleDir));
+            return;
+        }
 
-            let direction;
+        // 2. Obtener las teclas según el rol (Reutilizamos tu lógica de teclas)
+        // Si eres Player 1 usas WASD, si eres Player 2 usas IJKL
+        const keys = (this.myRole === 'player1') ? 
+            { left: 'A', right: 'D', jump: 'W', receive: 'S', power: 'E' } : 
+            { left: 'J', right: 'L', jump: 'I', receive: 'K', power: 'O' };
 
-            // movimiento horizontal normal
-            if (mapping.leftKeyObj.isDown) {
-                direction = 'left';
-            }
-            else if (mapping.rightKeyObj.isDown) {
-                direction = 'right';
-            }
-            // no se pulsa nada, así que se queda idle según hacia dónde miraba
-            else {
-                direction = (player.facing === 'left') ? 'idleLeft': 'idleRight';
-            }
+        const cursorKeys = {
+            left: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[keys.left]),
+            right: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[keys.right]),
+            jump: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[keys.jump]),
+            receive: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[keys.receive]),
+            power: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[keys.power])
+        };
 
-            // se aplica movimiento/idle SOLO si no está saltando
-            // si está saltando, no se procesa el movimiento para no sobrescribir la animación
-            if (!player.isJumping) {
-                this.commandProcessor.process(
-                    new MovePlayerCommand(player, direction)
-                );
-            }
+        let direction;
 
-            // recepción
-            if (Phaser.Input.Keyboard.JustDown(mapping.receiveKeyObj)) {
-                const receiveDir = (player.facing === 'left') ? 'receiveLeft' : 'receiveRight';
-                this.commandProcessor.process(
-                    new MovePlayerCommand(player, receiveDir)
-                );
-            }
+        // 3. Movimiento Horizontal
+        if (cursorKeys.left.isDown) {
+            direction = 'left';
+        } else if (cursorKeys.right.isDown) {
+            direction = 'right';
+        } else {
+            direction = (player.facing === 'left') ? 'idleLeft' : 'idleRight';
+        }
 
-            // salto/remate
-            if (Phaser.Input.Keyboard.JustDown(mapping.jumpKeyObj)) {
-                const jumpDir = (player.facing === 'left') ? 'jumpLeft' : 'jumpRight';
-                this.commandProcessor.process(
-                    new MovePlayerCommand(player, jumpDir)
-                );
-            }
+        // Aplicar movimiento solo si no está en medio de un salto (para no romper la animación)
+        if (!player.isJumping) {
+            this.commandProcessor.process(new MovePlayerCommand(player, direction));
+        }
 
-            // PowerUps
-            if (Phaser.Input.Keyboard.JustDown(mapping.powerKeyObj)) {
+        // 4. Recepción (JustDown para que no se repita infinitamente al mantener)
+        if (Phaser.Input.Keyboard.JustDown(cursorKeys.receive)) {
+            const receiveDir = (player.facing === 'left') ? 'receiveLeft' : 'receiveRight';
+            this.commandProcessor.process(new MovePlayerCommand(player, receiveDir));
+        }
+
+        // 5. Salto / Remate
+        if (Phaser.Input.Keyboard.JustDown(cursorKeys.jump)) {
+            const jumpDir = (player.facing === 'left') ? 'jumpLeft' : 'jumpRight';
+            this.commandProcessor.process(new MovePlayerCommand(player, jumpDir));
+        }
+
+        // 6. Uso de PowerUp
+        if (Phaser.Input.Keyboard.JustDown(cursorKeys.power)) {
+            const powerType = player.getNextPowerUpType();
+
+            if (powerType) {
                 player.useNextPowerUp();
                 this.updatePlayerInventoryUI(player);
-            }
-        });
 
-        // se actualiza el estado de los jugadores (suelo, etc.)
-        this.players.forEach(player => player.update());
+                // Notificar al rival para que su pantalla reaccione (Fase 4: Sincronización)
+                this.socket.emit('use_powerup', { 
+                    type: powerType, 
+                    attacker: this.myRole 
+                });
+            }
+        }
     }
 
     // Crea la pelota
@@ -956,9 +1046,8 @@ export class Game_Scene extends Phaser.Scene {
 
         this.scene.start("EndGame_Scene", {
             winner: winner,
-            player1: this.player1,
-            player2: this.player2,
-            isOnline: false
+            player1: this.player1Data,
+            player2: this.player2Data,
         });
     }
 

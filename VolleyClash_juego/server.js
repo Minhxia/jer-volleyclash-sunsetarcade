@@ -297,9 +297,61 @@ io.on('connection', (socket) => {
     // salida del lobby
     socket.on('disconnect', () => {
         console.log('Usuario desconectado:', socket.id);
+
+        const leavingPlayer = roomPlayers.find(p => p.id === socket.id);
+
+        if (leavingPlayer) {
+            // Notificamos a los demás que la partida/sala se cierra por abandono
+            socket.broadcast.emit('player_abandoned', { 
+                username: leavingPlayer.username 
+            });
+        }
+        
         roomPlayers = roomPlayers.filter(p => p.id !== socket.id);
         io.emit('lobby_update', roomPlayers);
     });
+
+    // Recibir posición de un cliente y retransmitirla al resto
+    socket.on('player_move', (moveData) => {
+        // moveData contiene { x, y, anim, flipX }
+        // Usamos broadcast para enviarlo a todos menos al que lo envió
+        socket.broadcast.emit('opponent_move', {
+            id: socket.id,
+            x: moveData.x,
+            y: moveData.y,
+            anim: moveData.anim,
+            flipX: moveData.flipX
+        });
+    });
+
+    // Sincronización de la pelota (Solo la envía el Host para evitar conflictos)
+    socket.on('ball_sync', (ballData) => {
+        // ballData contiene { x, y, vx, vy }
+        socket.broadcast.emit('ball_update', ballData);
+    });
+
+    socket.on('update_score', (scoreData) => {
+        // scoreData: { p1Points, p2Points, p1Sets, p2Sets }
+        io.emit('score_sync', scoreData);
+    });
+
+    // Detección de Victoria comunicada por el servidor
+    socket.on('game_finished', (winnerData) => {
+        // winnerData: { winner: 'player1', winnerName: '...' }
+        io.emit('match_finished', winnerData);
+    });
+
+    // Gestion de powerups
+    socket.on('use_powerup', (powerData) => {
+        // powerData: { type: 'paralizar', target: 'player2' }
+        socket.broadcast.emit('apply_powerup', powerData);
+    });
+
+    // Spawn de power ups
+    socket.on('spawn_powerup', (data) => {
+    // data contiene { x, y, type }
+    socket.broadcast.emit('force_spawn_powerup', data);
+});
 });
 
 // -------------------------

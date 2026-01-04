@@ -11,7 +11,6 @@ export class EndGame_Scene extends Phaser.Scene {
         this.winner = data.winner;
         this.player1 = data.player1;
         this.player2 = data.player2;
-        this.isOnline = data.isOnline;
     }
 
     preload() {
@@ -81,9 +80,7 @@ export class EndGame_Scene extends Phaser.Scene {
             clickSoundKey: 'sonidoClick',
         });
 
-        if (this.isOnline) {
-            this.updateUserStats(this.winner);
-        }
+        this.updateUserStats(this.winner);
     }
 
     updateUserStats(winner) {
