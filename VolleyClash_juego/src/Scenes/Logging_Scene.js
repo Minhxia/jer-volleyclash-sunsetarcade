@@ -30,6 +30,7 @@ export class Logging_Scene extends Phaser.Scene {
                 if (response.ok) {
                     this.registry.set('username', resData.username);
                     this.registry.set('isHost', resData.isHost);
+                    this.scene.launch('ConnectionManager_Scene');
                     this.scene.start('Menu_Scene');
                 }
             } catch (e) {
@@ -203,8 +204,10 @@ export class Logging_Scene extends Phaser.Scene {
                     // Persistencia local para auto-login
                     localStorage.setItem('voley_session_token', data.token);
                     localStorage.setItem('voley_username', usernameValue);
+                    localStorage.setItem('voley_password', passwordValue);
 
                     console.log(`Login correcto. Usuario: ${usernameValue} | Host: ${data.isHost}`);
+                    this.scene.launch('ConnectionManager_Scene');
                     this.scene.start('Menu_Scene');
                 }
             } else {

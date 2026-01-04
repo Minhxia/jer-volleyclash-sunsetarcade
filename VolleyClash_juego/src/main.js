@@ -12,6 +12,8 @@ import { SelectPlayer_Scene } from "./Scenes/SelectPlayer_Scene.js";
 import { SelectScenario_Scene } from "./Scenes/SelectScenario_Scene.js";
 import { Lobby_Scene } from "./Scenes/Lobby_Scene.js";
 import { Logging_Scene } from "./Scenes/Logging_Scene.js";
+import { NoConnection_Scene } from "./Scenes/NoConection_Scene.js";
+import { ConnectionManager_Scene } from "./Scenes/ConectionManager_Scene.js";
 
 (async () => {
     // fallback para evitar problemas con las fuentes personalizadas
@@ -48,7 +50,7 @@ import { Logging_Scene } from "./Scenes/Logging_Scene.js";
                 game.globals = globals;
             }
         },
-        scene: [Logging_Scene, Menu_Scene, Game_Scene, Tutorial_Scene, Configuration_Scene, Credits_Scene, EndGame_Scene, Pause_Scene, ModeGame_Scene, SelectPlayer_Scene, SelectScenario_Scene, Lobby_Scene],
+        scene: [Logging_Scene, Menu_Scene, Game_Scene, Tutorial_Scene, Configuration_Scene, Credits_Scene, EndGame_Scene, Pause_Scene, ModeGame_Scene, SelectPlayer_Scene, SelectScenario_Scene, Lobby_Scene, NoConnection_Scene, ConnectionManager_Scene],
         backgroundColor:'#8675f1',
     };
 

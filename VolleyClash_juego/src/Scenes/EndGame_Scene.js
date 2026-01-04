@@ -70,9 +70,9 @@ export class EndGame_Scene extends Phaser.Scene {
         createUIButton(this, {
             x: width / 2,
             y: buttonY,
-            label: 'Modo de juego',
+            label: 'Volver',
             onClick: () => {
-                this.scene.start('ModeGame_Scene');
+                this.scene.start('Menu_Scene');
             },
             textStyle: buttonTextStyle,
             clickSoundKey: 'sonidoClick',

@@ -7,6 +7,7 @@ const { Server } = require('socket.io');
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+const lastSeen = new Map();
 
 const PORT = process.env.PORT || 8080;
 
@@ -123,6 +124,7 @@ app.post('/api/login', (req, res) => {
 app.post('/api/logout', (req, res) => {
     const { username } = req.body;
     activePlayers = activePlayers.filter(u => u !== username);
+    lastSeen.delete(username);
     console.log(`Usuario ${username} ha cerrado sesión.`);
     res.json({ success: true });
 });
@@ -136,6 +138,44 @@ app.get('/api/players/count', (req, res) => {
 app.get('/api/players/list', (req, res) => {
     res.json({ activePlayers });
 });
+
+// ULTIMA VEZ VISTOS
+app.get('/api/users/keepalive/:username', (req, res) => {
+    const { username } = req.params;
+
+    if (username && username !== 'undefined') {
+        if (!activePlayers.includes(username)) {
+            return res.status(401).json({ 
+                success: false, 
+                error: 'Session expired',
+                message: 'Inactividad detectada. Re-conectando...' 
+            });
+        }
+        lastSeen.set(username, Date.now());
+        return res.json({ success: true, count: activePlayers.length });
+    }
+    res.status(400).json({ error: 'Invalid user' });
+});
+
+setInterval(() => {
+    const now = Date.now();
+    for (const [username, timestamp] of lastSeen.entries()) {
+        if (now - timestamp > 10000) { 
+            console.log(`[Servidor] Desconexión detectada (timeout): ${username}`);
+
+            lastSeen.delete(username);
+
+            const antes = activePlayers.length;
+            activePlayers = activePlayers.filter(u => u !== username);
+
+            if (antes !== activePlayers.length) {
+                console.log(`[Servidor] Lista actualizada tras timeout: [${activePlayers.join(', ')}]`);
+                // Avisar a los clientes del cambio en el conteo
+                io.emit('lobby_update', roomPlayers.filter(p => p.username !== username));
+            }
+        }
+    }
+}, 5000);
 
 ///////////////////////////////////////////////////////////////////////////////
 ////////////////////////// DATOS ALMACENADOS //////////////////////////////////

@@ -9,10 +9,12 @@ export class Menu_Scene extends Phaser.Scene {
     }
 
     preload() {
+        // fondo
+        this.load.image('fondoMenuPrincipal', 'ASSETS/FONDOS/MENU_PRINCIPAL.png');
+
         // botones
         this.load.image('botonSeleccionado', 'ASSETS/UI/BOTONES/BOTON_BASE_G_SELECCIONADO.png');
         this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_BASE_G.png');
-        this.load.image('fondoMenuPrincipal', 'ASSETS/FONDOS/MENU_PRINCIPAL.png');
 
         // logo
         this.load.image('logoEmpresa', 'ASSETS/LOGO/logo_empresa.png');
@@ -112,28 +114,45 @@ export class Menu_Scene extends Phaser.Scene {
         this.add.image(this.scale.width - 20, this.scale.height - 20, 'logoEmpresa')
             .setScale(0.42)
             .setOrigin(1, 1);
+
+        /////////
+        // Estado del servidor
+        this.connectionText = this.add.text(20, 20, 'Servidor: ONLINE', { fontSize: '16px', color: '#00ff00' });
+        
+        const onUpdateCount = (count) => {
+            if (this.connectionText.active && this.connectionText) {
+                this.connectionText.setText(`Servidor: ONLINE | Usuarios: ${count}`);
+            }
+        };
+
+        this.game.events.on('update_online_count', onUpdateCount);
+
+        this.events.once('shutdown', () => {
+            this.game.events.off('update_online_count', onUpdateCount);
+        });
     }
 
     async handleLogout() {
         const username = this.registry.get('username');
         
-        // Avisar al servidor para que deje libre el puesto de Host
-        await fetch('/api/logout', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username })
-        });
+        try {
+            // Avisar al servidor para que deje libre el puesto de Host
+            await fetch('/api/logout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username })
+            });
+        } catch (e) { console.error("Error en logout"); }
 
         // Limpiar local
         localStorage.removeItem('voley_username');
         localStorage.removeItem('voley_session_token');
 
         // Limpiar registry
-        this.registry.remove('username');
-        this.registry.remove('userToken');
-        this.registry.remove('isHost');
+        this.registry.destroy();
 
         // Volver a la pantalla de login
+        this.scene.stop('Connection_Scene');
         this.scene.start('Logging_Scene');
     }
 }
