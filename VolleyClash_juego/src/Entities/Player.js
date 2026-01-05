@@ -71,7 +71,8 @@ export class Player {
                 jumpLeftAnim: 'charA_jumpLeft',
                 jumpRightAnim: 'charA_jumpRight',
                 receiveLeftAnim: 'charA_receiveLeft',
-                receiveRightAnim: 'charA_receiveRight'
+                receiveRightAnim: 'charA_receiveRight',
+                victory:"charA_victory"
             },
             // rápido y competitivo
             characterB: {
@@ -84,7 +85,8 @@ export class Player {
                 jumpLeftAnim: 'charB_jumpLeft',
                 jumpRightAnim: 'charB_jumpRight',
                 receiveLeftAnim: 'charB_receiveLeft',
-                receiveRightAnim: 'charB_receiveRight'
+                receiveRightAnim: 'charB_receiveRight',
+                victory:"charB_victory"
             },
             // divertido y algo distraído
             characterC: {
@@ -97,7 +99,8 @@ export class Player {
                 jumpLeftAnim: 'charC_jumpLeft',
                 jumpRightAnim: 'charC_jumpRight',
                 receiveLeftAnim: 'charC_receiveLeft',
-                receiveRightAnim: 'charC_receiveRight'
+                receiveRightAnim: 'charC_receiveRight',
+                victory:"charC_victory"
             }
         };
 

@@ -45,6 +45,7 @@ export class GameOnline_Scene extends Phaser.Scene {
         this.maxSets = 3; // mejor de 3
         this.currentSet = 1; // set actual
         this.isGoldenPoint = false;
+        this.isSetEnding = false;
     }
 
     preload() {
@@ -583,6 +584,12 @@ export class GameOnline_Scene extends Phaser.Scene {
     }
 
     _handleSetEndLogic(winner, matchOver) {
+        this.isSetEnding = true;
+        if (this.ball?.sprite) {
+            this.ball.isBallLive = false;
+            this.ball.sprite.setVelocity(0, 0);
+        }
+
         this.timerEvent.paused = true;
         this.updateSetScoreUI();
 
@@ -1025,6 +1032,8 @@ export class GameOnline_Scene extends Phaser.Scene {
     // Configura los event listeners de la pelota
     _setupBallEvents() {
         this.events.on('rallyConcluded', (data) => {
+            if (this.isSetEnding) return;
+
             // SOLO EL HOST calcula y emite el nuevo estado
             if (this.myRole === 'player1') {
                 const scorerId = data.scoringPlayerId;
@@ -1139,6 +1148,8 @@ export class GameOnline_Scene extends Phaser.Scene {
     }
 
     _endSet(winner) {
+        if (this.isSetEnding) return;
+
         if (this.myRole === 'player1') {
             if (winner === 'player1') this.setsP1++;
             else if (winner === 'player2') this.setsP2++;
@@ -1162,6 +1173,7 @@ export class GameOnline_Scene extends Phaser.Scene {
 
     // Reinicia el estado para un nuevo set
     _resetSet() {
+        this.isSetEnding = false;
         this.isGoldenPoint = false;
         // se actualiza el texto del set actual
         this.setText.setText(`SET ${this.currentSet}`);
