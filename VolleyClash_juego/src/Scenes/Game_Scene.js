@@ -10,9 +10,10 @@ import { getStoredSfxVolume } from '../UI/Audio.js';
 
 export class Game_Scene extends Phaser.Scene {
     tiempoTotal = 60; // para 2 min poner 120 segundos
-    tiempoRestante = this.tiempoTotal;
+    tiempoRestante;
     timerText;
     timerEvent;
+
     constructor() {
         super('Game_Scene');
     }
@@ -33,6 +34,7 @@ export class Game_Scene extends Phaser.Scene {
         this.currentSet = 1; // set actual
         this.isGoldenPoint = false;
         this.isSetEnding = false;
+        this.tiempoRestante = this.tiempoTotal;
     }
 
     preload() {
@@ -107,6 +109,9 @@ export class Game_Scene extends Phaser.Scene {
         this.worldWidth = width;
         this.worldHeight = height;
         const style = this.game.globals.defaultTextStyle;
+
+        this.events.off('rallyConcluded');
+        this.events.off('resume');
 
         // se definen los efectos de sonido
         this.sfx = {
@@ -848,6 +853,7 @@ export class Game_Scene extends Phaser.Scene {
 
     // Configura los event listeners de la pelota
     _setupBallEvents() {
+        this.events.off('rallyConcluded');
         this.events.on('rallyConcluded', (data) => {
             if (this.isSetEnding) return;
 
@@ -1065,5 +1071,12 @@ export class Game_Scene extends Phaser.Scene {
         p2.idleLeft();
 
         this.playSfx(this.sfx.whistle);
-    }    
+    }
+
+    shutdown() {
+        this.events.off('rallyConcluded');
+        if (this.timerEvent) {
+            this.timerEvent.destroy();
+        }
+    }
 }

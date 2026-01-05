@@ -59,7 +59,7 @@ export class EndGame_Scene extends Phaser.Scene {
         const winnerTextY = height * 0.33;
         const buttonY = height * 0.90;
         const spritePadding = height * 0.04;
-        const spriteCenterY = (winnerTextY + buttonY) / 2 - height * 0.02;
+        const spriteCenterY = Math.round((winnerTextY + buttonY) / 2 - height * 0.02);
 
         // Texto indicando el ganador
         const winnerText =
@@ -87,15 +87,17 @@ export class EndGame_Scene extends Phaser.Scene {
         const { spriteKey, animKey } = victoryConfig[winnerCharacter] || victoryConfig.characterA;
 
         // hueco para los sprites del ganador
-        this.winnerSpriteSlot = this.add.container(width / 2, spriteCenterY);
+        this.winnerSpriteSlot = this.add.container(Math.round(width / 2), spriteCenterY);
 
         const winnerSprite = this.add.sprite(0, 0, spriteKey);
+        winnerSprite.setCrop(0, 1, 128, 127);
         const availableHeight = (buttonY - winnerTextY) - spritePadding * 2;
         const availableWidth = width * 0.6;
-        const scale = Math.min(
+        let scale = Math.min(
             availableHeight / winnerSprite.height,
             availableWidth / winnerSprite.width
         ) * 0.85;
+        scale = Math.round(scale * 10) / 10;
         winnerSprite.setScale(Math.max(0.2, scale));
         winnerSprite.play(animKey);
         this.winnerSpriteSlot.add(winnerSprite);
