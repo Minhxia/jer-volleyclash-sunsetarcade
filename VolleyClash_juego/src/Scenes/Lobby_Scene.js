@@ -1,7 +1,7 @@
 //Pantalla de Lobby
 import Phaser from 'phaser';
 import { createUIButton, createIconButton } from '../UI/Buttons.js';
-import { io } from 'socket.io-client';
+// TODO import { io } from 'socket.io-client';
 
 export class Lobby_Scene extends Phaser.Scene {
     constructor() {

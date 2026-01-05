@@ -7,7 +7,7 @@ import { Ball } from '../Entities/Ball.js';
 import { CommandProcessor } from '../Commands/CommandProcessor.js';
 import { MovePlayerCommand } from '../Commands/MovePlayerCommand.js';
 import { getStoredSfxVolume } from '../UI/Audio.js';
-import { io } from 'socket.io-client';
+// TODO import { io } from 'socket.io-client';
 
 export class GameOnline_Scene extends Phaser.Scene {
     tiempoTotal = 60; // para 2 min poner 120 segundos
@@ -22,7 +22,7 @@ export class GameOnline_Scene extends Phaser.Scene {
         this.socket = this.registry.get('socket');   
         
         if(!this.socket) {
-            this.socket = io();
+            // TODO this.socket = io();
             this.registry.set('socket', this.socket);
         }
 
