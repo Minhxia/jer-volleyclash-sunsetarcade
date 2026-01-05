@@ -336,11 +336,6 @@ export class Game_Scene extends Phaser.Scene {
             this.scene.launch("Pause_Scene");
         });
 
-        // acceso directo a la escena de fin de partida
-        this.input.keyboard.on("keydown-F", () => {
-            const winner = this.scoreP1 >= this.scoreP2 ? "player1" : "player2";
-            this._endGame(winner);
-        });
         this.events.on('resume', () => {
             this.timerEvent.paused = false;
         });
