@@ -1,3 +1,9 @@
+const { WebSocketServer } = require('ws');
+
+const { createConnectionService } = require('./services/connectionService');
+const { createGameRoomService } = require('./services/gameRoomService');
+const { createMatchmakingService } = require('./services/matchmakingService');
+
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
@@ -24,7 +30,7 @@ const readUsers = () => {
     if (!fs.existsSync(USERS_FILE)) {
         fs.writeFileSync(USERS_FILE, JSON.stringify([]));
     }
-    const data = fs.readFileSync(USERS_FILE);
+    const data = fs.readFileSync(USERS_FILE, 'utf8');
     return JSON.parse(data);
 };
 
@@ -54,11 +60,13 @@ app.post('/api/register', (req, res) => {
     }
 
     // Guardamos el nuevo usuario
-    users.push({ username, 
-        password, 
-        partidaJugadas: 0, 
-        partidasGanadas: 0, 
-        partidasPerdidas:0 });
+    users.push({
+        username,
+        password,
+        partidaJugadas: 0,
+        partidasGanadas: 0,
+        partidasPerdidas: 0
+    });
     saveUsers(users);
 
     console.log(`Usuario registrado: ${username}`);
@@ -107,11 +115,11 @@ app.post('/api/login', (req, res) => {
 
         console.log(`Login exitoso: ${username} | ¿Es Host?: ${isHost}`);
         console.log(`Jugadores activos: [${activePlayers.join(', ')}]`);
-        
+
         // Token
-        res.json({ 
-            success: true, 
-            username: user.username, 
+        res.json({
+            success: true,
+            username: user.username,
             token: `token-${user.username}`,
             isHost: isHost
         });
@@ -145,10 +153,10 @@ app.get('/api/users/keepalive/:username', (req, res) => {
 
     if (username && username !== 'undefined') {
         if (!activePlayers.includes(username)) {
-            return res.status(401).json({ 
-                success: false, 
+            return res.status(401).json({
+                success: false,
                 error: 'Session expired',
-                message: 'Inactividad detectada. Re-conectando...' 
+                message: 'Inactividad detectada. Re-conectando...'
             });
         }
         lastSeen.set(username, Date.now());
@@ -160,7 +168,7 @@ app.get('/api/users/keepalive/:username', (req, res) => {
 setInterval(() => {
     const now = Date.now();
     for (const [username, timestamp] of lastSeen.entries()) {
-        if (now - timestamp > 10000) { 
+        if (now - timestamp > 10000) {
             console.log(`[Servidor] Desconexión detectada (timeout): ${username}`);
 
             lastSeen.delete(username);
@@ -189,7 +197,7 @@ app.get('/api/users/profile/:username', (req, res) => {
     if (!user) {
         return res.status(404).json({ error: 'Usuario no encontrado' });
     }
-    
+
     res.json({
         username: user.username,
         partidaJugadas: user.partidaJugadas,
@@ -252,145 +260,183 @@ app.get('/status', (req, res) => {
     res.status(200).send('active');
 });
 
+
 // ----- WEBSOCKETS -----
 
-let roomPlayers = [];
-let roomScenario = null;
+// Map: ws -> { id, username, character, isHost, isAlive }
+const clients = new Map();
+// Datos del jugador
+function getMeta(ws) {
+    return clients.get(ws);
+}
 
-// TODO io.on('connection', (socket) => {
-//     console.log('Nueva conexión WebSocket:', socket.id);
+const connectionService = createConnectionService();
+const gameRoomService = createGameRoomService(connectionService, getMeta);
+const matchmakingService = createMatchmakingService(connectionService, gameRoomService, getMeta);
 
-//     // Cuando un jugador entra a la escena Lobby_Scene
-//     socket.on('join_lobby', (userData) => {
-//         if (userData.selectedScenario) {
-//             roomScenario = userData.selectedScenario;
-//         }
-//         const player = {
-//             id: socket.id,
-//             username: userData.username,
-//             character: userData.character,
-//             ready: false,
-//             isHost: activePlayers[0] === userData.username
-//         };
+const wss = new WebSocketServer({ server });
 
-//         // Evitar duplicados
-//         roomPlayers = roomPlayers.filter(p => p.username !== userData.username);
-//         roomPlayers.push(player);
+let nextWsId = 1;
 
-//         // Notificar a todos en la sala la nueva lista
-//         io.emit('lobby_update', roomPlayers);
-//     });
+// Inicializa los datos para un ws
+function initMeta(ws) {
+    const meta = {
+        id: `ws_${nextWsId++}`,
+        username: null,
+        character: null,
+        isHost: false,
+        isAlive: true
+    };
+    clients.set(ws, meta);
+    return meta;
+}
 
-//     // Cuando un jugador pulsa el botón "Listo"
-//     socket.on('player_ready', (isReady) => {
-//         const player = roomPlayers.find(p => p.id === socket.id);
-//         if (player) {
-//             player.ready = isReady;
-//             console.log(`Jugador ${player.username} está listo: ${isReady}`);
+// Convierte RawData a string
+function rawToText(raw) {
+    // raw: RawData (string | Buffer | ArrayBuffer | Buffer[])
+    if (typeof raw === 'string') return raw;
+    if (Buffer.isBuffer(raw)) return raw.toString('utf8');
+    if (Array.isArray(raw)) return Buffer.concat(raw).toString('utf8');
+    if (raw instanceof ArrayBuffer) return Buffer.from(raw).toString('utf8');
+    return String(raw);
+}
 
-//             io.emit('lobby_update', roomPlayers);
-//         }
+// Evento de nueva conexión
+wss.on('connection', (ws) => {
+    const meta = initMeta(ws);
 
-//         // Si hay 2 y ambos están listos, el servidor da la orden de empezar
-//         if (roomPlayers.length === 2 && roomPlayers.every(p => p.ready)) {
-//             console.log("¡Todos listos! Iniciando partida...");
-//             io.emit('start_game', { players: roomPlayers, selectedScenario: roomScenario });
+    connectionService.add(ws);
+    console.log(`[WS] Conectado: ${meta.id}`);
 
-//             // Reseteo
-//             roomPlayers.forEach(p => p.ready = false);
-//             io.emit('lobby_update', roomPlayers);
-//         }
-//     });
+    // Manejo de pong para keep-alive
+    ws.on('pong', () => {
+        const m = getMeta(ws);
+        if (m) m.isAlive = true;
+    });
 
-//     // Desconexion
-//     socket.on('disconnect', () => {
-//         console.log('Usuario desconectado:', socket.id);
+    // Manejo de mensajes entrantes
+    ws.on('message', (raw) => {
+        let data;
+        try {
+            const text = rawToText(raw);
+            data = JSON.parse(text);
+        } catch {
+            connectionService.send(ws, 'error', { message: 'JSON inválido' });
+            return;
+        }
 
-//         const leavingPlayer = roomPlayers.find(p => p.id === socket.id);
+        const type = data?.type;
+        if (!type) {
+            connectionService.send(ws, 'error', { message: 'Mensaje sin "type"' });
+            return;
+        }
 
-//         if (leavingPlayer) {
-//             // Notificamos a los demás que la partida/sala se cierra por abandono
-//             socket.broadcast.emit('player_abandoned', { 
-//                 username: leavingPlayer.username 
-//             });
-//             activePlayers = activePlayers.filter(u => u !== leavingPlayer.username);
-//         }
-        
-//         roomPlayers = roomPlayers.filter(p => p.id !== socket.id);
-//         if (roomPlayers.length > 0 && !roomPlayers.some(p => p.isHost)) {
-//             roomPlayers[0].isHost = true;
-//         }
-//         io.emit('lobby_update', roomPlayers);
-//     });
+        switch (type) {
+            // ----- Lobby -----
+            case 'join_lobby': {
+                matchmakingService.joinLobby(ws, data);
+                break;
+            }
 
-//     // GameOnline_Scene
-//     // Recibir posición de un cliente y retransmitirla al resto
-//     // TODO revisar interacción con salto y animaciones
-//     socket.on('player_move', (moveData) => {
-//         // moveData contiene { x, y, anim, flipX }
-//         // Usamos broadcast para enviarlo a todos menos al que lo envió
-//         socket.broadcast.emit('opponent_move', {
-//             id: socket.id,
-//             x: moveData.x,
-//             y: moveData.y,
-//             anim: moveData.anim,
-//             flipX: moveData.flipX
-//         });
-//     });
+            case 'player_ready':
+                matchmakingService.setReady(ws, !!data.isReady);
+                break;
 
-//     // Sincronización de la pelota (Solo la envía el Host para evitar conflictos)
-//     // TODO Borrar, probar versión dónde se mantiene la posición "offline" en cada cliente
-//     socket.on('ball_sync', (ballData) => {
-//         // ballData contiene { x, y, vx, vy }
-//         socket.broadcast.emit('ball_update', ballData);
-//     });
+            // ----- In-game sync -----
+            case 'player_move':
+                gameRoomService.handlePlayerMove(ws, {
+                    x: data.x,
+                    y: data.y,
+                    anim: data.anim,
+                    flipX: data.flipX
+                });
+                break;
 
-//     // Gestión de puntuación
-//     socket.on('update_score', (scoreData) => {
-//         // scoreData: { p1Points, p2Points, p1Sets, p2Sets }
-//         io.emit('score_sync', scoreData);
-//     });
+            case 'ball_sync':
+                gameRoomService.handleBallSync(ws, {
+                    x: data.x,
+                    y: data.y,
+                    vx: data.vx,
+                    vy: data.vy
+                });
+                break;
 
-//     socket.on('set_finished_sync', (data) => socket.broadcast.emit('set_finished_sync', data));
+            case 'update_score':
+                gameRoomService.handleScoreUpdate(ws, data);
+                break;
 
-//     socket.on('golden_point_sync', () => {
-//         socket.broadcast.emit('force_golden_point');
-//     });
+            case 'set_finished_sync':
+                gameRoomService.forwardToOpponent(ws, 'set_finished_sync', data);
+                break;
 
-//     // Detección de Victoria comunicada por el servidor
-//     socket.on('game_finished', (winnerData) => {
-//         // winnerData: { winner: 'player1', winnerName: '...' }
-//         io.emit('match_finished', winnerData);
-//     });
+            case 'golden_point_sync':
+                gameRoomService.forwardToOpponent(ws, 'force_golden_point', {});
+                break;
 
-//     // GameOnline_Scene ?
-//     // Gestion de powerups
-//     socket.on('use_powerup', (powerData) => {
-//         // powerData: { type: 'paralizar', target: 'player2' }
-//         socket.broadcast.emit('apply_powerup', powerData);
-//     });
+            case 'game_finished':
+                gameRoomService.broadcastToMatch('match_finished', data);
+                break;
 
-//     // GameOnline_Scene ?
-//     // Spawn de power ups
-//     socket.on('spawn_powerup', (data) => {
-//     // data contiene { x, y, type }
-//     socket.broadcast.emit('force_spawn_powerup', data);
+            case 'use_powerup':
+                gameRoomService.forwardToOpponent(ws, 'apply_powerup', data);
+                break;
 
-//     // Gestion del tiempo
-//     socket.on('timer_sync', (data) => socket.broadcast.emit('timer_sync', data));
-// });
-// });
+            case 'spawn_powerup':
+                gameRoomService.forwardToOpponent(ws, 'force_spawn_powerup', data);
+                break;
 
-// -------------------------
+            case 'timer_sync':
+                gameRoomService.forwardToOpponent(ws, 'timer_sync', data);
+                break;
 
-// Esto asegura que si se refresca la página, se cargue el index.html
-// TODO app.get('*', (req, res) => {
-//     res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
-// });
+            default:
+                connectionService.send(ws, 'error', { message: `Tipo desconocido: ${type}` });
+                break;
+        }
+    });
 
-// server.listen(PORT, "0.0.0.0", () => {
-//     console.log(`Server is running on http://localhost:${PORT}`);
-// });
+    ws.on('close', () => {
+        const m = getMeta(ws);
+        console.log(`[WS] Desconectado: ${m?.id ?? 'unknown'}`);
+
+        // saca del lobby y notifica abandono
+        matchmakingService.leave(ws);
+
+        // limpieza de conexión
+        connectionService.remove(ws);
+
+        // al desconectar, quitar del listado de activos
+        if (m?.username) {
+            activePlayers = activePlayers.filter(u => u !== m.username);
+            lastSeen.delete(m.username);
+        }
+
+        clients.delete(ws);
+    });
+
+    ws.on('error', (err) => {
+        const m = getMeta(ws);
+        console.error(`[WS] Error (${m?.id ?? 'unknown'}):`, err);
+    });
+});
+
+// Intervalo de ping para detectar desconexiones “silenciosas”
+const interval = setInterval(() => {
+    for (const [ws, meta] of clients) {
+        if (meta.isAlive === false) {
+            console.log(`[WS] Terminando conexión muerta: ${meta.id}`);
+            ws.terminate();
+            clients.delete(ws);
+            continue;
+        }
+
+        meta.isAlive = false;
+        ws.ping();
+    }
+}, 30000);
+
+wss.on('close', () => clearInterval(interval));
+
 
 // Si no se indica host, por defecto es 0.0.0.0
 // https://nodejs.org/api/net.html#serverlistenport-host-backlog-callback
