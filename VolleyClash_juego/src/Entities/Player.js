@@ -71,7 +71,8 @@ export class Player {
                 jumpLeftAnim: 'charA_jumpLeft',
                 jumpRightAnim: 'charA_jumpRight',
                 receiveLeftAnim: 'charA_receiveLeft',
-                receiveRightAnim: 'charA_receiveRight'
+                receiveRightAnim: 'charA_receiveRight',
+                victory:"charA_victory"
             },
             // rápido y competitivo
             characterB: {
@@ -84,7 +85,8 @@ export class Player {
                 jumpLeftAnim: 'charB_jumpLeft',
                 jumpRightAnim: 'charB_jumpRight',
                 receiveLeftAnim: 'charB_receiveLeft',
-                receiveRightAnim: 'charB_receiveRight'
+                receiveRightAnim: 'charB_receiveRight',
+                victory:"charB_victory"
             },
             // divertido y algo distraído
             characterC: {
@@ -97,7 +99,8 @@ export class Player {
                 jumpLeftAnim: 'charC_jumpLeft',
                 jumpRightAnim: 'charC_jumpRight',
                 receiveLeftAnim: 'charC_receiveLeft',
-                receiveRightAnim: 'charC_receiveRight'
+                receiveRightAnim: 'charC_receiveRight',
+                victory:"charC_victory"
             }
         };
 
@@ -343,6 +346,9 @@ export class Player {
 
     // Actualizar flags como isOnGround (se llama a esto desde la escena, en cada frame)
     update() {
+        this.clampWithinBounds();
+        this.updateMultiplierTextPosition();
+
         if (this.sprite.body) {
             const wasOnGround = this.isOnGround;
             this.isOnGround = this.isGrounded();
@@ -389,9 +395,6 @@ export class Player {
                 }
             }
         }
-        this.clampWithinBounds();
-
-        this.updateMultiplierTextPosition();
     }
 
     // Uso de los power-ups
@@ -448,6 +451,7 @@ export class Player {
         for (const type in this.activePowerUps) {
             if (now <= this.activePowerUps[type]) continue;
 
+            console.log(`[Player] Expirando powerup: ${type}`);
             delete this.activePowerUps[type];
 
             switch (type) {
@@ -473,6 +477,16 @@ export class Player {
         if (scoreNeedsRecalc) this.recalculateScoreEffect();
     }
 
+    // Método para que la escena consulte qué hay en la primera posición del inventario
+    getNextPowerUpType() {
+        return this.powerUpInventory.length > 0 ? this.powerUpInventory[0] : null;
+    }
+
+    // Método para aplicar efectos que vienen desde el Socket
+    applyPowerUpEffect(type) {
+        console.log(`Aplicando efecto: ${type} a ${this.id}`);
+        this.applyOrRefreshTimedEffect(type, POWERUP_DURATION_MS[type]);
+    }
 
     //// EFECTOS VISUALES DE LOS POWER-UPS ////
     // paralizar -> rojo + parpadeo

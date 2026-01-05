@@ -295,10 +295,14 @@ io.on('connection', (socket) => {
         if (roomPlayers.length === 2 && roomPlayers.every(p => p.ready)) {
             console.log("¡Todos listos! Iniciando partida...");
             io.emit('start_game', { players: roomPlayers, selectedScenario: roomScenario });
+
+            // Reseteo
+            roomPlayers.forEach(p => p.ready = false);
+            io.emit('lobby_update', roomPlayers);
         }
     });
 
-    // salida del lobby
+    // Desconexion
     socket.on('disconnect', () => {
         console.log('Usuario desconectado:', socket.id);
 
@@ -309,11 +313,12 @@ io.on('connection', (socket) => {
             socket.broadcast.emit('player_abandoned', { 
                 username: leavingPlayer.username 
             });
+            activePlayers = activePlayers.filter(u => u !== leavingPlayer.username);
         }
         
         roomPlayers = roomPlayers.filter(p => p.id !== socket.id);
-        if (roomPlayers.length === 0) {
-            roomScenario = null;
+        if (roomPlayers.length > 0 && !roomPlayers.some(p => p.isHost)) {
+            roomPlayers[0].isHost = true;
         }
         io.emit('lobby_update', roomPlayers);
     });
@@ -340,9 +345,16 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('ball_update', ballData);
     });
 
+    // Gestión de puntuación
     socket.on('update_score', (scoreData) => {
         // scoreData: { p1Points, p2Points, p1Sets, p2Sets }
         io.emit('score_sync', scoreData);
+    });
+
+    socket.on('set_finished_sync', (data) => socket.broadcast.emit('set_finished_sync', data));
+
+    socket.on('golden_point_sync', () => {
+        socket.broadcast.emit('force_golden_point');
     });
 
     // Detección de Victoria comunicada por el servidor
@@ -363,6 +375,9 @@ io.on('connection', (socket) => {
     socket.on('spawn_powerup', (data) => {
     // data contiene { x, y, type }
     socket.broadcast.emit('force_spawn_powerup', data);
+
+    // Gestion del tiempo
+    socket.on('timer_sync', (data) => socket.broadcast.emit('timer_sync', data));
 });
 });
 
