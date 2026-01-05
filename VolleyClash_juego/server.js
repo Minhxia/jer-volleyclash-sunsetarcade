@@ -330,7 +330,9 @@ io.on('connection', (socket) => {
         io.emit('lobby_update', roomPlayers);
     });
 
+    // GameOnline_Scene
     // Recibir posición de un cliente y retransmitirla al resto
+    // TODO revisar interacción con salto y animaciones
     socket.on('player_move', (moveData) => {
         // moveData contiene { x, y, anim, flipX }
         // Usamos broadcast para enviarlo a todos menos al que lo envió
@@ -344,6 +346,7 @@ io.on('connection', (socket) => {
     });
 
     // Sincronización de la pelota (Solo la envía el Host para evitar conflictos)
+    // TODO Borrar, probar versión dónde se mantiene la posición "offline" en cada cliente
     socket.on('ball_sync', (ballData) => {
         // ballData contiene { x, y, vx, vy }
         socket.broadcast.emit('ball_update', ballData);
@@ -367,12 +370,14 @@ io.on('connection', (socket) => {
         io.emit('match_finished', winnerData);
     });
 
+    // GameOnline_Scene ?
     // Gestion de powerups
     socket.on('use_powerup', (powerData) => {
         // powerData: { type: 'paralizar', target: 'player2' }
         socket.broadcast.emit('apply_powerup', powerData);
     });
 
+    // GameOnline_Scene ?
     // Spawn de power ups
     socket.on('spawn_powerup', (data) => {
     // data contiene { x, y, type }
