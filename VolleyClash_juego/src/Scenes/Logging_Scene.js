@@ -16,25 +16,28 @@ export class Logging_Scene extends Phaser.Scene {
         const savedPass = sessionStorage.getItem('voley_password'); // Guarda la pass (o un token) para re-loguear
 
         if (savedName && savedPass) {
-            console.log("Intentando auto-login para:", savedName);
-            
-            // En lugar de entrar directo, preguntamos al servidor para que nos asigne Host/Invitado
             try {
                 const response = await fetch(`${this.apiUrl}/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: savedName, password: savedPass })
                 });
-                const resData = await response.json();
 
-                if (response.ok) {
-                    this.registry.set('username', resData.username);
-                    this.registry.set('isHost', resData.isHost);
-                    this.scene.launch('ConnectionManager_Scene');
-                    this.scene.start('Menu_Scene');
+                if (!response.ok) {
+                    // se limpian las credenciales inválidas
+                    sessionStorage.removeItem('voley_username');
+                    sessionStorage.removeItem('voley_password');
+                    sessionStorage.removeItem('voley_session_token');
+                    return;
                 }
+
+                const resData = await response.json();
+                this.registry.set('username', resData.username);
+                this.registry.set('isHost', resData.isHost);
+                this.scene.launch('ConnectionManager_Scene');
+                this.scene.start('Menu_Scene');
             } catch (e) {
-                console.error("Auto-login fallido");
+                console.error("Auto-login fallido", e);
             }
         }
     }
@@ -50,9 +53,9 @@ export class Logging_Scene extends Phaser.Scene {
 
         // sonido
         this.load.audio('sonidoClick', 'ASSETS/SONIDO/SonidoBoton.mp3');
-        
+
         // marco
-        this.load.image('marco','ASSETS/UI/MARCOS/VACIOS/MARCOS_ESCENARIO.png')
+        this.load.image('marco', 'ASSETS/UI/MARCOS/VACIOS/MARCOS_ESCENARIO.png')
     }
 
     create() {
@@ -108,7 +111,7 @@ export class Logging_Scene extends Phaser.Scene {
             textStyle: { ...style, fontSize: '14px', color: '#FF0000' },
             clickSoundKey: 'sonidoClick'
         });
-        
+
         // Texto para alternar entre Login y Registro
         this.toggleText = this.add.text(centerX, height * 0.62, '¿Aún no tienes cuenta? Regístrate aquí', {
             ...style, fontSize: '16px', color: '#0000EE', fontStyle: 'italic'
@@ -126,10 +129,10 @@ export class Logging_Scene extends Phaser.Scene {
         `);
 
         const inputEl = dom.node.querySelector('input');
-        
+
         inputEl.addEventListener('focus', () => this.input.keyboard.enabled = false);
         inputEl.addEventListener('blur', () => this.input.keyboard.enabled = true);
-        
+
         return inputEl;
     }
 
@@ -153,7 +156,7 @@ export class Logging_Scene extends Phaser.Scene {
             // MODO LOGIN: Volvemos a la posición original
             this.mainBtn.button.setX(centerX - 80);
             this.mainBtn.text.setX(centerX - 80);
-            
+
             this.deleteBtn.button.setVisible(true);
             this.deleteBtn.text.setVisible(true);
         }
@@ -180,8 +183,8 @@ export class Logging_Scene extends Phaser.Scene {
             const response = await fetch(`${this.apiUrl}${endpoint}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    username: usernameValue, 
+                body: JSON.stringify({
+                    username: usernameValue,
                     password: passwordValue
                 })
             });
