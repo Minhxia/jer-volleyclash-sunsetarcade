@@ -41,10 +41,6 @@ export class Lobby_Scene extends Phaser.Scene {
         this.isPlayerReady = false; 
         this.showingAbandonError = false;
 
-        if (this.btnListo.text) this.btnListo.text.setText('Listo?');
-        this.btnVolver.setAlpha(1);
-        this.btnVolver.setInteractive();
-
         this.add.image(0, 0, 'fondo').setOrigin(0).setDepth(-1);
 
         // Título
@@ -113,6 +109,14 @@ export class Lobby_Scene extends Phaser.Scene {
             clickSoundKey: 'sonidoClick',
             onClick: () => this.handleBack()
         });
+
+        if (this.btnListo?.setLabel) {
+            this.btnListo.setLabel('Listo?');
+        } else if (this.btnListo?.text) {
+            this.btnListo.text.setText('Listo?');
+        }
+        this.btnVolver?.setAlpha(1);
+        this.btnVolver?.setInteractive();
 
         // Conexión al WebSockets
         this.socket = this.registry.get('socket');

@@ -21,6 +21,20 @@ export class EndGame_Scene extends Phaser.Scene {
 
         // sonido
         this.load.audio('sonidoClick', 'ASSETS/SONIDO/SonidoBoton.mp3');
+
+        // animaciones de victoria
+        this.load.spritesheet(
+            'victoria_A', 
+            'ASSETS/PERSONAJES/ANIMACIONES/PERSONAJE_A/A_VICTORIA.png', 
+            {frameWidth:128,frameHeight: 128});
+        this.load.spritesheet(
+            'victoria_B', 
+            'ASSETS/PERSONAJES/ANIMACIONES/PERSONAJE_B/A_VICTORIA.png', 
+            {frameWidth:128,frameHeight: 128});
+        this.load.spritesheet(
+            'victoria_C', 
+            'ASSETS/PERSONAJES/ANIMACIONES/PERSONAJE_C/A_VICTORIA.png', 
+            {frameWidth:128,frameHeight: 128});
     }
 
     create() { 
@@ -28,7 +42,9 @@ export class EndGame_Scene extends Phaser.Scene {
         const style = this.game.globals.defaultTextStyle;
 
         const charP1 = this.player1.name;
+        const spriteP1 = this.player1.character;
         const charP2 = this.player2.name;
+        const spriteP2 = this.player2.character;
 
         // Fondo
         this.add.image(0, 0, 'fondo').setOrigin(0).setDepth(-1);
@@ -40,10 +56,10 @@ export class EndGame_Scene extends Phaser.Scene {
             color: '#5f0000ff'
         }).setOrigin(0.5);
 
-        const winnerTextY = height * 0.36;
-        const spriteRowY = height * 0.52;
+        const winnerTextY = height * 0.33;
         const buttonY = height * 0.90;
-        const spriteOffsetX = width * 0.2;
+        const spritePadding = height * 0.04;
+        const spriteCenterY = (winnerTextY + buttonY) / 2 - height * 0.02;
 
         // Texto indicando el ganador
         const winnerText =
@@ -57,10 +73,32 @@ export class EndGame_Scene extends Phaser.Scene {
             color: '#5f0000ff'
         }).setOrigin(0.5);
 
-        // Huecos para sprites de ganador y perdedor (animaciones futuras)
-        this.winnerSpriteSlot = this.add.container(width / 2 - spriteOffsetX, spriteRowY);
-        this.loserSpriteSlot = this.add.container(width / 2 + spriteOffsetX, spriteRowY);
+        // se crean las animaciones
+        this._createAnimations();
 
+        const winnerCharacter = this.winner === "player1" ? spriteP1 : spriteP2;
+
+        const victoryConfig = {
+            characterA: { spriteKey: 'victoria_A', animKey: 'charA_victory' },
+            characterB: { spriteKey: 'victoria_B', animKey: 'charB_victory' },
+            characterC: { spriteKey: 'victoria_C', animKey: 'charC_victory' }
+        };
+
+        const { spriteKey, animKey } = victoryConfig[winnerCharacter] || victoryConfig.characterA;
+
+        // hueco para los sprites del ganador
+        this.winnerSpriteSlot = this.add.container(width / 2, spriteCenterY);
+
+        const winnerSprite = this.add.sprite(0, 0, spriteKey);
+        const availableHeight = (buttonY - winnerTextY) - spritePadding * 2;
+        const availableWidth = width * 0.6;
+        const scale = Math.min(
+            availableHeight / winnerSprite.height,
+            availableWidth / winnerSprite.width
+        ) * 0.85;
+        winnerSprite.setScale(Math.max(0.2, scale));
+        winnerSprite.play(animKey);
+        this.winnerSpriteSlot.add(winnerSprite);
 
         // botón para volver al menú principal
         const buttonTextStyle = {
@@ -81,6 +119,30 @@ export class EndGame_Scene extends Phaser.Scene {
         });
 
         this.updateUserStats(this.winner);
+    }
+
+    // Crea las animaciones de victoria
+    _createAnimations(){
+        this.anims.create({
+            key: 'charA_victory',
+            frames: this.anims.generateFrameNumbers('victoria_A', { start: 0, end: 1 }),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'charB_victory',
+            frames: this.anims.generateFrameNumbers('victoria_B', { start: 0, end: 1 }),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'charC_victory',
+            frames: this.anims.generateFrameNumbers('victoria_C', { start: 0, end: 1 }),
+            frameRate: 4,
+            repeat: -1
+        });
     }
 
     updateUserStats(winner) {
