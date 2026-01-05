@@ -38,6 +38,13 @@ export class Lobby_Scene extends Phaser.Scene {
         const { width, height } = this.scale;
         const centerX = width / 2;
 
+        this.isPlayerReady = false; 
+        this.showingAbandonError = false;
+
+        if (this.btnListo.text) this.btnListo.text.setText('Listo?');
+        this.btnVolver.setAlpha(1);
+        this.btnVolver.setInteractive();
+
         this.add.image(0, 0, 'fondo').setOrigin(0).setDepth(-1);
 
         // Título
@@ -108,7 +115,18 @@ export class Lobby_Scene extends Phaser.Scene {
         });
 
         // Conexión al WebSockets
-        this.socket = io();
+        this.socket = this.registry.get('socket');
+        if (!this.socket) {
+            this.socket = io();
+            this.registry.set('socket', this.socket);
+        } else {
+            this.socket.removeAllListeners();
+            this.socket.emit('player_ready', false);
+        }
+
+        this.socket.on('lobby_update', (players) => { /* ... */ });
+        this.socket.on('start_game', (data) => { /* ... */ });
+        this.socket.on('player_abandoned', (data) => { /* ... */ });
 
         // Unirse al lobby
         this.socket.emit('join_lobby', {
@@ -120,7 +138,33 @@ export class Lobby_Scene extends Phaser.Scene {
         // Actualizaciones del lobby
         this.socket.on('lobby_update', (players) => {
             this.lobbyPlayers = players;
-            this.updateLobbyUI(players);
+
+            if (this.showingAbandonError) return;
+
+            this.p1StatusText.setText('Esperando Host...');
+            this.p2StatusText.setText('Esperando rival...');
+
+            const p1Data = players.find(p => p.isHost);
+            const p2Data = players.find(p => !p.isHost);
+
+
+            if (p1Data) {
+                const emoji = p1Data.ready ? '✅' : '❌';
+                this.p1StatusText.setText(`${p1Data.username} (HOST) --- ${emoji}`);
+                
+                // Si YO soy el nuevo host (porque el anterior se fue)
+                if (p1Data.id === this.socket.id) {
+                    this.isHost = true;
+                    console.log("Ahora eres el Host de la sala");
+                }
+            }
+
+            if (p2Data) {
+                const emoji = p2Data.ready ? '✅' : '❌';
+                this.p2StatusText.setText(`${p2Data.username} --- ${emoji}`);
+            } else {
+                this.p2StatusText.setText('Esperando rival...');
+            }
         });
 
         // Escuchar orden de inicio
@@ -145,24 +189,26 @@ export class Lobby_Scene extends Phaser.Scene {
                 selectedScenario
             });
         });
-    }
 
-    updateLobbyUI(players) {
-        // Buscamos al Host (p0) y al Invitado (p1) en el array que envía el servidor
-        const p1Data = players.find(p => p.isHost);
-        const p2Data = players.find(p => !p.isHost);
+        this.socket.on('player_abandoned', (data) => {
+            this.showingAbandonError = true;
 
-        if (p1Data) {
-            const emoji = p1Data.ready ? '✅' : '❌';
-            this.p1StatusText.setText(`${p1Data.username} --- ${emoji}`);
-        }
+            console.log(`El usuario ${data.username} ha salido del lobby`);
+            
+            this.p2StatusText.setText(`¡${data.username} ha salido!`);
+            this.p2StatusText.setStyle({ fill: '#ff0000' });
 
-        if (p2Data) {
-            const emoji = p2Data.ready ? '✅' : '❌';
-            this.p2StatusText.setText(`${p2Data.username} --- ${emoji}`);
-        } else {
-            this.p2StatusText.setText('Esperando rival...');
-        }
+            this.time.delayedCall(3000, () => {
+                this.showingAbandonError = false;
+                if (this.p2StatusText) {
+                    this.p2StatusText.setStyle({ fill: '#000' });
+                    this.socket.emit('request_lobby_update');
+                }
+            });
+
+            this.isPlayerReady = false;
+            this.btnListo.text.setText('LISTO?');
+        });
     }
 
     toggleReady() {
@@ -188,5 +234,15 @@ export class Lobby_Scene extends Phaser.Scene {
         if (this.socket) this.socket.disconnect();
         const targetScene = this.isHost ? 'SelectScenario_Scene' : 'SelectPlayer_Scene';
         this.scene.start(targetScene, { mode: this.mode, isHost: this.isHost });
+    }
+
+    shutdown() {
+        // Eliminamos todos los escuchadores de red para que no afecten a la siguiente partida
+        if (this.socket) {
+            this.socket.off('start_game');
+            this.socket.off('join_lobby');
+            this.socket.off('player_abandoned');
+            this.socket.off('lobby_update');
+        }
     }
 }
