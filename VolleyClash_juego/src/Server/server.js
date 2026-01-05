@@ -2,11 +2,11 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
-const { Server } = require('socket.io');
+// TODO const { Server } = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+// TODO const io = new Server(server);
 const lastSeen = new Map();
 
 const PORT = process.env.PORT || 8080;
@@ -171,7 +171,7 @@ setInterval(() => {
             if (antes !== activePlayers.length) {
                 console.log(`[Servidor] Lista actualizada tras timeout: [${activePlayers.join(', ')}]`);
                 // Avisar a los clientes del cambio en el conteo
-                io.emit('lobby_update', roomPlayers.filter(p => p.username !== username));
+                // io.emit('lobby_update', roomPlayers.filter(p => p.username !== username));
             }
         }
     }
@@ -257,137 +257,144 @@ app.get('/status', (req, res) => {
 let roomPlayers = [];
 let roomScenario = null;
 
-io.on('connection', (socket) => {
-    console.log('Nueva conexión WebSocket:', socket.id);
+// TODO io.on('connection', (socket) => {
+//     console.log('Nueva conexión WebSocket:', socket.id);
 
-    // Cuando un jugador entra a la escena Lobby_Scene
-    socket.on('join_lobby', (userData) => {
-        if (userData.selectedScenario) {
-            roomScenario = userData.selectedScenario;
-        }
-        const player = {
-            id: socket.id,
-            username: userData.username,
-            character: userData.character,
-            ready: false,
-            isHost: activePlayers[0] === userData.username
-        };
+//     // Cuando un jugador entra a la escena Lobby_Scene
+//     socket.on('join_lobby', (userData) => {
+//         if (userData.selectedScenario) {
+//             roomScenario = userData.selectedScenario;
+//         }
+//         const player = {
+//             id: socket.id,
+//             username: userData.username,
+//             character: userData.character,
+//             ready: false,
+//             isHost: activePlayers[0] === userData.username
+//         };
 
-        // Evitar duplicados
-        roomPlayers = roomPlayers.filter(p => p.username !== userData.username);
-        roomPlayers.push(player);
+//         // Evitar duplicados
+//         roomPlayers = roomPlayers.filter(p => p.username !== userData.username);
+//         roomPlayers.push(player);
 
-        // Notificar a todos en la sala la nueva lista
-        io.emit('lobby_update', roomPlayers);
-    });
+//         // Notificar a todos en la sala la nueva lista
+//         io.emit('lobby_update', roomPlayers);
+//     });
 
-    // Cuando un jugador pulsa el botón "Listo"
-    socket.on('player_ready', (isReady) => {
-        const player = roomPlayers.find(p => p.id === socket.id);
-        if (player) {
-            player.ready = isReady;
-            console.log(`Jugador ${player.username} está listo: ${isReady}`);
+//     // Cuando un jugador pulsa el botón "Listo"
+//     socket.on('player_ready', (isReady) => {
+//         const player = roomPlayers.find(p => p.id === socket.id);
+//         if (player) {
+//             player.ready = isReady;
+//             console.log(`Jugador ${player.username} está listo: ${isReady}`);
 
-            io.emit('lobby_update', roomPlayers);
-        }
+//             io.emit('lobby_update', roomPlayers);
+//         }
 
-        // Si hay 2 y ambos están listos, el servidor da la orden de empezar
-        if (roomPlayers.length === 2 && roomPlayers.every(p => p.ready)) {
-            console.log("¡Todos listos! Iniciando partida...");
-            io.emit('start_game', { players: roomPlayers, selectedScenario: roomScenario });
+//         // Si hay 2 y ambos están listos, el servidor da la orden de empezar
+//         if (roomPlayers.length === 2 && roomPlayers.every(p => p.ready)) {
+//             console.log("¡Todos listos! Iniciando partida...");
+//             io.emit('start_game', { players: roomPlayers, selectedScenario: roomScenario });
 
-            // Reseteo
-            roomPlayers.forEach(p => p.ready = false);
-            io.emit('lobby_update', roomPlayers);
-        }
-    });
+//             // Reseteo
+//             roomPlayers.forEach(p => p.ready = false);
+//             io.emit('lobby_update', roomPlayers);
+//         }
+//     });
 
-    // Desconexion
-    socket.on('disconnect', () => {
-        console.log('Usuario desconectado:', socket.id);
+//     // Desconexion
+//     socket.on('disconnect', () => {
+//         console.log('Usuario desconectado:', socket.id);
 
-        const leavingPlayer = roomPlayers.find(p => p.id === socket.id);
+//         const leavingPlayer = roomPlayers.find(p => p.id === socket.id);
 
-        if (leavingPlayer) {
-            // Notificamos a los demás que la partida/sala se cierra por abandono
-            socket.broadcast.emit('player_abandoned', { 
-                username: leavingPlayer.username 
-            });
-            activePlayers = activePlayers.filter(u => u !== leavingPlayer.username);
-        }
+//         if (leavingPlayer) {
+//             // Notificamos a los demás que la partida/sala se cierra por abandono
+//             socket.broadcast.emit('player_abandoned', { 
+//                 username: leavingPlayer.username 
+//             });
+//             activePlayers = activePlayers.filter(u => u !== leavingPlayer.username);
+//         }
         
-        roomPlayers = roomPlayers.filter(p => p.id !== socket.id);
-        if (roomPlayers.length > 0 && !roomPlayers.some(p => p.isHost)) {
-            roomPlayers[0].isHost = true;
-        }
-        io.emit('lobby_update', roomPlayers);
-    });
+//         roomPlayers = roomPlayers.filter(p => p.id !== socket.id);
+//         if (roomPlayers.length > 0 && !roomPlayers.some(p => p.isHost)) {
+//             roomPlayers[0].isHost = true;
+//         }
+//         io.emit('lobby_update', roomPlayers);
+//     });
 
-    // GameOnline_Scene
-    // Recibir posición de un cliente y retransmitirla al resto
-    // TODO revisar interacción con salto y animaciones
-    socket.on('player_move', (moveData) => {
-        // moveData contiene { x, y, anim, flipX }
-        // Usamos broadcast para enviarlo a todos menos al que lo envió
-        socket.broadcast.emit('opponent_move', {
-            id: socket.id,
-            x: moveData.x,
-            y: moveData.y,
-            anim: moveData.anim,
-            flipX: moveData.flipX
-        });
-    });
+//     // GameOnline_Scene
+//     // Recibir posición de un cliente y retransmitirla al resto
+//     // TODO revisar interacción con salto y animaciones
+//     socket.on('player_move', (moveData) => {
+//         // moveData contiene { x, y, anim, flipX }
+//         // Usamos broadcast para enviarlo a todos menos al que lo envió
+//         socket.broadcast.emit('opponent_move', {
+//             id: socket.id,
+//             x: moveData.x,
+//             y: moveData.y,
+//             anim: moveData.anim,
+//             flipX: moveData.flipX
+//         });
+//     });
 
-    // Sincronización de la pelota (Solo la envía el Host para evitar conflictos)
-    // TODO Borrar, probar versión dónde se mantiene la posición "offline" en cada cliente
-    socket.on('ball_sync', (ballData) => {
-        // ballData contiene { x, y, vx, vy }
-        socket.broadcast.emit('ball_update', ballData);
-    });
+//     // Sincronización de la pelota (Solo la envía el Host para evitar conflictos)
+//     // TODO Borrar, probar versión dónde se mantiene la posición "offline" en cada cliente
+//     socket.on('ball_sync', (ballData) => {
+//         // ballData contiene { x, y, vx, vy }
+//         socket.broadcast.emit('ball_update', ballData);
+//     });
 
-    // Gestión de puntuación
-    socket.on('update_score', (scoreData) => {
-        // scoreData: { p1Points, p2Points, p1Sets, p2Sets }
-        io.emit('score_sync', scoreData);
-    });
+//     // Gestión de puntuación
+//     socket.on('update_score', (scoreData) => {
+//         // scoreData: { p1Points, p2Points, p1Sets, p2Sets }
+//         io.emit('score_sync', scoreData);
+//     });
 
-    socket.on('set_finished_sync', (data) => socket.broadcast.emit('set_finished_sync', data));
+//     socket.on('set_finished_sync', (data) => socket.broadcast.emit('set_finished_sync', data));
 
-    socket.on('golden_point_sync', () => {
-        socket.broadcast.emit('force_golden_point');
-    });
+//     socket.on('golden_point_sync', () => {
+//         socket.broadcast.emit('force_golden_point');
+//     });
 
-    // Detección de Victoria comunicada por el servidor
-    socket.on('game_finished', (winnerData) => {
-        // winnerData: { winner: 'player1', winnerName: '...' }
-        io.emit('match_finished', winnerData);
-    });
+//     // Detección de Victoria comunicada por el servidor
+//     socket.on('game_finished', (winnerData) => {
+//         // winnerData: { winner: 'player1', winnerName: '...' }
+//         io.emit('match_finished', winnerData);
+//     });
 
-    // GameOnline_Scene ?
-    // Gestion de powerups
-    socket.on('use_powerup', (powerData) => {
-        // powerData: { type: 'paralizar', target: 'player2' }
-        socket.broadcast.emit('apply_powerup', powerData);
-    });
+//     // GameOnline_Scene ?
+//     // Gestion de powerups
+//     socket.on('use_powerup', (powerData) => {
+//         // powerData: { type: 'paralizar', target: 'player2' }
+//         socket.broadcast.emit('apply_powerup', powerData);
+//     });
 
-    // GameOnline_Scene ?
-    // Spawn de power ups
-    socket.on('spawn_powerup', (data) => {
-    // data contiene { x, y, type }
-    socket.broadcast.emit('force_spawn_powerup', data);
+//     // GameOnline_Scene ?
+//     // Spawn de power ups
+//     socket.on('spawn_powerup', (data) => {
+//     // data contiene { x, y, type }
+//     socket.broadcast.emit('force_spawn_powerup', data);
 
-    // Gestion del tiempo
-    socket.on('timer_sync', (data) => socket.broadcast.emit('timer_sync', data));
-});
-});
+//     // Gestion del tiempo
+//     socket.on('timer_sync', (data) => socket.broadcast.emit('timer_sync', data));
+// });
+// });
 
 // -------------------------
 
 // Esto asegura que si se refresca la página, se cargue el index.html
-app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
-});
+// TODO app.get('*', (req, res) => {
+//     res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
+// });
 
-server.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+// server.listen(PORT, "0.0.0.0", () => {
+//     console.log(`Server is running on http://localhost:${PORT}`);
+// });
+
+// Si no se indica host, por defecto es 0.0.0.0
+// https://nodejs.org/api/net.html#serverlistenport-host-backlog-callback
+server.listen(PORT, () => {
+    console.log(`Servidor corriendo en dirección 0.0.0.0 y puerto ${PORT}`);
+    console.log(`\taccesible desde http://localhost:${PORT}`);
 });
