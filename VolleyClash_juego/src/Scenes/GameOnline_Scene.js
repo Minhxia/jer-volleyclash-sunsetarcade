@@ -317,6 +317,9 @@ export class GameOnline_Scene extends Phaser.Scene {
             ]
         };
 
+        // acctivar listeners del WebSocket
+        this.setupWebSocketListeners();
+
         // inicialización de la pelota
         this._createBall();
         // empujón sutíl para evitar que se quede sobre la red al inicio
@@ -371,33 +374,33 @@ export class GameOnline_Scene extends Phaser.Scene {
 
     handleServerMessage(data) {
         switch (data.type) {
-            case 'paddleUpdate':
-                // Update opponent's paddle position
-                this.remotePaddle.sprite.y = data.y;
-                break;
+            // case 'paddleUpdate':
+            //     // Update opponent's paddle position
+            //     this.remotePaddle.sprite.y = data.y;
+            //     break;
 
-            case 'scoreUpdate':
-                // Update scores from server
-                this.localScore = this.playerRole === 'player1' ? data.player1Score : data.player2Score;
-                this.remoteScore = this.playerRole === 'player1' ? data.player2Score : data.player1Score;
+            // case 'scoreUpdate':
+            //     // Update scores from server
+            //     this.localScore = this.playerRole === 'player1' ? data.player1Score : data.player2Score;
+            //     this.remoteScore = this.playerRole === 'player1' ? data.player2Score : data.player1Score;
 
-                this.scoreLeft.setText(data.player1Score.toString());
-                this.scoreRight.setText(data.player2Score.toString());
+            //     this.scoreLeft.setText(data.player1Score.toString());
+            //     this.scoreRight.setText(data.player2Score.toString());
 
-                // Stop ball, server will relaunch it
-                this.ball.setVelocity(0, 0);
-                this.ball.setPosition(400, 300);
-                break;
+            //     // Stop ball, server will relaunch it
+            //     this.ball.setVelocity(0, 0);
+            //     this.ball.setPosition(400, 300);
+            //     break;
 
-            case 'ballRelaunch':
-                // Server is relaunching the ball with new velocity
-                this.ball.setPosition(data.ball.x, data.ball.y);
-                this.ball.setVelocity(data.ball.vx, data.ball.vy);
-                break;
+            // case 'ballRelaunch':
+            //     // Server is relaunching the ball with new velocity
+            //     this.ball.setPosition(data.ball.x, data.ball.y);
+            //     this.ball.setVelocity(data.ball.vx, data.ball.vy);
+            //     break;
 
-            case 'gameOver':
-                this.endGame(data.winner, data.player1Score, data.player2Score);
-                break;
+            // case 'gameOver':
+            //     this.endGame(data.winner, data.player1Score, data.player2Score);
+            //     break;
 
             case 'playerDisconnected':
                 this.handleDisconnection();
@@ -405,6 +408,32 @@ export class GameOnline_Scene extends Phaser.Scene {
 
             default:
                 console.log('Unknown message type:', data.type);
+        }
+    }
+
+    handleDisconnection() {
+        this.gameEnded = true;
+        // Detener cronómetro y físicas
+        if (this.timerEvent) this.timerEvent.paused = true;
+        this.physics.world.pause();
+
+        // Feedback visual
+        const abandonText = `El oponente ha abandonado.`;
+        console.log(abandonText);
+
+        this.add.text(400, 250, abandonText, {
+            fontSize: '48px',
+            color: '#ff0000'
+        }).setOrigin(0.5);
+
+        // Limpieza y salida
+        this.shutdown();
+        this.scene.start('Menu_Scene');
+    }
+
+    shutdown() {
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            this.ws.close();
         }
     }
 
@@ -1131,11 +1160,5 @@ export class GameOnline_Scene extends Phaser.Scene {
         p2.idleLeft();
 
         this.playSfx(this.sfx.whistle);
-    }
-
-    shutdown() {
-        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-            this.ws.close();
-        }
     }
 }

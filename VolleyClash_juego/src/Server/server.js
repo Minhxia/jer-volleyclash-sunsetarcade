@@ -423,7 +423,7 @@ wss.on('connection', (ws) => {
             activePlayers = activePlayers.filter(u => u !== m.username);
             lastSeen.delete(m.username);
         }
-
+        gameRoomService.handleDisconnect(ws);
         clients.delete(ws);
     });
 
