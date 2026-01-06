@@ -17,8 +17,8 @@ export class SelectPlayer_Scene extends Phaser.Scene {
     init(data) {
         this.mode = this.registry.get('mode');
         console.log('Modo de Juego:', this.mode);
-        this.isHost = this.registry.get('isHost');
-        console.log('Host:', this.isHost);
+        //this.isHost = this.registry.get('isHost');
+        //console.log('Host:', this.isHost);
     }
 
     preload() {
@@ -74,7 +74,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         // según el modo se crea una UI u otra
         if (this.mode === 'local') {
             this.createLocalUI(width, height, style);
-        } 
+        }
         if (this.mode === 'online') {
             this.createOnlineUI(width, height, style);
         }
@@ -143,14 +143,14 @@ export class SelectPlayer_Scene extends Phaser.Scene {
 
         const selectionOffsetY = 40;
 
-        this.add.text(width / 2, 60 + selectionOffsetY, `${this.players[0].name}`, { 
+        this.add.text(width / 2, 60 + selectionOffsetY, `${this.players[0].name}`, {
             ...style,
             fontFamily: 'VT323',
             fontSize: '32px',
             color: '#000',
-            fontStyle: 'bold' 
+            fontStyle: 'bold'
         }).setOrigin(0.5);
-        
+
         // Texto de turno (Estado en este caso, pero con el mismo nombre para manterner la misma funcionalidad)
         this.turnText = this.add.text(width / 2, 130, 'Ningún personaje seleccionado', {
             ...style,
@@ -426,7 +426,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
 
             this.registry.set('myCharacter', this.players[0].character);
 
-            if (this.isHost) {
+            /*if (this.isHost) {
                 // Soy el admin: puedo pasar a elegir escenario
                 this.scene.start('SelectScenario_Scene', {
                     mode: this.mode,
@@ -439,7 +439,8 @@ export class SelectPlayer_Scene extends Phaser.Scene {
                     player2: this.players[0],
                     isHost: false 
                 });
-            }
+            }*/
+            this.scene.start('Lobby_Scene', {mode: this.mode});
         }
     }
 
@@ -506,7 +507,7 @@ export class SelectPlayer_Scene extends Phaser.Scene {
         }
 
         if (this.mode === 'online') {
-    
+
             const p1HasChar = !!this.players?.[0]?.character;
 
             if (!p1HasChar) {

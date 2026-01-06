@@ -99,6 +99,16 @@ function createMatchmakingService(connectionService, gameRoomService, getMeta) {
         broadcastLobbyUpdate();
     }
 
+    // Cambia el escenario para esa sala
+    function setScenario(ws, scenario) {
+        // solo el host puede cambiarlo
+        const me = roomPlayers.find(p => p.ws === ws);
+        if (!me || !me.isHost) return;
+
+        roomScenario = scenario || roomScenario;
+        broadcastLobbyUpdate();
+    }
+
     // Cambia el estado del jugador a ready
     function setReady(ws, isReady) {
         const p = roomPlayers.find(x => x.ws === ws);
@@ -155,6 +165,7 @@ function createMatchmakingService(connectionService, gameRoomService, getMeta) {
 
     return {
         joinLobby,
+        setScenario,
         setReady,
         leave,
         // para debug

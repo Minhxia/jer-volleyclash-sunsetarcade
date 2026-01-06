@@ -30,7 +30,7 @@ export class SelectScenario_Scene extends Phaser.Scene {
         this.load.audio('sonidoClick', 'ASSETS/SONIDO/SonidoBoton.mp3');
 
         // Marco
-        this.load.image('marco', 'ASSETS/UI/MARCOS/VACIOS/MARCOS_ESCENARIO')
+        this.load.image('marco', 'ASSETS/UI/MARCOS/VACIOS/MARCOS_ESCENARIO.png')
     }
 
     init(data) {

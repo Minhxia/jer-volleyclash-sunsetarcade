@@ -33,7 +33,7 @@ export class Logging_Scene extends Phaser.Scene {
 
                 const resData = await response.json();
                 this.registry.set('username', resData.username);
-                this.registry.set('isHost', resData.isHost);
+                // this.registry.set('isHost', resData.isHost);
                 this.scene.launch('ConnectionManager_Scene');
                 this.scene.start('Menu_Scene');
             } catch (e) {
@@ -202,14 +202,14 @@ export class Logging_Scene extends Phaser.Scene {
                     // Login: Guardamos datos en el registry
                     this.registry.set('username', usernameValue);
                     this.registry.set('userToken', data.token);
-                    this.registry.set('isHost', data.isHost);
+                    // this.registry.set('isHost', data.isHost);
 
                     // Persistencia local para auto-login
                     sessionStorage.setItem('voley_session_token', data.token);
                     sessionStorage.setItem('voley_username', usernameValue);
                     sessionStorage.setItem('voley_password', passwordValue);
 
-                    console.log(`Login correcto. Usuario: ${usernameValue} | Host: ${data.isHost}`);
+                    console.log(`Login correcto. Usuario: ${usernameValue}`);
                     this.scene.launch('ConnectionManager_Scene');
                     this.scene.start('Menu_Scene');
                 }

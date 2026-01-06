@@ -345,6 +345,11 @@ wss.on('connection', (ws) => {
                 break;
             }
 
+            case 'select_scenario':
+                matchmakingService.setScenario(ws, data.selectedScenario);
+                break;
+
+
             case 'player_ready':
                 matchmakingService.setReady(ws, !!data.isReady);
                 break;
