@@ -70,6 +70,7 @@ function createGameRoomService(connectionService, getMeta) {
         });
     }
 
+    // TODO Cambiar para usarlo solo en reset de pelota y enviar a ambos
     // Controla la sincronización de la pelota
     function handleBallSync(ws, ballData) {
         if (!isInMatch(ws)) return;
