@@ -107,13 +107,20 @@ export default class ScenarioPickerUI {
         this.isHost = !!isHost;
 
         // host ve controles y el no-host ve texto informativo
-        if (this.controls) this.controls.setVisible(this.isHost);
-        if (this.onlyHostText) this.onlyHostText.setVisible(!this.isHost);
+        this.controls?.setVisible(this.isHost);
+        this.onlyHostText?.setVisible(!this.isHost);
 
         // activar/desactivar interacciones
         for (const btn of Object.values(this.buttons)) {
-            if (this.isHost) btn.setInteractive({ useHandCursor: true });
-            else btn.disableInteractive();
+            if (this.isHost) {
+                btn.setInteractive({ useHandCursor: true });
+            }
+            else {
+                btn.removeInteractive?.();
+                if (!btn.removeInteractive) {
+                    if (btn.input) btn.disableInteractive();
+                }
+            }
         }
 
         this._refreshButtons();

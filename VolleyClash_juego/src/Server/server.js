@@ -111,9 +111,10 @@ app.post('/api/login', (req, res) => {
             activePlayers.push(username);
         }
 
-        const isHost = activePlayers[0] === username;
+        // const isHost = activePlayers[0] === username;
 
-        console.log(`Login exitoso: ${username} | ¿Es Host?: ${isHost}`);
+        // console.log(`Login exitoso: ${username} | ¿Es Host?: ${isHost}`);
+        console.log(`Login exitoso: ${username}`);
         console.log(`Jugadores activos: [${activePlayers.join(', ')}]`);
 
         // Token
@@ -121,7 +122,7 @@ app.post('/api/login', (req, res) => {
             success: true,
             username: user.username,
             token: `token-${user.username}`,
-            isHost: isHost
+            // isHost: isHost
         });
     } else {
         res.status(401).json({ success: false, error: 'Usuario o contraseña incorrectos' });
