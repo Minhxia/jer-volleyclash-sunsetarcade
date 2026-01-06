@@ -3,7 +3,7 @@
 import Phaser from 'phaser';
 import { createUIButton, createIconButton } from '../UI/Buttons.js';
 import ScenarioPickerUI from '../UI/ScenarioPicker.js';
-
+import PlayerCardUI from '../UI/PlayerCard.js';
 
 export class Lobby_Scene extends Phaser.Scene {
     constructor() {
@@ -11,6 +11,7 @@ export class Lobby_Scene extends Phaser.Scene {
 
         this.isPlayerReady = false;
         this.lobbyPlayers = [];
+        this.pendingLobbyUpdate = null;
 
         this.ws = null;
     }
@@ -18,7 +19,7 @@ export class Lobby_Scene extends Phaser.Scene {
     init(data) {
         // se recupera el modo, el rol y los datos del jugador
         this.mode = data.mode;
-        this.isHost = data.isHost;
+        this.isHost = false;    // se actualiza al recibir lobby_update
         this.player1 = data.player1;
         this.player2 = data.player2;
         this.selectedScenario = data.selectedScenario;
@@ -43,6 +44,11 @@ export class Lobby_Scene extends Phaser.Scene {
         this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_BASE_SINSELECCIONAR.png');
         this.load.image('botonSeleccionado', 'ASSETS/UI/BOTONES/BOTON_BASE.png');
 
+        // retratos de personajes
+        this.load.image('portraitA', 'ASSETS/UI/MARCOS/PERSONAJES%20EN%20MARCOS/PERSONAJE_A.png');
+        this.load.image('portraitB', 'ASSETS/UI/MARCOS/PERSONAJES%20EN%20MARCOS/PERSONAJE_B.png');
+        this.load.image('portraitC', 'ASSETS/UI/MARCOS/PERSONAJES%20EN%20MARCOS/PERSONAJE_C.png');
+
         // sonido
         this.load.audio('sonidoClick', 'ASSETS/SONIDO/SonidoBoton.mp3');
     }
@@ -50,91 +56,103 @@ export class Lobby_Scene extends Phaser.Scene {
     create() {
         const style = this.game.globals.defaultTextStyle;
         const { width, height } = this.scale;
-        const centerX = width / 2;
-
-        this.isPlayerReady = false;
-        this.showingAbandonError = false;
 
         this.add.image(0, 0, 'fondo').setOrigin(0).setDepth(-1);
 
-        // Título
-        this.add.text(centerX, height * 0.18, 'LOBBY', {
-            ...style, fontSize: '40px', color: '#000', fontStyle: 'bold'
+        // Título arriba
+        this.add.text(width / 2, height * 0.09, 'Lobby', {
+            ...style,
+            fontSize: '38px',
+            color: '#5f0000ff'
         }).setOrigin(0.5);
 
-        // Filtro del marco
-        const frameY = height * 0.48;
-        const frame = this.add.image(centerX, frameY, 'marco').setOrigin(0.5);
-        frame.texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+        //// ZONA SUPERIOR: ESCENARIO ////
+        const previewX = width * 0.33;
+        const previewY = height * 0.34;
+        const previewW = width * 0.42;
+        const previewH = height * 0.30;
 
-        // Escala del marco
-        const targetFrameWidth = width * 0.3;
-        const targetFrameHeight = height * 0.3;
-        frame.setDisplaySize(targetFrameWidth, targetFrameHeight);
+        // Marco del escenario
+        const scenarioFrame = this.add.image(previewX, previewY, 'marco').setOrigin(0.5);
+        scenarioFrame.texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+        scenarioFrame.setDisplaySize(previewW, previewH);
 
-        // Selector de escenario
+        // ScenarioPicker, preview encima del marco a la izq + botones a la dcha
         this.scenarioUI = new ScenarioPickerUI(this, {
-            centerX,
-            frameY,
-            frameW: targetFrameWidth,
-            frameH: targetFrameHeight,
             style,
             scenarios: ['Gym', 'Playa', 'Jardin'],
             defaultScenario: this.selectedScenario ?? 'Gym',
-            buttonTextures: {
-                normal: 'botonSinSeleccionar',
-                selected: 'botonSeleccionado'
-            },
+            buttonTextures: { normal: 'botonSinSeleccionar', selected: 'botonSeleccionado' },
+
+            previewX,
+            previewY,
+            previewW,
+            previewH,
+
+            buttonsX: width * 0.72,
+            buttonsY: previewY - previewH * 0.28,
+            buttonsSpacingY: previewH * 0.34,
+            buttonsScale: 1.55,
+
             onSelect: (scenarioName) => {
-                // solo se llama si es host (la clase lo bloquea si no)
                 this._sendWS({ type: 'select_scenario', selectedScenario: scenarioName });
             }
         });
 
-
-        // Configuración de nombres y estados
-        const lineSpacing = 40;
-        const startY = frameY - lineSpacing;
-
-        // Título/Encabezado del Lobby (dentro del marco arriba)
-        this.add.text(centerX, startY, "ESTADO DE JUGADORES", {
+        //// ZONA INFERIOR: JUGADORES /////
+        const playersCenterX = (width / 2) - 30;
+        this.add.text(playersCenterX, height * 0.61, 'Estado de los jugadores', {
             ...style,
             fontSize: '22px',
-            color: '#000000',
-            fontStyle: 'bold'
+            color: '#000',
         }).setOrigin(0.5);
 
-        // Jugador 1
-        const name1 = this.isHost ? (this.player1?.name || 'Tú') : (this.player1?.name || 'Admin...');
-        this.p1StatusText = this.add.text(centerX, frameY, `${name1} --- ❌`, {
-            ...style,
-            fontSize: '28px',
-            color: '#000000'
-        }).setOrigin(0.5);
+        const portraitKeys = {
+            characterA: 'portraitA',
+            characterB: 'portraitB',
+            characterC: 'portraitC',
+        };
 
-        // Jugador 2
-        const name2 = !this.isHost ? (this.player2?.name || 'Tú') : (this.player2?.name || 'Esperando...');
-        this.p2StatusText = this.add.text(centerX, frameY + lineSpacing, `${name2} --- ❌`, {
-            ...style,
-            fontSize: '28px',
-            color: '#000000'
-        }).setOrigin(0.5);
+        const cardsY = height * 0.76;
+        const cardWidth = width * 0.30;
+        const cardsGap = width * 0.06;
+        const cardsTotalWidth = cardWidth * 2 + cardsGap;
+        const hostCardX = playersCenterX - cardsTotalWidth / 2 + cardWidth / 2 - 30;
+        const guestCardX = hostCardX + cardWidth + cardsGap;
 
-        // Botón Listo
+        this.hostCard = new PlayerCardUI(this, hostCardX, cardsY, {
+            style,
+            title: 'Host',
+            portraitKeys,
+            defaultPortraitKey: null,
+            w: cardWidth,
+            h: height * 0.18,
+        });
+
+        this.guestCard = new PlayerCardUI(this, guestCardX, cardsY, {
+            style,
+            title: 'Rival',
+            portraitKeys,
+            defaultPortraitKey: null,
+            w: cardWidth,
+            h: height * 0.18,
+        });
+
+        ///// BOTONES /////
         this.btnListo = createUIButton(this, {
-            x: centerX,
-            y: height * 0.75,
+            x: playersCenterX,
+            y: height * 0.92,
             label: '¿Listo?',
             onClick: () => this.toggleReady(),
-            scale: 1.5,
             textureNormal: 'botonSimple',
             textureHover: 'botonSimpleSeleccionado',
-            textStyle: { ...style, fontSize: '14px', color: '#000' },
+            textStyle: { ...style, fontSize: '22px', color: '#000' },
             clickSoundKey: 'sonidoClick'
         });
-        this.btnListo?.disableInteractive?.();
 
-        // Botón Volver
+        this.btnListo.button.disableInteractive();
+        this.btnListo.button.setAlpha(0.7);
+
         this.btnVolver = createIconButton(this, {
             x: width * 0.06,
             y: height * 0.08,
@@ -145,15 +163,8 @@ export class Lobby_Scene extends Phaser.Scene {
             onClick: () => this.handleBack()
         });
 
-        if (this.btnListo?.setLabel) {
-            this.btnListo.setLabel('¿Listo?');
-        } else if (this.btnListo?.text) {
-            this.btnListo.text.setText('Listo?');
-        }
-        this.btnVolver?.setAlpha(1);
-        this.btnVolver?.setInteractive();
 
-        // ----- Conexión a WebSockets -----
+        // ----- CONEXIÓN A WEBSOCKETS -----
         this.ws = this.registry.get('ws');
 
         if (!this.ws || this.ws.readyState === WebSocket.CLOSED || this.ws.readyState === WebSocket.CLOSING) {
@@ -193,13 +204,13 @@ export class Lobby_Scene extends Phaser.Scene {
 
         // si ya está abierto, se envía ya, si no, espera a onopen
         if (this.ws.readyState === WebSocket.OPEN) {
-            this.btnListo?.setInteractive?.();
+            this.btnListo?.button.setInteractive?.({ useHandCursor: true });
             this._sendWS({ type: 'player_ready', isReady: false });
             this._sendWS(joinPayload);
         } else {
             this.ws.onopen = () => {
                 console.log('[WS] conectado');
-                this.btnListo?.setInteractive?.();
+                this.btnListo?.button.setInteractive?.({ useHandCursor: true });
                 this._sendWS({ type: 'player_ready', isReady: false });
                 this._sendWS(joinPayload);
             };
@@ -220,14 +231,10 @@ export class Lobby_Scene extends Phaser.Scene {
 
         // se actualiza el botón
         const nuevoTextoBoton = this.isPlayerReady ? 'Cancelar' : '¿Listo?';
-        if (this.btnListo.setLabel) {
-            this.btnListo.setLabel(nuevoTextoBoton);
-        } else if (this.btnListo.text) {
-            this.btnListo.text.setText(nuevoTextoBoton);
-        }
+        this.btnListo.text.setText(nuevoTextoBoton);
 
         this.btnVolver.setAlpha(this.isPlayerReady ? 0.3 : 1);
-        this.isPlayerReady ? this.btnVolver.disableInteractive() : this.btnVolver.setInteractive();
+        this.isPlayerReady ? this.btnVolver.disableInteractive() : this.btnVolver.setInteractive({ useHandCursor: true });
     }
 
     // Controla el botón de volver atrás
@@ -235,23 +242,38 @@ export class Lobby_Scene extends Phaser.Scene {
         // avisa que ya no está listo
         this._sendWS({ type: 'player_ready', isReady: false });
 
-        // se cierra el ws y vuelve a la selección
+        // avisa que abandonas el lobby
+        this._sendWS({ type: 'leave_lobby' });
+
+        // cierra el ws y limpia el registry
         if (this.ws) {
             try { this.ws.close(); } catch { }
         }
         this.registry.remove('ws');
 
-        const targetScene = this.isHost ? 'SelectScenario_Scene' : 'SelectPlayer_Scene';
-        this.scene.start(targetScene, { mode: this.mode, isHost: this.isHost });
+        // navega según el modo
+        if (this.mode === 'online') {
+            this.scene.start('SelectPlayer_Scene', { mode: 'online' });
+            return;
+        }
+
+        // fallback
+        this.scene.start('SelectPlayer_Scene', { mode: 'local' });
     }
+
 
     // Limpia al salir del lobby
     shutdown() {
-        if (this.ws) {
-            this.scenarioUI?.destroy();
-            this.scenarioUI = null;
+        // destruye UIs
+        this.scenarioUI?.destroy();
+        this.scenarioUI = null;
+        this.hostCard?.destroy();
+        this.hostCard = null;
+        this.guestCard?.destroy();
+        this.guestCard = null;
 
-            // se limpian los handlers del lobby
+        // limpia handlers del ws
+        if (this.ws) {
             this.ws.onmessage = null;
             this.ws.onerror = null;
             this.ws.onclose = null;
@@ -262,15 +284,10 @@ export class Lobby_Scene extends Phaser.Scene {
     // Construye la URL del WebSocket según el protocolo y host actuales
     _getWsUrl() {
         const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-
         // frontend en 3000, backend en 8080
         const backendPort = (window.location.port === '3000') ? '8080' : window.location.port;
 
         return `${protocol}://${window.location.hostname}:${backendPort}`;
-        //const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-        //return `${protocol}://${window.location.hostname}:8080`;
-        //return `${protocol}://${window.location.hostname}:${window.location.port}`;
-        //this.baseUrl = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
     }
 
 
@@ -287,61 +304,15 @@ export class Lobby_Scene extends Phaser.Scene {
             case 'lobby_update': {
                 const players = msg.players ?? [];
                 this.lobbyPlayers = players;
-
-                if (this.showingAbandonError) return;
-
-                // escenario (viene del servidor)
-                if (msg.selectedScenario) {
-                    // se guarda el escenario seleccionado
-                    this.selectedScenario = msg.selectedScenario;
-                    // se actualiza la UI
-                    this.scenarioUI?.setScenario(this.selectedScenario);
+                if (this.showingAbandonError) {
+                    this.pendingLobbyUpdate = {
+                        players,
+                        selectedScenario: msg.selectedScenario
+                    };
+                    return;
                 }
 
-                this.p1StatusText.setText('Esperando Host...');
-                this.p2StatusText.setText('Esperando rival...');
-
-                const p1Data = players.find(p => p.isHost);
-                const p2Data = players.find(p => !p.isHost);
-
-                const myUsername = this.registry.get('username');
-
-                // host
-                let newIsHost = false;
-
-                if (p1Data) {
-                    const emoji = p1Data.ready ? '✅' : '❌';
-                    this.p1StatusText.setText(`${p1Data.username} (HOST) --- ${emoji}`);
-
-                    newIsHost = (p1Data.username === myUsername);
-
-                    if (newIsHost !== this.isHost) {
-                        if (newIsHost) {
-                            console.log(`[LOBBY] Ahora eres el HOST (${myUsername})`);
-                        } else {
-                            console.log(`[LOBBY] Ya NO eres el host (host actual: ${p1Data.username})`);
-                        }
-                    }
-                } else {
-                    if (this.isHost) {
-                        console.log('[LOBBY] Ya NO eres el host (no hay host asignado)');
-                    }
-                    newIsHost = false;
-                }
-
-                this.isHost = newIsHost;
-
-                // si tienes UI de selección de escenario:
-                this.scenarioUI?.setIsHost(this.isHost);
-
-                // player2
-                if (p2Data) {
-                    const emoji = p2Data.ready ? '✅' : '❌';
-                    this.p2StatusText.setText(`${p2Data.username} --- ${emoji}`);
-                } else {
-                    this.p2StatusText.setText('Esperando rival...');
-                }
-
+                this._applyLobbyUpdate(players, msg.selectedScenario);
                 break;
             }
 
@@ -376,24 +347,31 @@ export class Lobby_Scene extends Phaser.Scene {
 
                 console.log(`El usuario ${msg.username} ha salido del lobby`);
 
-                this.p2StatusText.setText(`¡${msg.username} ha salido!`);
-                this.p2StatusText.setStyle({ fill: '#ff0000' });
+                // se pinta el aviso en la tarjeta del rival
+                this.guestCard?.showLeftMessage?.(msg.username);
 
-                this.time.delayedCall(3000, () => {
+                this.time.delayedCall(2000, () => {
                     this.showingAbandonError = false;
-                    if (this.p2StatusText) {
-                        this.p2StatusText.setStyle({ fill: '#000' });
-                        // se espera al siguiente lobby_update, que llega tras leave
+                    if (this.pendingLobbyUpdate) {
+                        const { players, selectedScenario } = this.pendingLobbyUpdate;
+                        this.pendingLobbyUpdate = null;
+                        this._applyLobbyUpdate(players, selectedScenario);
                     }
+
+                    // se quita el estilo rojo
+                    this.guestCard?.clearAlertStyle?.();
                 });
 
+                // Reset del botón Listo
                 this.isPlayerReady = false;
+
                 if (this.btnListo?.setLabel) this.btnListo.setLabel('¿Listo?');
                 else if (this.btnListo?.text) this.btnListo.text.setText('¿Listo?');
 
-                // re-habilitar volver
+                // se re-habilita volver
                 this.btnVolver.setAlpha(1);
-                this.btnVolver.setInteractive();
+                this.btnVolver.setInteractive({ useHandCursor: true });
+
                 break;
             }
 
@@ -407,5 +385,33 @@ export class Lobby_Scene extends Phaser.Scene {
                 console.log('[WS] msg desconocido', msg);
                 break;
         }
+    }
+
+    _applyLobbyUpdate(players, selectedScenario) {
+        // escenario (viene del servidor)
+        if (selectedScenario) {
+            this.selectedScenario = selectedScenario;
+            this.scenarioUI?.setScenario(this.selectedScenario);
+        }
+
+        const host = players.find(p => p.isHost) ?? null;
+        const guest = players.find(p => !p.isHost) ?? null;
+
+        // host
+        const myUsername = this.registry.get('username');
+        const newIsHost = !!(host && host.username === myUsername);
+        if (newIsHost !== this.isHost) {
+            console.log(newIsHost
+                ? `[LOBBY] Ahora eres el HOST (${myUsername})`
+                : `[LOBBY] Ya NO eres el host (host actual: ${host?.username ?? '—'})`
+            );
+        }
+
+        this.isHost = newIsHost;
+        this.scenarioUI?.setIsHost(this.isHost);
+
+        // Tarjetas
+        this.hostCard?.setPlayer(host ? { ...host, isHost: true } : null);
+        this.guestCard?.setPlayer(guest ? { ...guest, isHost: false } : null);
     }
 }

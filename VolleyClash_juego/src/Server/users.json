@@ -40,5 +40,12 @@
     "partidaJugadas": 0,
     "partidasGanadas": 0,
     "partidasPerdidas": 0
+  },
+  {
+    "username": "pepe",
+    "password": "pepe",
+    "partidaJugadas": 0,
+    "partidasGanadas": 0,
+    "partidasPerdidas": 0
   }
 ]

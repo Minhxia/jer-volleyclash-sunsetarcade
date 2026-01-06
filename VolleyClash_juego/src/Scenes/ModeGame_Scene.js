@@ -56,7 +56,7 @@ export class ModeGame_Scene extends Phaser.Scene {
             .setOrigin(0.5);
 
         // layout
-        const buttonY = height * 0.5;
+        const buttonY = height * 0.6;
         const spacing = Math.min(280, width * 0.3);
         const startX = width / 2 - spacing / 2;
 
@@ -118,15 +118,17 @@ export class ModeGame_Scene extends Phaser.Scene {
 
         // CONEXIÓN A SERVIDOR Y JUGADORES CONECTADOS
         // Textos
-        this.serverStatusText = this.add.text(width / 2, height * 0.30, 'Estado del servidor: comprobando...', {
+        this.serverStatusText = this.add.text(width / 2, height * 0.40, 'Estado del servidor: comprobando...', {
             ...style,
-            fontSize: '22px',
+            fontFamily: 'VT323',
+            fontSize: '34px',
             color: '#555555'
         }).setOrigin(0.5);
 
-        this.playersCountText = this.add.text(width / 2, height * 0.36, 'Jugadores conectados: 0', {
+        this.playersCountText = this.add.text(width / 2, height * 0.46, 'Jugadores conectados: 0', {
             ...style,
-            fontSize: '22px',
+            fontFamily: 'VT323',
+            fontSize: '34px',
             color: '#555555'
         }).setOrigin(0.5);
 

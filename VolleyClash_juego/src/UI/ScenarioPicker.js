@@ -1,66 +1,74 @@
 // UI para elegir escenario en el lobby
 export default class ScenarioPickerUI {
+    // cfg: { centerX, frameY, frameW, frameH, style, scenarios, 
+    //         defaultScenario, buttonTextures, onSelect }
     constructor(scene, cfg) {
         this.scene = scene;
 
-        // cfg: { centerX, frameY, frameW, frameH, style, scenarios, 
-        //         defaultScenario, buttonTextures, onSelect }
-        this.centerX = cfg.centerX;
-        this.frameY = cfg.frameY;
-        this.frameW = cfg.frameW;
-        this.frameH = cfg.frameH;
-        this.style = cfg.style;
         this.scenarios = cfg.scenarios ?? [];
         this.selectedScenario = cfg.defaultScenario ?? (this.scenarios[0] ?? 'Gym');
+
+        this.style = cfg.style;
         this.buttonTextures = cfg.buttonTextures ?? {
             normal: 'botonSinSeleccionar',
             selected: 'botonSeleccionado',
         };
+
         this.onSelect = cfg.onSelect ?? (() => { });
         this.isHost = false;
+
         this.container = scene.add.container(0, 0);
 
-        // preview del escenario (encajada al marco)
-        this.preview = scene.add.image(this.centerX, this.frameY, this.selectedScenario).setOrigin(0.5);
-        this.preview.setDisplaySize(this.frameW * 0.92, this.frameH * 0.92);
+        // Layout (lateral)
+        this.previewX = cfg.previewX ?? cfg.centerX;
+        this.previewY = cfg.previewY ?? cfg.frameY;
+        this.previewW = cfg.previewW ?? cfg.frameW;
+        this.previewH = cfg.previewH ?? cfg.frameH;
+
+        this.buttonsX = cfg.buttonsX ?? (cfg.centerX ?? this.previewX);
+        this.buttonsY = cfg.buttonsY ?? (this.previewY - 70);
+        this.buttonsSpacingY = cfg.buttonsSpacingY ?? 90;
+        this.buttonsScale = cfg.buttonsScale ?? 1.6;
+
+        this.container = scene.add.container(0, 0);
+        this.controls = scene.add.container(0, 0);
+
+        // Preview
+        this.preview = scene.add.image(this.previewX, this.previewY, this.selectedScenario).setOrigin(0.5);
+        this.preview.setDisplaySize(this.previewW * 0.92, this.previewH * 0.92);
 
         this.infoText = scene.add.text(
-            this.centerX,
-            this.frameY + this.frameH / 2 + 18,
+            this.previewX,
+            this.previewY + this.previewH / 2 + 22,
             `Escenario: ${this.selectedScenario}`,
-            { ...this.style, fontSize: '18px', color: '#000' }
+            { ...this.style, fontSize: '22px', color: '#000' }
         ).setOrigin(0.5);
 
         this.onlyHostText = scene.add.text(
-            this.centerX,
-            this.frameY + this.frameH / 2 + 40,
-            `El host elige el escenario`,
-            { ...this.style, fontSize: '16px', color: '#444' }
+            this.buttonsX,
+            this.buttonsY + this.buttonsSpacingY * this.scenarios.length + 10,
+            'El host elige el escenario',
+            { ...this.style, fontSize: '22px', color: '#444' }
         ).setOrigin(0.5);
 
-        // Controles del host
-        this.controls = scene.add.container(0, 0);
+        // Botones de selección (columna derecha)
         this.buttons = {};
 
-        const btnY = scene.scale.height * 0.62;
-        const btnSpacing = 170;
-        const startX = this.centerX - btnSpacing;
-
         this.scenarios.forEach((name, i) => {
-            const x = startX + i * btnSpacing;
+            const x = this.buttonsX;
+            const y = this.buttonsY + i * this.buttonsSpacingY;
 
-            //// BOTÓN ////
-            const btn = scene.add.image(x, btnY, this.buttonTextures.normal)
-                .setScale(1.75);
+            const btn = scene.add.image(x, y, this.buttonTextures.normal)
+                .setScale(this.buttonsScale)
+                .setInteractive({ useHandCursor: true });
 
-            // texto
-            const label = scene.add.text(x, btnY, name, {
+            const label = scene.add.text(x, y, name, {
                 ...this.style,
                 fontSize: '28px',
                 color: '#000',
             }).setOrigin(0.5);
 
-            // hover
+            // Hover
             btn.on('pointerover', () => {
                 if (!this.isHost) return;
                 btn.setTexture(this.buttonTextures.selected);
@@ -71,24 +79,25 @@ export default class ScenarioPickerUI {
                 this._refreshButtons();
             });
 
-            // click (selecciona y avisa al lobby para mandar WS)
+            // Click
             btn.on('pointerup', (pointer) => {
                 if (!this.isHost) return;
                 const inside = btn.getBounds().contains(pointer.x, pointer.y);
                 if (!inside) return;
 
-                this.setScenario(name); // cambia UI local
-                this.onSelect(name);    // el Lobby manda {type:'select_scenario', ...}
+                this.scene.sound?.play?.('sonidoClick');
+                this.setScenario(name);
+                this.onSelect(name);
             });
 
             this.buttons[name] = { btn, label };
             this.controls.add([btn, label]);
         });
 
+        this.container.add([this.preview, this.infoText, this.controls, this.onlyHostText]);
+
         this._refreshButtons();
         this.setIsHost(false);
-
-        this.container.add([this.preview, this.infoText, this.onlyHostText, this.controls]);
     }
 
     // Cambia el escenario seleccionado
@@ -96,8 +105,8 @@ export default class ScenarioPickerUI {
         if (!name) return;
         this.selectedScenario = name;
 
-        if (this.preview) this.preview.setTexture(name);
-        if (this.infoText) this.infoText.setText(`Escenario: ${name}`);
+        this.preview?.setTexture(name);
+        this.infoText?.setText(`Escenario: ${name}`);
 
         this._refreshButtons();
     }
@@ -107,22 +116,18 @@ export default class ScenarioPickerUI {
         this.isHost = !!isHost;
 
         // host ve controles y el no-host ve texto informativo
-        this.controls?.setVisible(this.isHost);
         this.onlyHostText?.setVisible(!this.isHost);
 
-        // activar/desactivar interacciones
         for (const { btn, label } of Object.values(this.buttons)) {
             if (this.isHost) {
-                btn.setInteractive({ useHandCursor: true });
                 btn.setAlpha(1);
+                // se re-habilita si estaba desactivado
                 label.setAlpha(1);
+                btn.setInteractive({ useHandCursor: true });
             } else {
-                // se quita la interacción
-                if (btn.input) btn.disableInteractive();
-                else btn.removeInteractive?.();
-                // feedback visual
-                btn.setAlpha(0.7);
-                label.setAlpha(0.7);
+                btn.disableInteractive();
+                btn.setAlpha(0.6);
+                label.setAlpha(0.6);
             }
         }
 
@@ -140,5 +145,6 @@ export default class ScenarioPickerUI {
     // Destruye la UI
     destroy() {
         this.container?.destroy(true);
+        this.container = null;
     }
 }

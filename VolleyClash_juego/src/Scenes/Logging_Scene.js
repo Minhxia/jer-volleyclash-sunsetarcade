@@ -67,64 +67,100 @@ export class Logging_Scene extends Phaser.Scene {
         this.add.image(0, 0, 'fondo').setOrigin(0).setDisplaySize(width, height).setDepth(-1);
 
         // Titulo
-        this.titleText = this.add.text(centerX, 60, 'INICIAR SESIÓN', {
-            ...style, fontSize: '36px', color: '#000', fontStyle: 'bold'
+        this.titleText = this.add.text(centerX, 60, 'Iniciar sesión', {
+            ...style,
+            fontSize: '42px',
+            color: '#5f0000ff'
         }).setOrigin(0.5);
 
         // Marco
         const marco = this.add.image(centerX, height * 0.52, 'marco').setOrigin(0.5);
         marco.setDisplaySize(width * 0.4, height * 0.65);
-        marco.texture.setFilter(Phaser.Textures.FilterMode.NEAREST); // Solo a esta instancia
+        marco.texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
 
         // INPUTS
         // Usuario
-        this.add.text(centerX, height * 0.28, 'Usuario:', { ...style, fontSize: '20px', color: '#000' }).setOrigin(0.5);
-        this.userInput = this.createHtmlInput(centerX, height * 0.35, 'Nombre de usuario', style);
+        this.add.text(centerX, height * 0.28, 'Usuario:', {
+            ...style,
+            fontSize: '26px',
+            color: '#000'
+        }).setOrigin(0.5);
+        this.userInput = this.createHtmlInput(centerX, height * 0.36, 'Nombre de usuario', {
+            ...style,
+            fontFamily: 'VT323',
+            fontSize: '22px',
+            color: '#000'
+        });
 
         // Contraseña
-        this.add.text(centerX, height * 0.45, 'Contraseña:', { ...style, fontSize: '20px', color: '#000' }).setOrigin(0.5);
-        this.passInput = this.createHtmlInput(centerX, height * 0.52, '********', style, true);
+        this.add.text(centerX, height * 0.45, 'Contraseña:', {
+            ...style,
+            fontSize: '26px',
+            color: '#000'
+        }).setOrigin(0.5);
+        this.passInput = this.createHtmlInput(centerX, height * 0.53, '********', {
+            ...style,
+            fontFamily: 'VT323',
+            fontSize: '22px',
+            color: '#000'
+        }, true);
 
         // --- BOTONES ---
         // Botón Principal
         this.mainBtn = createUIButton(this, {
             x: centerX - 80,
-            y: height * 0.7,
-            label: 'ENTRAR',
+            y: height * 0.73,
+            label: 'Entrar',
             onClick: () => this.handleSubmit(),
             scale: 2,
             textureNormal: 'botonSimple',
             textureHover: 'botonSimpleSeleccionado',
-            textStyle: { ...style, fontSize: '14px', color: '#000' },
+            textStyle: {
+                ...style,
+                fontSize: '22px',
+                color: '#00AA00'
+            },
             clickSoundKey: 'sonidoClick'
         });
 
         // Boton de Borrado
         this.deleteBtn = createUIButton(this, {
             x: centerX + 80,
-            y: height * 0.7,
-            label: 'ELIMINAR CUENTA',
+            y: height * 0.73,
+            label: 'Eliminar\ncuenta',
             onClick: () => this.handleDeleteUser(),
             scale: 2,
             textureNormal: 'botonSimple',
             textureHover: 'botonSimpleSeleccionado',
-            textStyle: { ...style, fontSize: '14px', color: '#FF0000' },
+            textStyle: {
+                ...style,
+                fontSize: '21px',
+                color: '#AA0000'
+            },
             clickSoundKey: 'sonidoClick'
         });
 
         // Texto para alternar entre Login y Registro
-        this.toggleText = this.add.text(centerX, height * 0.62, '¿Aún no tienes cuenta? Regístrate aquí', {
-            ...style, fontSize: '16px', color: '#0000EE', fontStyle: 'italic'
+        this.toggleText = this.add.text(centerX, height * 0.64, '¿Aún no tienes cuenta? Regístrate aquí', {
+            ...style,
+            fontFamily: 'VT323',
+            fontSize: '20px',
+            color: '#0000EE',
+            fontStyle: 'italic'
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
         this.toggleText.on('pointerdown', () => this.toggleMode());
     }
 
+    // Crea un input HTML integrado en la escena
     createHtmlInput(x, y, placeholder, style, isPassword = false) {
         const type = isPassword ? 'password' : 'text';
+        const fontSize = style?.fontSize ?? '16px';
+        const fontFamily = style?.fontFamily ?? 'Arial';
+
         const dom = this.add.dom(x, y).createFromHTML(`
             <input type="${type}" placeholder="${placeholder}" 
-            style="width:180px; padding:8px; font-size:16px; font-family:${style.fontFamily}; 
+            style="width:180px; padding:8px; font-size:${fontSize}; font-family:${fontFamily}; 
             border-radius:12px; border: 6px solid #FFAA00; text-align:center; outline:none;" />
         `);
 
@@ -136,13 +172,14 @@ export class Logging_Scene extends Phaser.Scene {
         return inputEl;
     }
 
+    // Alterna entre modo Login y Registro
     toggleMode() {
         this.isRegistering = !this.isRegistering;
         const { width } = this.scale;
         const centerX = width / 2;
 
-        this.titleText.setText(this.isRegistering ? 'REGISTRARSE' : 'INICIAR SESIÓN');
-        this.mainBtn.text.setText(this.isRegistering ? 'CREAR CUENTA' : 'ENTRAR');
+        this.titleText.setText(this.isRegistering ? 'Registrarse' : 'Iniciar sesión');
+        this.mainBtn.text.setText(this.isRegistering ? 'Crear cuenta' : 'Entrar');
         this.toggleText.setText(this.isRegistering ? '¿Ya tienes cuenta? Inicia sesión' : '¿Aún no tienes cuenta? Regístrate aquí');
 
         if (this.isRegistering) {
@@ -162,6 +199,7 @@ export class Logging_Scene extends Phaser.Scene {
         }
     }
 
+    // Controla el envío del formulario de login/registro
     async handleSubmit() {
         // Obtenemos los valores de los elementos HTML reales
         const usernameValue = this.userInput.value.trim();
@@ -222,6 +260,7 @@ export class Logging_Scene extends Phaser.Scene {
         }
     }
 
+    // Controla la eliminación de un usuario
     async handleDeleteUser() {
         const username = this.userInput.value.trim();
         const password = this.passInput.value.trim();
