@@ -357,12 +357,7 @@ wss.on('connection', (ws) => {
 
             // ----- In-game sync -----
             case 'player_move':
-                gameRoomService.handlePlayerMove(ws, {
-                    x: data.x,
-                    y: data.y,
-                    anim: data.anim,
-                    flipX: data.flipX
-                });
+                gameRoomService.handlePlayerMove(ws, data);
                 break;
 
             case 'ball_sync':

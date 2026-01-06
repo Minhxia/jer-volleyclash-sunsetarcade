@@ -35,6 +35,10 @@ export class GameOnline_Scene extends Phaser.Scene {
         this.isGoldenPoint = false;
         this.isSetEnding = false;
         this.ws = this.registry.get('ws');
+        this.myUsername = this.registry.get('username');
+        // console.log('player1:', this.player1);
+        // console.log('player2:', this.player2);
+        // console.log('myUsername:', this.myUsername);
     }
 
     preload() {
@@ -374,6 +378,9 @@ export class GameOnline_Scene extends Phaser.Scene {
 
     handleServerMessage(data) {
         switch (data.type) {
+            case 'opponent_move':
+                this._handleOponentInput(data);
+                break;
             // case 'paddleUpdate':
             //     // Update opponent's paddle position
             //     this.remotePaddle.sprite.y = data.y;
@@ -434,6 +441,12 @@ export class GameOnline_Scene extends Phaser.Scene {
     shutdown() {
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
             this.ws.close();
+        }
+    }
+
+    sendMessage(message) {
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            this.ws.send(JSON.stringify(message));
         }
     }
 
@@ -505,7 +518,8 @@ export class GameOnline_Scene extends Phaser.Scene {
     // Bucle principal del juego
     update() {
         // se procesan los inputs de los jugadores
-        this._handleInputForAllPlayers();
+        // this._handleInputForAllPlayers();
+        this._handleMyInput();
         // se actualizan los power-ups
         this.players.forEach(player => player.updatePowerUps());
         // se actualiza el estado de la pelota
@@ -843,68 +857,99 @@ export class GameOnline_Scene extends Phaser.Scene {
         });
     }
 
-    // Procesa el input de los dos jugadores
-    _handleInputForAllPlayers() {
-        this.inputMappings.forEach(mapping => {
-            const player = this.players.get(mapping.playerId);
-            if (!player) return;
+    // TODO mandar como mensaje al servidor el command para que lo ejecute también el otro jugador
+    // Procesa solo el input del jugador local
+    _handleMyInput() {
+        const player = this.player1.name === this.myUsername ? this.players.get('player1') : this.players.get('player2');
+        // console.log('[GameOnline_Scene][_handleMyInput] player:', player);
+        // console.log('[GameOnline_Scene][_handleMyInput] myUsername:', this.myUsername);
+        const mapping = this.inputMappings.find(mapping => mapping.playerId === player.id);
+        // si está paralizado, se deja en idle
+        if (player.isParalyzed) {
+            const idleDir = (player.facing === 'left') ? 'idleLeft' : 'idleRight';
+            this.commandProcessor.process(
+                new MovePlayerCommand(player, idleDir)
+            );
+            this.sendMessage({
+                type: 'player_move', playerName: this.myUsername, command: idleDir
+            });
+            return;
+        }
 
-            // si está paralizado, se deja en idle
-            if (player.isParalyzed) {
-                const idleDir = (player.facing === 'left') ? 'idleLeft' : 'idleRight';
-                this.commandProcessor.process(
-                    new MovePlayerCommand(player, idleDir)
-                );
-                return;
-            }
+        let direction;
 
-            let direction;
+        // movimiento horizontal normal
+        if (mapping.leftKeyObj.isDown) {
+            direction = 'left';
+        }
+        else if (mapping.rightKeyObj.isDown) {
+            direction = 'right';
+        }
+        // no se pulsa nada, así que se queda idle según hacia dónde miraba
+        else {
+            direction = (player.facing === 'left') ? 'idleLeft': 'idleRight';
+        }
 
-            // movimiento horizontal normal
-            if (mapping.leftKeyObj.isDown) {
-                direction = 'left';
-            }
-            else if (mapping.rightKeyObj.isDown) {
-                direction = 'right';
-            }
-            // no se pulsa nada, así que se queda idle según hacia dónde miraba
-            else {
-                direction = (player.facing === 'left') ? 'idleLeft': 'idleRight';
-            }
+        // se aplica movimiento/idle SOLO si no está saltando
+        // si está saltando, no se procesa el movimiento para no sobrescribir la animación
+        if (!player.isJumping) {
+            this.commandProcessor.process(
+                new MovePlayerCommand(player, direction)
+            );
+            this.sendMessage({
+                type: 'player_move', playerName: this.myUsername, command: direction
+            });
+        }
 
-            // se aplica movimiento/idle SOLO si no está saltando
-            // si está saltando, no se procesa el movimiento para no sobrescribir la animación
-            if (!player.isJumping) {
-                this.commandProcessor.process(
-                    new MovePlayerCommand(player, direction)
-                );
-            }
+        // recepción
+        if (Phaser.Input.Keyboard.JustDown(mapping.receiveKeyObj)) {
+            const receiveDir = (player.facing === 'left') ? 'receiveLeft' : 'receiveRight';
+            this.commandProcessor.process(
+                new MovePlayerCommand(player, receiveDir)
+            );
+            this.sendMessage({
+                type: 'player_move', playerName: this.myUsername, command: receiveDir
+            });
+        }
 
-            // recepción
-            if (Phaser.Input.Keyboard.JustDown(mapping.receiveKeyObj)) {
-                const receiveDir = (player.facing === 'left') ? 'receiveLeft' : 'receiveRight';
-                this.commandProcessor.process(
-                    new MovePlayerCommand(player, receiveDir)
-                );
-            }
+        // salto/remate
+        if (Phaser.Input.Keyboard.JustDown(mapping.jumpKeyObj)) {
+            const jumpDir = (player.facing === 'left') ? 'jumpLeft' : 'jumpRight';
+            this.commandProcessor.process(
+                new MovePlayerCommand(player, jumpDir)
+            );
+            this.sendMessage({
+                type: 'player_move', playerName: this.myUsername, command: jumpDir
+            });
+        }
 
-            // salto/remate
-            if (Phaser.Input.Keyboard.JustDown(mapping.jumpKeyObj)) {
-                const jumpDir = (player.facing === 'left') ? 'jumpLeft' : 'jumpRight';
-                this.commandProcessor.process(
-                    new MovePlayerCommand(player, jumpDir)
-                );
-            }
+        // PowerUps
+        if (Phaser.Input.Keyboard.JustDown(mapping.powerKeyObj)) {
+            player.useNextPowerUp();
+            this.updatePlayerInventoryUI(player);
+            this.sendMessage({
+                type: 'player_move', playerName: this.myUsername, command: 'powerUp'
+            });
+        }
+        
+        // se actualiza el estado del jugador local
+        player.update();     
+    }
 
-            // PowerUps
-            if (Phaser.Input.Keyboard.JustDown(mapping.powerKeyObj)) {
-                player.useNextPowerUp();
-                this.updatePlayerInventoryUI(player);
-            }
-        });
-
-        // se actualiza el estado de los jugadores (suelo, etc.)
-        this.players.forEach(player => player.update());
+    _handleOponentInput(data) {
+        const opponent = this.player1.name === data.playerName ? this.players.get('player1') : this.players.get('player2');
+        // console.log('[GameOnline_Scene][_handleOponentInput] data:', data);
+        // console.log('[GameOnline_Scene][_handleOponentInput] opponent:', opponent);
+        // console.log('[GameOnline_Scene][_handleOponentInput] username:', data.playerName);
+        if (data.command === 'powerUp') {
+            opponent.useNextPowerUp();
+            this.updatePlayerInventoryUI(opponent);
+        } else {
+            this.commandProcessor.process(
+                new MovePlayerCommand(opponent, data.command)
+            );
+        }
+        opponent.update();
     }
 
     // Crea la pelota

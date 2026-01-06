@@ -78,11 +78,8 @@ function createGameRoomService(connectionService, getMeta) {
         const meta = getMeta ? getMeta(ws) : null;
 
         sendToOpponent(ws, 'opponent_move', {
-            id: meta?.id ?? null,
-            x: moveData.x,
-            y: moveData.y,
-            anim: moveData.anim,
-            flipX: !!moveData.flipX
+            playerName: moveData.playerName,
+            command: moveData.command
         });
     }
 
