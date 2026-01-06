@@ -24,11 +24,29 @@ export class Ball {
         this.lastHitPlayerId = null;
 		
         //this.isFirstServe = true;
+
+        // semilla para generar números aleatorios deterministas
+        this.seed = 42;
+        this.rng = this._pseudoRandom(this.seed);
+    }
+
+    // Generador de números pseudoaleatorios simple (LCG)
+    // https://javascript.info/task/pseudo-random-generator
+    _pseudoRandom(seed) {
+        let value = seed;
+        return function() {
+            value = (value * 361652 + 493342125) % 969454359;
+            return value / (969454359 - 1);
+        }
     }
 
     // Genera un número aleatorio para variar levemente la velocidad de la pelota
     _getRandomFactor(min = 0.95, max = 1.05) {
-        return min + (max - min) * Math.random();
+        // return min + (max - min) * Math.random();
+        // let rng_val = this.rng();
+        // console.log('RNG Value:', rng_val, '\tSeed:', this.seed);
+        // return min + (max - min) * rng_val;
+        return min + (max - min) * this.rng();
     }
 
     // Se llama cuando un jugador golpea la pelota
@@ -171,7 +189,8 @@ export class Ball {
 
     // Empujon sutil al saque para evitar que caiga sobre la red
     _getSubtleNudge(spawnX, sidePadding, worldWidth) {
-        const sign = Math.random() < 0.5 ? -1 : 1;
+        // const sign = Math.random() < 0.5 ? -1 : 1;
+        const sign = this.rng() < 0.5 ? -1 : 1;
         const offset = sign * 12;
         const clampedX = Math.max(sidePadding, Math.min(worldWidth - sidePadding, spawnX + offset));
 
