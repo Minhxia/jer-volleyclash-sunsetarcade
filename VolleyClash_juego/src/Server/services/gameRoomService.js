@@ -51,6 +51,22 @@ function createGameRoomService(connectionService, getMeta) {
             if (other !== ws) connectionService.send(other, type, payload);
         }
     }
+    
+    // Maneja la desconexión de un jugador
+    function handleDisconnect(ws) {
+        if (!match || !isInMatch(ws)) return;
+
+        const opponent = match.players[0] === ws ? match.players[1] : match.players[0];
+
+        if (opponent.readyState === 1) { // WebSocket.OPEN
+            opponent.send(JSON.stringify({
+            type: 'playerDisconnected'
+            }));
+        }
+
+        // Clean up room
+        match = null;
+    }
 
     //// EVENTOS DE JUEGO ////
     // Estos métodos se llaman desde server.js al recibir mensajes in-game
@@ -105,6 +121,7 @@ function createGameRoomService(connectionService, getMeta) {
         startMatch,
         endMatchIfContains,
 
+        handleDisconnect,
         handlePlayerMove,
         handleBallSync,
         handleScoreUpdate,
