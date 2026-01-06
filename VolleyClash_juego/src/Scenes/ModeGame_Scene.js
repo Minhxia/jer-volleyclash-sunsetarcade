@@ -131,7 +131,9 @@ export class ModeGame_Scene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         // Llamadas iniciales
-        this.baseUrl = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
+        //this.baseUrl = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
+        this.baseUrl = `${window.location.protocol}//${window.location.hostname}:8080`;
+
         this.checkServerStatus();
         this.updatePlayersCount();
 
