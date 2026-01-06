@@ -262,8 +262,14 @@ export class Lobby_Scene extends Phaser.Scene {
     // Construye la URL del WebSocket según el protocolo y host actuales
     _getWsUrl() {
         const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+
+        // frontend en 3000, backend en 8080
+        const backendPort = (window.location.port === '3000') ? '8080' : window.location.port;
+
+        return `${protocol}://${window.location.hostname}:${backendPort}`;
+        //const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
         //return `${protocol}://${window.location.hostname}:8080`;
-        return `${protocol}://${window.location.hostname}:${window.location.port}`;
+        //return `${protocol}://${window.location.hostname}:${window.location.port}`;
         //this.baseUrl = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
     }
 

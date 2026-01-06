@@ -111,15 +111,18 @@ export default class ScenarioPickerUI {
         this.onlyHostText?.setVisible(!this.isHost);
 
         // activar/desactivar interacciones
-        for (const btn of Object.values(this.buttons)) {
+        for (const { btn, label } of Object.values(this.buttons)) {
             if (this.isHost) {
                 btn.setInteractive({ useHandCursor: true });
-            }
-            else {
-                btn.removeInteractive?.();
-                if (!btn.removeInteractive) {
-                    if (btn.input) btn.disableInteractive();
-                }
+                btn.setAlpha(1);
+                label.setAlpha(1);
+            } else {
+                // se quita la interacción
+                if (btn.input) btn.disableInteractive();
+                else btn.removeInteractive?.();
+                // feedback visual
+                btn.setAlpha(0.7);
+                label.setAlpha(0.7);
             }
         }
 
