@@ -39,7 +39,9 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
  3.1 [Lenguajes y Frameworks](#31-lenguajes-y-frameworks)  
  3.2 [Arquitectura Cliente-Servidor](#32-arquitectura-cliente-servidor)  
  3.3 [Control de Versiones y Gestión](#33-control-de-versiones-y-gestión)
-
+ 3.4 [API REST](#34-api-rest)  
+ 3.5 [Comunicación en Tiempo Real – WebSockets](#35-comunicación-en-tiempo-real--websockets)
+   
 4. [Jugabilidad](#4-jugabilidad)  
  4.1 [Objetivo del juego](#41-objetivo-del-juego)  
  4.2 [Controles](#42-controles)  
@@ -85,6 +87,8 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
 9. [Referencias](#9-referencias)
 
 10. [Licencia](#10-licencia)
+
+11. [Enlaces del Proyecto](#11-enlaces-del-proyecto)
 
 ---
 
@@ -162,6 +166,55 @@ El sistema está dividido en dos capas:
 - **Gestión del proyecto:**  
   - Ramas separadas por funcionalidad.  
   - Commits frecuentes con mensajes descriptivos.  
+
+---
+
+## 3.4 API REST
+
+La **API REST** de *Volley Clash* se encarga de la gestión general del juego fuera de la partida en tiempo real. Su función principal es manejar la información persistente y las acciones que no requieren sincronización inmediata entre jugadores.
+
+### Funcionalidades principales de la API REST
+- **Gestión de jugadores**
+  - Registro de nombre del jugador.
+  - Identificación básica de usuarios para partidas online.
+  
+- **Gestión de lobby**
+  - Creación de salas de juego.
+  - Unión de jugadores a una sala existente.
+  - Asignación de roles (Jugador 1 / Jugador 2).
+
+- **Resultados de partidas**
+  - Registro del ganador y marcador final.
+  - Almacenamiento de estadísticas básicas (partidas jugadas, partidas ganadas).
+
+### Endpoints principales (ejemplo)
+- `POST /login` → Registro o identificación del jugador  
+- `POST /lobby/create` → Crear una sala de juego  
+- `POST /lobby/join` → Unirse a una sala existente  
+- `POST /match/result` → Enviar resultado de una partida  
+
+La API REST está desarrollada en **Node.js**, utilizando **Express**, y se comunica con el cliente mediante **JSON**.
+
+---
+
+## 3.5 Comunicación en Tiempo Real – WebSockets
+
+Para garantizar una experiencia multijugador fluida y competitiva, *Volley Clash* utiliza **WebSockets** para la comunicación en tiempo real durante las partidas.
+
+### Uso de WebSockets en el juego
+Los WebSockets se emplean exclusivamente durante el transcurso de una partida, permitiendo:
+- Sincronización de la **posición de los jugadores**.
+- Envío del estado de la **pelota** (posición y velocidad).
+- Activación y efectos de los **power-ups**.
+- Actualización instantánea del **marcador**, sets y tiempo restante.
+- Gestión del estado de la partida (saque, rally, punto, fin de set).
+
+### Ventajas del uso de WebSockets
+- Comunicación **bidireccional** y persistente.
+- **Baja latencia**, esencial para un juego competitivo.
+- Reducción de peticiones HTTP repetidas.
+
+El servidor actúa como **autoridad del juego**, validando las acciones recibidas de los clientes y enviando el estado actualizado a ambos jugadores para evitar desincronizaciones o comportamientos no deseados.
 
 ---
 
@@ -508,3 +561,18 @@ El objetivo de nuestra campaña de marketing es conseguir que **Volley Clash** s
 # 10. Licencia
 **Licencia Apache 2.0**  
 Este proyecto está bajo la licencia Apache 2.0. Consulta el archivo LICENSE para más información.
+
+---
+
+# 11. Enlaces del Proyecto
+
+El juego **Volley Clash** se encuentra disponible en varias plataformas de distribución de juegos web:
+
+- **Newgrounds**  
+  https://www.newgrounds.com/portal/view/1013538
+
+- **Game Jolt**  
+  https://gamejolt.com/games/volley-clash/1041346
+
+- **Itch.io**  
+  https://splatboy32.itch.io/volley-clash
