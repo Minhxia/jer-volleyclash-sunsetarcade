@@ -84,11 +84,15 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
  8.1 [Estrategia de difusión y canales](#81-estrategia-de-difusión-y-canales)  
  8.2 [Público objetivo](#82-público-objetivo)
 
-9. [Referencias](#9-referencias)
+9. [Comunicación cliente servidor](#9-comunicación)
+  9.1 [Comunicacion Cliente servidor con API REST](#91-comunicacion-cliente-servidor-con-api-rest)
+  9.2 [Comunicacion asincrona con WebSockests](#92-comunicacion-asincrona-con-websockests)
 
-10. [Licencia](#10-licencia)
+10. [Referencias](#9-referencias)
 
-11. [Enlaces del Proyecto](#11-enlaces-del-proyecto)
+11. [Licencia](#10-licencia)
+
+12. [Enlaces del Proyecto](#11-enlaces-del-proyecto)
 
 ---
 
@@ -590,10 +594,29 @@ El objetivo de nuestra campaña de marketing es conseguir que **Volley Clash** s
 - Jugadores casuales entre 8 y 25 años.  
 - Personas que frecuentan páginas de juegos gratuitos como *Friv*, *Minijuegos*, *1001Juegos*, etc.  
 - Usuarios que buscan diversión rápida sin necesidad de descargas ni registros.  
+---
+# 9. Comunicación
+## 9.1 Comunicacion Cliente servidor con API REST
+Se ha creado un servidor que funciona en entorno local y que se encarga de gestionar y almacenar los datos del juego. Siguiendo una arquitectura cliente–servidor, el cliente es responsable de la interacción con el usuario y de la presentación de la información, mientras que el servidor gestiona la lógica de negocio y el almacenamiento de datos.
+
+A través del protocolo HTTP, el servidor expone una API REST que permite administrar la información local del juego de forma estructurada y segura. Gracias a esta implementación, el servidor es capaz de realizar las siguientes acciones:
+* Crear y eliminar usuarios.
+
+* Iniciar y cerrar sesión.
+
+* Comunicar el estado del servidor.
+
+* Informar del número de usuarios conectados.
+
+* Almacenar datos como el nombre de usuario, contraseña y estadísticas de partidas jugadas, ganadas y perdidas.
+
+* Generar un ranking con los cinco jugadores más destacados.
+
+## 9.2 Comunicacion asincrona con WebSockests
 
 ---
 
-# 9. Referencias
+# 10. Referencias
 - Fuentes de inspiración:
     - **Haikyuu!!** — Referente temático y estético de voleibol.
     - **Pou – Modo vóley** — Referente de ritmo arcade y tono casual. 
@@ -617,16 +640,16 @@ El objetivo de nuestra campaña de marketing es conseguir que **Volley Clash** s
 
 - Recursos propios del proyecto: 
     - **Arte y UI** (logotipo, escenarios, personajes, iconos, *power-ups*): **creación original del equipo**.
-
 ---
 
-# 10. Licencia
+
+# 11. Licencia
 **Licencia Apache 2.0**  
 Este proyecto está bajo la licencia Apache 2.0. Consulta el archivo LICENSE para más información.
 
 ---
 
-# 11. Enlaces del Proyecto
+# 12. Enlaces del Proyecto
 
 El juego **Volley Clash** se encuentra disponible en varias plataformas de distribución de juegos web:
 
