@@ -8,11 +8,9 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
-// TODO const { Server } = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
-// TODO const io = new Server(server);
 const lastSeen = new Map();
 
 const PORT = process.env.PORT || 8080;
@@ -402,8 +400,6 @@ wss.on('connection', (ws) => {
                 break;
 
             case 'collect_powerup':
-                //gameRoomService.forwardToOpponent(ws, 'collect_powerup', data);
-                //gameRoomService.forwardToHost(ws, 'collect_powerup', data);
                 gameRoomService.broadcastToMatch('collect_powerup', data);
                 break;
 
@@ -412,13 +408,11 @@ wss.on('connection', (ws) => {
                 break;
 
             case 'spawn_powerup':
-                //gameRoomService.forwardToOpponent(ws, 'spawn_powerup', data);
                 gameRoomService.handleSpawnPowerUp(ws, data);
                 break;
 
             case 'remove_powerup':
-                //gameRoomService.forwardToOpponent(ws, 'remove_powerup', data);
-                gameRoomService.handleRemovePowerUp(ws, data); // host-only
+                gameRoomService.handleRemovePowerUp(ws, data);
                 break;
 
             case 'use_powerup':
@@ -469,7 +463,7 @@ wss.on('connection', (ws) => {
     });
 });
 
-// Intervalo de ping para detectar desconexiones “silenciosas”
+// Intervalo de ping para detectar desconexiones
 const interval = setInterval(() => {
     for (const [ws, meta] of clients) {
         if (meta.isAlive === false) {

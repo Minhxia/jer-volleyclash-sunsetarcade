@@ -30,7 +30,7 @@ export class GameOnline_Scene extends Phaser.Scene {
         this.scoreP2 = 0;
         this.setsP1 = 0;
         this.setsP2 = 0;
-        this.maxSets = 1; // mejor de 3
+        this.maxSets = 3; // mejor de 3
         this.currentSet = 1; // set actual
         this.isGoldenPoint = false;
         this.isSetEnding = false;
@@ -234,16 +234,7 @@ export class GameOnline_Scene extends Phaser.Scene {
             .setOrigin(0.5)
             .setDepth(9999)
             .setVisible(false);
-
-        // iniciar el contador para el cronómetro
-        /*this.timerEvent = this.time.addEvent({
-            delay: 1000,
-            callback: this.updateTimer,
-            callbackScope: this,
-            loop: true
-        });
-
-        this.updateTimer();*/
+        
         if (this.isHostClient()) {
             this.timerEvent = this.time.addEvent({
                 delay: 1000,
@@ -292,9 +283,9 @@ export class GameOnline_Scene extends Phaser.Scene {
         }).setOrigin(0.5).setDepth(9999);
 
         // suelo de prueba: crear un cuerpo estático rectangular invisible
-        // Configurable: altura y desplazamiento desde el fondo (`groundOffset`)
+        // altura y desplazamiento configurables desde el fondo (`groundOffset`)
         const groundHeight = 20;
-        const groundOffset = 90; // elevar el suelo 100px desde el fondo
+        const groundOffset = 90;
         this.groundHeight = groundHeight;
         this.groundY = this.worldHeight - groundOffset;
 
@@ -310,7 +301,6 @@ export class GameOnline_Scene extends Phaser.Scene {
         // primero se crean los jugadores
         this._createPlayers();
         // después, se montan las colisiones con el suelo, red, etc.
-        // montar colisiones físicas entre jugadores y suelo para que body.blocked.down funcione
         this._setupPhysicsWorld(ground);
         // por último, se asignan las teclas
         this._setupInputMappings();
@@ -367,9 +357,6 @@ export class GameOnline_Scene extends Phaser.Scene {
             ]
         };
 
-        // acctivar listeners del WebSocket
-        // this.setupWebSocketListeners();
-
         // inicialización de la pelota
         this._createBall();
         // el host inicializa la pelota y las colisiones
@@ -398,19 +385,6 @@ export class GameOnline_Scene extends Phaser.Scene {
             this.ballNet.ty = this.ball.sprite.y;
             this.ballNet.hasTarget = true;
         }
-
-        /*this.input.keyboard.on("keydown-ESC", () => {
-            // se detiene el game loop
-            this.scene.pause();
-            this.timerEvent.paused = true;
-            this.scene.launch("Pause_Scene");
-        });
-
-        // acceso directo a la escena de fin de partida
-        this.input.keyboard.on("keydown-F", () => {
-            const winner = this.scoreP1 >= this.scoreP2 ? "player1" : "player2";
-            this._endGame(winner);
-        });*/
 
         // se activan los listeners del WebSocket
         this.setupWebSocketListeners();
@@ -462,34 +436,6 @@ export class GameOnline_Scene extends Phaser.Scene {
             case 'opponent_move':
                 this._handleOponentInput(data);
                 break;
-            // case 'paddleUpdate':
-            //     // Update opponent's paddle position
-            //     this.remotePaddle.sprite.y = data.y;
-            //     break;
-
-            // case 'scoreUpdate':
-            //     // Update scores from server
-            //     this.localScore = this.playerRole === 'player1' ? data.player1Score : data.player2Score;
-            //     this.remoteScore = this.playerRole === 'player1' ? data.player2Score : data.player1Score;
-
-            //     this.scoreLeft.setText(data.player1Score.toString());
-            //     this.scoreRight.setText(data.player2Score.toString());
-
-            //     // Stop ball, server will relaunch it
-            //     this.ball.setVelocity(0, 0);
-            //     this.ball.setPosition(400, 300);
-            //     break;
-
-            // case 'ballRelaunch':
-            //     // Server is relaunching the ball with new velocity
-            //     this.ball.setPosition(data.ball.x, data.ball.y);
-            //     this.ball.setVelocity(data.ball.vx, data.ball.vy);
-            //     break;
-
-            // case 'gameOver':
-            //     this.endGame(data.winner, data.player1Score, data.player2Score);
-            //     break;
-
             case 'ball_update': // ball_sync en server
                 // lo usa el no-host
                 if (!this.isHostClient()) this._onBallUpdate(data);
@@ -668,7 +614,6 @@ export class GameOnline_Scene extends Phaser.Scene {
                         const appliedType = player.useNextPowerUp(powerType);
                         if (!appliedType) {
                             player.activatePowerUp(powerType);
-                            player.applyPowerUpEffect(powerType);
                             console.log('[PowerUp] no-host apply fallback:', powerType,
                                 'inv:', player.powerUpInventory);
                         } else {
@@ -712,7 +657,6 @@ export class GameOnline_Scene extends Phaser.Scene {
                 break;
 
             case 'score_sync':
-                // if (!this.isHostClient()) this._applyScoreSync(data);
                 const oldP1 = this.scoreP1;
                 const oldP2 = this.scoreP2;
 
@@ -775,11 +719,11 @@ export class GameOnline_Scene extends Phaser.Scene {
 
     handleDisconnection() {
         this.gameEnded = true;
-        // Detener cronómetro y físicas
+        // detiene el cronómetro y las físicas
         if (this.timerEvent) this.timerEvent.paused = true;
         this.physics.world.pause();
 
-        // Feedback visual
+        // feedback visual
         const abandonText = `El oponente ha abandonado.`;
         console.log(abandonText);
 
@@ -788,7 +732,7 @@ export class GameOnline_Scene extends Phaser.Scene {
             color: '#ff0000'
         }).setOrigin(0.5);
 
-        // Limpieza y salida
+        // limpieza y salida
         this.shutdown();
         this.scene.start('Menu_Scene');
     }
@@ -832,14 +776,13 @@ export class GameOnline_Scene extends Phaser.Scene {
 
                 const x = rng.between(Math.floor(xMin), Math.floor(xMax));
 
-                //const x = Phaser.Math.Between(80, this.worldWidth - 80);
                 const y = rng.between(this.worldHeight - 220, this.worldHeight - 120);
 
                 const type = this._getWeightedPowerUpType();
                 if (type) {
                     const id = ++this.powerUpSeq;
-                    const powerUp = new PowerUp(this, x, y, type/*id*/);
-                    //powerUp.id = id;
+                    const powerUp = new PowerUp(this, x, y, type);
+                    
                     const originalCollect = powerUp.collect.bind(powerUp);
                     powerUp.collect = (player) => {
                         const before = Array.isArray(player?.powerUpInventory)
@@ -943,7 +886,6 @@ export class GameOnline_Scene extends Phaser.Scene {
     // Bucle principal del juego
     update() {
         // se procesan los inputs de los jugadores
-        // this._handleInputForAllPlayers();
         this._handleMyInput();
         // se actualizan los power-ups
         this.players.forEach(player => player.updatePowerUps());
@@ -976,13 +918,6 @@ export class GameOnline_Scene extends Phaser.Scene {
 
         this.tiempoRestante--;
         this._renderTimerText();
-
-        // Formato
-        //const minutos = Math.floor(this.tiempoRestante / 60);
-        //const segundos = this.tiempoRestante % 60;
-        //const formato = `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
-
-        //this.timerText.setText(formato);
 
         // manda el tiempo al otro cliente
         this.sendMessage({ type: 'timer_sync', tiempoRestante: this.tiempoRestante });
@@ -1279,11 +1214,11 @@ export class GameOnline_Scene extends Phaser.Scene {
             // jugador 2
             {
                 playerId: 'player2',
-                leftKey: 'A',
-                rightKey: 'D',
-                jumpKey: 'W',
-                receiveKey: 'S',
-                powerKey: 'E'
+                leftKey: 'J',
+                rightKey: 'L',
+                jumpKey: 'I',
+                receiveKey: 'K',
+                powerKey: 'O'
             }
         ];
 
@@ -1309,12 +1244,9 @@ export class GameOnline_Scene extends Phaser.Scene {
         });
     }
 
-    // TODO mandar como mensaje al servidor el command para que lo ejecute también el otro jugador
     // Procesa solo el input del jugador local
     _handleMyInput() {
         const player = this.player1.name === this.myUsername ? this.players.get('player1') : this.players.get('player2');
-        // console.log('[GameOnline_Scene][_handleMyInput] player:', player);
-        // console.log('[GameOnline_Scene][_handleMyInput] myUsername:', this.myUsername);
         const mapping = this.inputMappings.find(mapping => mapping.playerId === player.id);
         // si está paralizado, se deja en idle
         if (player.isParalyzed) {
@@ -1322,9 +1254,6 @@ export class GameOnline_Scene extends Phaser.Scene {
             this.commandProcessor.process(
                 new MovePlayerCommand(player, idleDir)
             );
-            //this.sendMessage({
-            //    type: 'player_move', playerName: this.myUsername, command: idleDir
-            //});
             return;
         }
 
@@ -1375,57 +1304,13 @@ export class GameOnline_Scene extends Phaser.Scene {
             });
         }
 
-        /*
-        // PowerUps
+        // powerups
         if (Phaser.Input.Keyboard.JustDown(mapping.powerKeyObj)) {
-            console.log('[PowerUp] key pressed. isHost?', this.isHostClient(),
-                'player:', player.id, 'inv:', player.powerUpInventory);
-            if (this.isHostClient()) {
-                // host: aplica local y lo replica
-                const usedType = player.useNextPowerUp();
-                if (!usedType) return;
-
-                console.log('[PowerUp] Host used:', usedType, 'inv:', player.powerUpInventory);
-
-                this.updatePlayerInventoryUI(player);
-
-                console.log('[PowerUp] Host send use_powerup:', usedType);
-                this.sendMessage({
-                    type: 'use_powerup',
-                    playerName: this.myUsername,
-                    powerType: usedType
-                });
-
-                this._sendInventorySync();
-            } else {
-                // no-host: pide al host que aplique el siguiente powerup
-                if (this.pendingPowerUpUse) return;
-
-                const requestedType = player.getNextPowerUpType?.();
-                if (!requestedType) return;
-
-                this.pendingPowerUpUse = {
-                    playerName: this.myUsername,
-                    powerType: requestedType
-                };
-
-                console.log('[PowerUp] no-host send use_powerup:', requestedType,
-                    'inv:', player.powerUpInventory);
-                this.sendMessage({
-                    type: 'use_powerup',
-                    playerName: this.myUsername,
-                    powerType: requestedType
-                });
-            }
-        }
-        */
-
-        if (Phaser.Input.Keyboard.JustDown(mapping.powerKeyObj)) {
-
             console.log('[PowerUp] key pressed. isHost?', this.isHostClient(),
                 'player:', player.id,
                 'inv:', player.powerUpInventory);
 
+            // host
             if (this.isHostClient()) {
                 const usedType = player.useNextPowerUp();
                 if (!usedType) return;
@@ -1449,7 +1334,7 @@ export class GameOnline_Scene extends Phaser.Scene {
                     return;
                 }
 
-                const requestedType = player.powerUpInventory?.[0];   // ✅ CLAVE
+                const requestedType = player.powerUpInventory?.[0];
                 if (!requestedType) {
                     console.log('[PowerUp] no powerups in inventory -> ignore');
                     return;
@@ -1477,9 +1362,6 @@ export class GameOnline_Scene extends Phaser.Scene {
 
     _handleOponentInput(data) {
         const opponent = this.player1.name === data.playerName ? this.players.get('player1') : this.players.get('player2');
-        // console.log('[GameOnline_Scene][_handleOponentInput] data:', data);
-        // console.log('[GameOnline_Scene][_handleOponentInput] opponent:', opponent);
-        // console.log('[GameOnline_Scene][_handleOponentInput] username:', data.playerName);
         if (data.command === 'powerUp') {
             opponent.useNextPowerUp();
             this.updatePlayerInventoryUI(opponent);
@@ -1511,10 +1393,9 @@ export class GameOnline_Scene extends Phaser.Scene {
 
         // colisión pelota-red
         this.physics.add.collider(this.ball.sprite, this.red, () => {
-            // Esto se dispara al tocar la red
+            // se dispara al tocar la red
             console.log('La pelota toca la red!');
 
-            // Por ejemplo, se puede frenar la pelota:
             this.ball.sprite.setVelocityX(this.ball.sprite.body.velocity.x * 0.5);
             this.ball.sprite.setVelocityY(this.ball.sprite.body.velocity.y * 0.5);
         });
@@ -1737,13 +1618,13 @@ export class GameOnline_Scene extends Phaser.Scene {
         const matchOver = (this.setsP1 === 2 || this.setsP2 === 2);
 
         if (matchOver) {
-            // último set: mostramos el mensaje 2s y luego pasamos a la escena final
+            // último set: se muestra el mensaje 2s y luego se pasa a la escena final
             this.time.delayedCall(2000, () => {
                 // (si quieres, aquí podrías ocultar el texto)
                 this._endGame(winner);
             });
         } else {
-            // set intermedio: mostramos el mensaje 2s, lo ocultamos y reiniciamos el set
+            // set intermedio: se muestra el mensaje 2s, se oculta y se reinicia el set
             this.time.delayedCall(2000, () => {
                 if (this.setWinnerText) {
                     this.setWinnerText.setVisible(false);
@@ -1778,9 +1659,6 @@ export class GameOnline_Scene extends Phaser.Scene {
 
         // se sincroniza el marcador
         this._sendScoreSync();
-
-        // se reinicia la pelota
-        //this.ball.resetRally();
 
         // se reposicionan los jugadores a sus posiciones iniciales
         const p1 = this.players.get('player1');
@@ -1988,5 +1866,4 @@ export class GameOnline_Scene extends Phaser.Scene {
             p2Inv: p2?.powerUpInventory ?? []
         });
     }
-
 }

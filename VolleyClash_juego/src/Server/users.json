@@ -9,8 +9,8 @@
   {
     "username": "Marco",
     "password": "Marco",
-    "partidaJugadas": 13,
-    "partidasGanadas": 8,
+    "partidaJugadas": 15,
+    "partidasGanadas": 10,
     "partidasPerdidas": 5
   },
   {
@@ -23,9 +23,9 @@
   {
     "username": "sara",
     "password": "1234",
-    "partidaJugadas": 6,
-    "partidasGanadas": 5,
-    "partidasPerdidas": 1
+    "partidaJugadas": 9,
+    "partidasGanadas": 7,
+    "partidasPerdidas": 2
   },
   {
     "username": "aaaa",

@@ -54,7 +54,6 @@ function createGameRoomService(connectionService, getMeta) {
         for (const other of match.players) {
             if (other !== ws) {
                 connectionService.send(other, type, payload);
-                //console.log("[GAMEROOMSERVICE] Mensaje enviado al oponente.");
             };
         }
     }
@@ -69,7 +68,6 @@ function createGameRoomService(connectionService, getMeta) {
             opponent.send(JSON.stringify({
                 type: 'playerDisconnected'
             }));
-            //connectionService.send(opponent, 'playerDisconnected', {});
         }
 
         // Clean up room
@@ -91,7 +89,6 @@ function createGameRoomService(connectionService, getMeta) {
         });
     }
 
-    // TODO Cambiar para usarlo solo en reset de pelota y enviar a ambos
     // Controla la sincronización de la pelota
     function handleBallSync(ws, ballData) {
         if (!isInMatch(ws)) return;

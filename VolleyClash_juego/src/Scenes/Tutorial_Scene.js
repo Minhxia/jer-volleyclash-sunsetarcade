@@ -20,7 +20,6 @@ export class Tutorial_Scene extends Phaser.Scene {
     preload() {
         // imágenes del tutorial
         this.load.image('tut0_controles', 'ASSETS/TUTORIAL/TUT0_Controles.png');
-        this.load.image('tut0_controlesOnline', 'ASSETS/TUTORIAL/TUT0_ControlesOnline.png');
         this.load.image('tut1_set', 'ASSETS/TUTORIAL/TUT1_Set.png');
         this.load.image('tut2_pelota', 'ASSETS/TUTORIAL/TUT2_Pelota.png');
         this.load.image('tut3_powerup', 'ASSETS/TUTORIAL/TUT3_Powerup.png');
@@ -74,8 +73,7 @@ export class Tutorial_Scene extends Phaser.Scene {
         // contenido del tutorial (slides)
         this.pageIndex = 0;
         this.pages = [
-            { key: 'tut0_controles', title: 'Controles Local' },
-            { key: 'tut0_controlesOnline', title: 'Controles Online' },
+            { key: 'tut0_controles', title: 'Controles Local - Online' },
             { key: 'tut1_set', title: 'Reglas básicas: set' },
             { key: 'tut2_pelota', title: 'Reglas básicas: pelota' },
             { key: 'tut3_powerup', title: 'Reglas básicas: power-ups' },
