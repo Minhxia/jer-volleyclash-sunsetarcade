@@ -27,7 +27,7 @@ function createConnectionService() {
     // Envía un mensaje JSON a todos los clientes ws conectados
     function broadcast(type, payload = {}) {
         for (const client of clients) {
-            safeSend(client, { type, ...payload });
+            safeSend(client, { ...payload, type });
         }
     }
 
