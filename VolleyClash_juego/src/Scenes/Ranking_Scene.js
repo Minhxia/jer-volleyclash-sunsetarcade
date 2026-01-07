@@ -43,7 +43,7 @@ export class Ranking_Scene extends Phaser.Scene {
     card.setStrokeStyle(2, 0xffffff, 0.2);
 
     // título
-    this.add
+    this.add 
       .text(cardX, height * 0.1, "Ranking", {
         ...style,
         fontSize: "42px",

@@ -13,7 +13,13 @@ export class Menu_Scene extends Phaser.Scene {
         this.load.image('fondoMenuPrincipal', 'ASSETS/FONDOS/MENU_PRINCIPAL.png');
     }
 
-    create() {        
+    create() {       
+        const style = this.game.globals?.defaultTextStyle ?? {
+            fontFamily: "Arial",
+            fontSize: "20px",
+            color: "#ffffff",
+            };
+        
         // posiciones base para los botones del menú
         // (así se puede cambiar el tamaño sin problemas)
         const { width, height } = this.scale;
@@ -29,7 +35,8 @@ export class Menu_Scene extends Phaser.Scene {
         // TODO: cambiar por una imagen?
         // título del juego
         this.add.text(mitadDerechaX, 100, 'Volley Clash', {
-            fontSize: '32px',
+            ...style,
+            fontSize: '75px',
             color: '#ffffff'
         }).setOrigin(0.5);
 
@@ -40,6 +47,7 @@ export class Menu_Scene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true });
 
         const playText = this.add.text(0, 0, 'Jugar', {
+            ...style,
             fontSize: '20px',
             color: '#000000'
         });
@@ -69,6 +77,7 @@ export class Menu_Scene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true });
 
         const rankingText = this.add.text(0, 0, 'Ranking', {
+            ...style,
             fontSize: '20px',
             color: '#000000'
         });
@@ -99,6 +108,7 @@ export class Menu_Scene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true });
 
         const configText = this.add.text(0, 0, 'Configuración', {
+            ...style,
             fontSize: '20px',
             color: '#000000'
         });
@@ -127,6 +137,7 @@ export class Menu_Scene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true });
 
         const creditsText = this.add.text(0, 0, 'Créditos', {
+            ...style,
             fontSize: '20px',
             color: '#000000'
         });

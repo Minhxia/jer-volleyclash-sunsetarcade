@@ -600,17 +600,23 @@ El objetivo de nuestra campaña de marketing es conseguir que **Volley Clash** s
 Se ha creado un servidor que funciona en entorno local y que se encarga de gestionar y almacenar los datos del juego. Siguiendo una arquitectura cliente–servidor, el cliente es responsable de la interacción con el usuario y de la presentación de la información, mientras que el servidor gestiona la lógica de negocio y el almacenamiento de datos.
 
 A través del protocolo HTTP, el servidor expone una API REST que permite administrar la información local del juego de forma estructurada y segura. Gracias a esta implementación, el servidor es capaz de realizar las siguientes acciones:
-* Crear y eliminar usuarios.
+* Crear y eliminar usuarios, mediante peticiones POST y DELETE.
+El registro de usuarios se realiza a través del endpoint /api/register, donde se valida la existencia previa del usuario y la corrección de la contraseña antes de almacenarlo. La eliminación de usuarios se gestiona mediante /api/users/:username, requiriendo la contraseña para garantizar la seguridad de la operación.
 
-* Iniciar y cerrar sesión.
+* Iniciar y cerrar sesión, mediante peticiones POST.
+El inicio de sesión se gestiona en /api/login, validando las credenciales y manteniendo un registro de los usuarios activos en el servidor. El cierre de sesión se realiza mediante /api/logout, eliminando al usuario de la lista de jugadores conectados y liberando su sesión activa.
 
 * Comunicar el estado del servidor.
+El servidor dispone de un endpoint /status que permite comprobar si se encuentra activo y operativo, facilitando la verificación del estado del sistema desde el cliente.
 
 * Informar del número de usuarios conectados.
+A través del endpoint /api/players/count, el servidor devuelve en tiempo real el número de jugadores actualmente conectados, información que se gestiona mediante una lista interna de jugadores activos.
 
 * Almacenar datos como el nombre de usuario, contraseña y estadísticas de partidas jugadas, ganadas y perdidas.
+Cada usuario almacena de forma persistente sus estadísticas de juego, que se actualizan al finalizar cada partida mediante el endpoint /api/game/finish. Además, el perfil del jugador puede consultarse mediante /api/users/profile/:username.
 
 * Generar un ranking con los cinco jugadores más destacados.
+El servidor genera dinámicamente un ranking de los cinco mejores jugadores en función del número de partidas ganadas, accesible a través del endpoint /api/topPlayers, devolviendo únicamente la información relevante para su visualización en el cliente.
 
 ## 9.2 Comunicacion asincrona con WebSockests
 
