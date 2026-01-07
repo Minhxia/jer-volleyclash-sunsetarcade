@@ -622,6 +622,9 @@ export class GameOnline_Scene extends Phaser.Scene {
                 const whoUsed = data.playerName; // primero se determina QUIÉN lo usó
                 const powerType = data.powerType;
 
+                console.log('[PowerUp] apply_powerup recv. isHost?', this.isHostClient(),
+                    'who:', whoUsed, 'type:', powerType);
+
                 const player = (this.player1.name === whoUsed)
                     ? this.players.get('player1')
                     : this.players.get('player2');
@@ -635,9 +638,14 @@ export class GameOnline_Scene extends Phaser.Scene {
                     if (!appliedType) appliedType = player.useNextPowerUp();
 
                     if (!appliedType) {
+                        console.log('[PowerUp] Host apply failed. who:', whoUsed,
+                            'type:', powerType, 'inv:', player.powerUpInventory);
                         this._sendInventorySync();
                         break;
                     }
+
+                    console.log('[PowerUp] Host apply ok:', appliedType,
+                        'inv:', player.powerUpInventory);
 
                     this.updatePlayerInventoryUI(player);
                     this._sendInventorySync();
@@ -658,6 +666,11 @@ export class GameOnline_Scene extends Phaser.Scene {
                         if (!appliedType) {
                             player.activatePowerUp(powerType);
                             player.applyPowerUpEffect(powerType);
+                            console.log('[PowerUp] no-host apply fallback:', powerType,
+                                'inv:', player.powerUpInventory);
+                        } else {
+                            console.log('[PowerUp] no-host applied:', appliedType,
+                                'inv:', player.powerUpInventory);
                         }
                         this.updatePlayerInventoryUI(player);
                     }
@@ -1297,6 +1310,8 @@ export class GameOnline_Scene extends Phaser.Scene {
         /*
         // PowerUps
         if (Phaser.Input.Keyboard.JustDown(mapping.powerKeyObj)) {
+            console.log('[PowerUp] key pressed. isHost?', this.isHostClient(),
+                'player:', player.id, 'inv:', player.powerUpInventory);
             if (this.isHostClient()) {
                 // host: aplica local y lo replica
                 const usedType = player.useNextPowerUp();
@@ -1306,6 +1321,7 @@ export class GameOnline_Scene extends Phaser.Scene {
 
                 this.updatePlayerInventoryUI(player);
 
+                console.log('[PowerUp] Host send use_powerup:', usedType);
                 this.sendMessage({
                     type: 'use_powerup',
                     playerName: this.myUsername,
@@ -1325,6 +1341,8 @@ export class GameOnline_Scene extends Phaser.Scene {
                     powerType: requestedType
                 };
 
+                console.log('[PowerUp] no-host send use_powerup:', requestedType,
+                    'inv:', player.powerUpInventory);
                 this.sendMessage({
                     type: 'use_powerup',
                     playerName: this.myUsername,
@@ -1348,6 +1366,7 @@ export class GameOnline_Scene extends Phaser.Scene {
 
                 this.updatePlayerInventoryUI(player);
 
+                console.log('[PowerUp] Host send use_powerup:', usedType);
                 this.sendMessage({
                     type: 'use_powerup',
                     playerName: this.myUsername,

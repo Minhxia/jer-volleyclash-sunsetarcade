@@ -415,6 +415,7 @@ wss.on('connection', (ws) => {
                 break;
 
             case 'use_powerup':
+                console.log('[SERVER] use_powerup from', data?.playerName, 'type:', data?.powerType);
                 gameRoomService.forwardToOpponent(ws, 'apply_powerup', data);
                 break;
 
