@@ -35,7 +35,7 @@ export class Menu_Scene extends Phaser.Scene {
             fontSize: '20px',
             color: '#ffffff'
         };
-        
+
         // layout
         const { width, height } = this.scale;
         const centerX = width / 2;
@@ -46,9 +46,9 @@ export class Menu_Scene extends Phaser.Scene {
             .setOrigin(0)
             .setDepth(-1);
         background.setDisplaySize(width, height);
-        
+
         // título del juego
-        this.add.text(rightHalfX, 115, 'Volley Clash', {
+        this.add.text(rightHalfX, 112, 'Volley Clash', {
             ...style,
             fontSize: '68px',
             color: '#ffffff'
@@ -56,7 +56,7 @@ export class Menu_Scene extends Phaser.Scene {
 
         //// BOTONES ////
         const firstButtonY = height / 2 - 63;
-        const buttonSpacing = 70;
+        const buttonSpacing = 62;
         const buttonTextStyle = { ...style, fontSize: '28px', color: '#000000' };
 
         // botón Jugar
@@ -89,10 +89,21 @@ export class Menu_Scene extends Phaser.Scene {
             clickSoundKey: 'sonidoClick',
         });
 
-        // botón Créditos
+        // botón Ranking
         createUIButton(this, {
             x: rightHalfX,
             y: firstButtonY + buttonSpacing * 3,
+            label: 'Ranking',
+            onClick: () => this.scene.start('Ranking_Scene'),
+            textStyle: buttonTextStyle,
+            clickSoundKey: 'sonidoClick',
+        });
+
+
+        // botón Créditos
+        createUIButton(this, {
+            x: rightHalfX,
+            y: firstButtonY + buttonSpacing * 4,
             label: 'Créditos',
             onClick: () => this.scene.start('Credits_Scene'),
             textStyle: buttonTextStyle,
@@ -118,7 +129,7 @@ export class Menu_Scene extends Phaser.Scene {
         /////////
         // Estado del servidor
         this.connectionText = this.add.text(20, 20, 'Servidor: ONLINE', { fontSize: '16px', color: '#00ff00' });
-        
+
         const onUpdateCount = (count) => {
             if (this.connectionText.active && this.connectionText) {
                 this.connectionText.setText(`Servidor: ONLINE | Usuarios: ${count}`);
@@ -134,7 +145,7 @@ export class Menu_Scene extends Phaser.Scene {
 
     async handleLogout() {
         const username = this.registry.get('username');
-        
+
         try {
             // Avisar al servidor para que deje libre el puesto de Host
             await fetch('/api/logout', {
