@@ -368,6 +368,10 @@ wss.on('connection', (ws) => {
                     seq: data.seq
                 });
                 break;
+            
+            case 'players_snap':
+                gameRoomService.forwardToOpponent(ws, 'players_snap', data);
+                break;
 
             case 'ball_reset':
                 gameRoomService.handleBallReset(ws, data);
@@ -387,11 +391,14 @@ wss.on('connection', (ws) => {
                 break;
 
             case 'golden_point_sync':
-                gameRoomService.forwardToOpponent(ws, 'force_golden_point', {});
+                gameRoomService.forwardToOpponent(ws, 'set_message', {
+                    text: data.text,
+                    visible: true
+                });
                 break;
 
             case 'game_finished':
-                gameRoomService.broadcastToMatch('match_finished', data);
+                gameRoomService.broadcastToMatch('game_finished', data);
                 break;
 
             case 'collect_powerup':
@@ -421,6 +428,14 @@ wss.on('connection', (ws) => {
 
             case 'timer_sync':
                 gameRoomService.forwardToOpponent(ws, 'timer_sync', data);
+                break;
+
+            case 'play_sound_sync':
+                gameRoomService.forwardToOpponent(ws, 'play_sound_sync', data);
+                break;
+
+            case 'set_message':
+                gameRoomService.forwardToOpponent(ws, 'set_message', data);
                 break;
 
             default:

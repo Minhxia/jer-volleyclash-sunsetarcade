@@ -72,11 +72,6 @@ export class Lobby_Scene extends Phaser.Scene {
         const previewW = width * 0.42;
         const previewH = height * 0.30;
 
-        // Marco del escenario
-        const scenarioFrame = this.add.image(previewX, previewY, 'marco').setOrigin(0.5);
-        scenarioFrame.texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
-        scenarioFrame.setDisplaySize(previewW, previewH);
-
         // ScenarioPicker, preview encima del marco a la izq + botones a la dcha
         this.scenarioUI = new ScenarioPickerUI(this, {
             style,
@@ -98,6 +93,11 @@ export class Lobby_Scene extends Phaser.Scene {
                 this._sendWS({ type: 'select_scenario', selectedScenario: scenarioName });
             }
         });
+
+        // Marco del escenario
+        const scenarioFrame = this.add.image(previewX, previewY, 'marco').setOrigin(0.5);
+        scenarioFrame.texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+        scenarioFrame.setDisplaySize(previewW, previewH);
 
         //// ZONA INFERIOR: JUGADORES /////
         const playersCenterX = (width / 2) - 30;

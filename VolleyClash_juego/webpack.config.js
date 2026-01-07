@@ -18,7 +18,7 @@ module.exports = {
 
     proxy: [
       {
-        context: ['/api', '/socket.io', '/status'],
+        context: ['/api', '/status'],
         target: 'http://localhost:8080',
         ws: true
       }

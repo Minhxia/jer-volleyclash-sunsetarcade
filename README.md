@@ -9,7 +9,7 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
 
 **Número de Grupo:** 5   
 **Repositorio de GitHub:** [URL del repositorio](https://github.com/Minhxia/jer-volleyclash-sunsetarcade)  
-**Presentación Fase 1:** [URL de la presentación](https://www.canva.com/design/DAG2J4n1DjQ/evYi3V_Vg3hBeLQZ4EcqLQ/view?utm_content=DAG2J4n1DjQ&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h76898e5bdb)  
+**Presentación Fase 3, 4 y 5:** [URL de la presentación](https://www.canva.com/design/DAG9vPPKsKo/-o2fW4u-cMkP8aeihkXtcg/edit?utm_content=DAG9vPPKsKo&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)  
 **Equipo de Desarrollo:**
 
 | Nombre | Correo Oficial | Cuenta de GitHub |
@@ -84,15 +84,11 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
  8.1 [Estrategia de difusión y canales](#81-estrategia-de-difusión-y-canales)  
  8.2 [Público objetivo](#82-público-objetivo)
 
-9. [Comunicación cliente servidor](#9-comunicación)
-  9.1 [Comunicacion Cliente servidor con API REST](#91-comunicacion-cliente-servidor-con-api-rest)
-  9.2 [Comunicacion asincrona con WebSockests](#92-comunicacion-asincrona-con-websockests)
+9. [Referencias](#9-referencias)
 
-10. [Referencias](#9-referencias)
+10. [Licencia](#10-licencia)
 
-11. [Licencia](#10-licencia)
-
-12. [Enlaces del Proyecto](#11-enlaces-del-proyecto)
+11. [Enlaces del Proyecto](#11-enlaces-del-proyecto)
 
 ---
 
@@ -190,12 +186,61 @@ La **API REST** de *Volley Clash* se encarga de la gestión general del juego fu
 - **Resultados de partidas**
   - Registro del ganador y marcador final.
   - Almacenamiento de estadísticas básicas (partidas jugadas, partidas ganadas).
+  - Creacion de un ranking entre los 5 mejores jugadores registrados.
+
+  A través del protocolo HTTP, el servidor expone una API REST que permite administrar la información local del juego de forma estructurada y segura. Gracias a esta implementación, el servidor es capaz de realizar las siguientes acciones:
+  * Crear y eliminar usuarios, mediante peticiones POST y DELETE.
+  El registro de usuarios se realiza a través del endpoint /api/register, donde se valida la existencia previa del usuario y la corrección de la contraseña antes de almacenarlo. La eliminación de usuarios se gestiona mediante /api/users/:username, requiriendo la contraseña para garantizar la seguridad de la operación.
+
+  * Iniciar y cerrar sesión, mediante peticiones POST.
+  El inicio de sesión se gestiona en /api/login, validando las credenciales y manteniendo un registro de los usuarios activos en el servidor. El cierre de sesión se realiza mediante /api/logout, eliminando al usuario de la lista de jugadores conectados y liberando su sesión activa.
+
+  * Comunicar el estado del servidor.
+  El servidor dispone de un endpoint /status que permite comprobar si se encuentra activo y operativo, facilitando la verificación del estado del sistema desde el cliente.
+
+  * Informar del número de usuarios conectados.
+  A través del endpoint /api/players/count, el servidor devuelve en tiempo real el número de jugadores actualmente conectados, información que se gestiona mediante una lista interna de jugadores activos.
+
+  * Almacenar datos como el nombre de usuario, contraseña y estadísticas de partidas jugadas, ganadas y perdidas.
+  Cada usuario almacena de forma persistente sus estadísticas de juego, que se actualizan al finalizar cada partida mediante el endpoint /api/game/finish. Además, el perfil del jugador puede consultarse mediante /api/users/profile/:username.
+
+  * Generar un ranking con los cinco jugadores más destacados.
+  El servidor genera dinámicamente un ranking de los cinco mejores jugadores en función del número de partidas ganadas, accesible a través del endpoint /api/topPlayers, devolviendo únicamente la información relevante para su visualización en el cliente.
+
 
 ### Endpoints principales (ejemplo)
-- `POST /login` → Registro o identificación del jugador  
-- `POST /lobby/create` → Crear una sala de juego  
-- `POST /lobby/join` → Unirse a una sala existente  
-- `POST /match/result` → Enviar resultado de una partida  
+
+#### Gestión de usuarios
+- **POST** `/api/register`  
+  Registrar un nuevo usuario.
+- **DELETE** `/api/users/:username`  
+  Eliminar un usuario existente (requiere contraseña).
+- **POST** `/api/login`  
+  Iniciar sesión de un usuario.
+- **POST** `/api/logout`  
+  Cerrar sesión de un usuario.
+- **GET** `/api/users/profile/:username`  
+  Obtener el perfil y estadísticas de un usuario.
+---
+#### Gestión de jugadores conectados
+- **GET** `/api/players/count`  
+  Obtener el número de jugadores conectados.
+- **GET** `/api/players/list`  
+  Obtener la lista de jugadores conectados.
+- **GET** `/api/users/keepalive/:username`  
+  Mantener la sesión activa y detectar inactividad.
+---
+#### Gestión de partidas y estadísticas
+- **PUT** `/api/game/finish`  
+  Actualizar estadísticas del usuario al finalizar una partida.
+---
+#### Ranking de jugadores
+- **GET** `/api/topPlayers`  
+  Obtener el ranking de los cinco mejores jugadores.
+---
+#### Estado del servidor
+- **GET** `/status`  
+  Comprobar el estado del servidor. 
 
 La API REST está desarrollada en **Node.js**, utilizando **Express**, y se comunica con el cliente mediante **JSON**.
 

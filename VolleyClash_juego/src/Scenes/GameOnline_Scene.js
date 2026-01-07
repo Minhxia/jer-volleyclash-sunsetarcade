@@ -1,6 +1,5 @@
 // Clase de la escena de juego online
 
-
 import Phaser from 'phaser';
 import { Player } from '../Entities/Player.js';
 import { PowerUp } from '../Entities/PowerUp.js';
@@ -11,9 +10,10 @@ import { getStoredSfxVolume } from '../UI/Audio.js';
 
 export class GameOnline_Scene extends Phaser.Scene {
     tiempoTotal = 60; // para 2 min poner 120 segundos
-    tiempoRestante = this.tiempoTotal;
+    tiempoRestante;
     timerText;
     timerEvent;
+
     constructor() {
         super('GameOnline_Scene');
     }
@@ -30,7 +30,7 @@ export class GameOnline_Scene extends Phaser.Scene {
         this.scoreP2 = 0;
         this.setsP1 = 0;
         this.setsP2 = 0;
-        this.maxSets = 3; // mejor de 3
+        this.maxSets = 1; // mejor de 3
         this.currentSet = 1; // set actual
         this.isGoldenPoint = false;
         this.isSetEnding = false;
@@ -59,6 +59,9 @@ export class GameOnline_Scene extends Phaser.Scene {
 
         this.ballSyncSeq = 0;
         this.ballSyncEvent = null;
+
+        this.lastHitTime = 0;
+        this.tiempoRestante = this.tiempoTotal;
 
         // PowerUps
         this.powerUpSeq = 0;
@@ -681,6 +684,16 @@ export class GameOnline_Scene extends Phaser.Scene {
                 if (!this.isHostClient()) {
                     this.setWinnerText.setText(data.text ?? '');
                     this.setWinnerText.setVisible(!!data.visible);
+
+                    if (data.visible) {
+                        this.time.delayedCall(2000, () => {
+                            this.setWinnerText.setVisible(false);
+                        });
+                    }
+
+                    if (data.text.toLowerCase().includes('oro')) {
+                        this.isGoldenPoint = true;
+                    }
                 }
                 break;
 
@@ -700,7 +713,13 @@ export class GameOnline_Scene extends Phaser.Scene {
 
             case 'score_sync':
                 // if (!this.isHostClient()) this._applyScoreSync(data);
+                const oldP1 = this.scoreP1;
+                const oldP2 = this.scoreP2;
+
                 this._applyScoreSync(data);
+                if (!this.isHostClient() && (this.scoreP1 > oldP1 || this.scoreP2 > oldP2)) {
+                    this.playSfx(this.sfx.point);
+                }
                 break;
 
             case 'timer_sync':
@@ -712,6 +731,41 @@ export class GameOnline_Scene extends Phaser.Scene {
 
             case 'playerDisconnected':
                 this.handleDisconnection();
+                break;
+            
+            case 'play_sound_sync':
+                if (!this.isHostClient()) {
+                    const key = this.sfx[data.sfx];
+                    this.playSfx(key);
+                }
+                break;
+            
+            case 'game_finished':
+                this.gameEnded = true; 
+                console.log("Recibido fin de partida del servidor");
+                
+                this.scene.start("EndGame_Scene", {
+                    winner: data.winner,
+                    player1: data.player1,
+                    player2: data.player2
+                });
+                break;
+            
+            case 'players_snap':
+                if (!this.isHostClient()) {
+                    const p1 = this.players.get('player1');
+                    const p2 = this.players.get('player2');
+                    
+                    if (p1) {
+                        p1.setPosition(data.p1.x, data.p1.y);
+                        p1.idleRight();
+                    }
+                    if (p2) {
+                        p2.setPosition(data.p2.x, data.p2.y);
+                        p2.idleLeft();
+                    }
+                    console.log("Posiciones de jugadores reiniciadas (Snap)");
+                }
                 break;
 
             default:
@@ -942,11 +996,25 @@ export class GameOnline_Scene extends Phaser.Scene {
             else if (this.scoreP2 > this.scoreP1) this._endSet("player2");
             else {
                 console.log("Empate en el set");
+
+                const msg = 'EMPATE: punto de oro';
+
                 this.isGoldenPoint = true;
                 if (this.setWinnerText) {
-                    this.setWinnerText.setText('EMPATE: punto de oro');
+                    this.setWinnerText.setText(msg);
                     this.setWinnerText.setVisible(true);
+
+                    this.time.delayedCall(2000, () => {
+                        if (this.setWinnerText) {
+                            this.setWinnerText.setVisible(false);
+                        }
+                    });
                 }
+
+                this.sendMessage({ 
+                    type: 'golden_point_sync', 
+                    text: msg 
+                });
             }
         }
     }
@@ -1211,11 +1279,11 @@ export class GameOnline_Scene extends Phaser.Scene {
             // jugador 2
             {
                 playerId: 'player2',
-                leftKey: 'J',
-                rightKey: 'L',
-                jumpKey: 'I',
-                receiveKey: 'K',
-                powerKey: 'O'
+                leftKey: 'A',
+                rightKey: 'D',
+                jumpKey: 'W',
+                receiveKey: 'S',
+                powerKey: 'E'
             }
         ];
 
@@ -1559,11 +1627,26 @@ export class GameOnline_Scene extends Phaser.Scene {
         }
 
         ball.hit(player, playerDirection, isJumping, isReceiving);
+
+        const now = this.time.now;
+        if (now > this.lastHitTime + 300) {
+            this.lastHitTime = now;
+
+            const soundType = isJumping ? 'spike' : 'receive';
+            
+            this.playSfx(this.sfx[soundType]);
+
+            this.sendMessage({
+                type: 'play_sound_sync',
+                sfx: soundType
+            });
+        }
     }
 
     // Controla el final del juego
     _endGame(winner) {
         this._stopBallSync();
+        this.gameEnded = true;
 
         // se para el timer del set
         if (this.timerEvent) {
@@ -1579,12 +1662,21 @@ export class GameOnline_Scene extends Phaser.Scene {
             this.physics.world.pause();
         }
 
-        console.log("Partida Local terminada. Ganador:", winner);
-
-        this.scene.start("EndGame_Scene", {
+        this.sendMessage({
+            type: 'game_finished',
             winner: winner,
             player1: this.player1,
-            player2: this.player2,
+            player2: this.player2
+        });
+
+        console.log("Partida Online terminada. Ganador:", winner);
+
+        this.time.delayedCall(100, () => {
+            this.scene.start("EndGame_Scene", {
+                winner: winner,
+                player1: this.player1,
+                player2: this.player2
+            });
         });
     }
 
@@ -1629,9 +1721,15 @@ export class GameOnline_Scene extends Phaser.Scene {
         this.sendMessage({ type: 'set_message', text: `SET para ${winner}`, visible: true });
 
         // mostrar mensaje de ganador de set
-        const winnerLabel = (winner === 'player1') ? 'Jugador 1' : 'Jugador 2';
+        const winnerLabel = (winner === 'player1') ? this.player1.name : this.player2.name;
         this.setWinnerText.setText(`SET para ${winnerLabel}`);
         this.setWinnerText.setVisible(true);
+
+        this.sendMessage({
+            type: 'set_message',
+            text: this.setWinnerText.text,
+            visible: true
+        });
 
         // Avanzar número de set
         this.currentSet++;
@@ -1688,17 +1786,27 @@ export class GameOnline_Scene extends Phaser.Scene {
         const p1 = this.players.get('player1');
         const p2 = this.players.get('player2');
 
-        p1.setPosition(this.worldWidth * 0.25, this.worldHeight * 0.7);
-        p2.setPosition(this.worldWidth * 0.75, this.worldHeight * 0.7);
+        const p1X = this.worldWidth * 0.25;
+        const p1Y = this.worldHeight * 0.7;
+        const p2X = this.worldWidth * 0.75;
+        const p2Y = this.worldHeight * 0.7;
+
+        p1.setPosition(p1X, p1Y);
+        p2.setPosition(p2X, p2Y);
 
         p1.idleRight();
         p2.idleLeft();
+
+        this.sendMessage({
+            type: 'players_snap',
+            p1: { x: p1X, y: p1Y },
+            p2: { x: p2X, y: p2Y }
+        });
 
         // se resetea la pelota y se avisa al otro cliente
         this.ball.resetRally();
         this.ball.setServePosition();
         this._sendBallReset('set_reset');
-
         this.playSfx(this.sfx.whistle);
     }
 
