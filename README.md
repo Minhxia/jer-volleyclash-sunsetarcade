@@ -250,7 +250,7 @@ La API REST está desarrollada en **Node.js**, utilizando **Express**, y se comu
 
 Para la sincronización de las partidas en tiempo real, **Volley Clash** utiliza **WebSockets** mediante la librería `ws` en Node.js. Esta tecnología permite una comunicación bidireccional persistente entre el servidor y los clientes durante toda la partida, garantizando baja latencia y coherencia en el estado del juego.
 
-El servidor WebSocket se inicializa sobre el mismo servidor HTTP que la API REST y actúa como **autoridad del juego**, validando y reenviando los eventos críticos entre los jugadores.
+El servidor WebSocket se inicializa sobre el mismo servidor HTTP que la API REST y actúa como **autoridad del juego**, validando y reenviando los eventos críticos entre los jugadores. Durante el partido, se utiliza un **host autoritativo**.
 
 ### Gestión de Conexiones
 
@@ -262,14 +262,18 @@ Cada conexión WebSocket mantiene una estructura de metadatos asociada con la si
 - **Rol de host**
 - **Estado de conexión (keep-alive)**
 
-El servidor mantiene un registro activo de clientes conectados y elimina automáticamente aquellas conexiones inactivas mediante un sistema de **ping/pong** periódico.
+El servidor mantiene un registro activo de clientes conectados y elimina automáticamente aquellas conexiones inactivas mediante un sistema de **ping/pong** periódico. Además, para mantener el código modular, el servidor se divide en servicios:
+
+- **connectionService**: mantiene un set de clientes WebSocket conectados, con métodos auxiliares para mandar mensaje con JSON.
+- **matchmakingService**: gestiona el lobby.
+- **gameRoomService**: se encarga de retransmitir los mensajes in-game entre los jugadores.
 
 ### Sistema de Lobby y Matchmaking
 
 A través de WebSockets se gestiona todo el flujo previo a la partida:
 
 - Entrada de jugadores al **lobby** (`join_lobby`)
-- Selección de **escenario**
+- Selección de **escenario** (solo el host puede seleccionar escenario)
 - Confirmación de **estado listo** de cada jugador
 - Asignación de roles y emparejamiento automático
 
@@ -283,10 +287,11 @@ Durante la partida, los WebSockets se utilizan para enviar y recibir eventos en 
 - **Sincronización de la pelota** (`ball_sync`)
 - **Actualización de puntuación** (`update_score`)
 - **Sincronización del temporizador** (`timer_sync`)
-- **Finalización de sets y partida**
-- **Gestión del punto de oro**
-- **Uso y aplicación de power-ups**
-- **Generación forzada de power-ups**
+- **Finalización de sets y partida** (`set_finished_sync`, `game_finished`)
+- **Gestión del punto de oro** (`golden_point_sync`)
+- **Gestión de inventario** (`inv_sync`)
+- **Generación y eliminación de power-ups** (`spawn_powerup`, `remove_powerup`)
+- **Uso y aplicación de power-ups** (`collect_powerup`, `collect_denied`, `use_powerup`)
 
 Los mensajes siguen un formato JSON y contienen siempre un campo `type` que identifica la acción a realizar.
 
