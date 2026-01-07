@@ -1,5 +1,7 @@
 // Pantalla del Menú Principal
 import Phaser from 'phaser';
+import { createUIButton } from '../UI/Buttons.js';
+import { ensureLoopingMusic, applyStoredVolume } from '../UI/Audio.js';
 
 export class Menu_Scene extends Phaser.Scene {
     constructor() {
@@ -7,158 +9,150 @@ export class Menu_Scene extends Phaser.Scene {
     }
 
     preload() {
-        // se cargan las imágenes de los botones
+        // fondo
+        this.load.image('fondoMenuPrincipal', 'ASSETS/FONDOS/MENU_PRINCIPAL.png');
+
+        // botones
         this.load.image('botonSeleccionado', 'ASSETS/UI/BOTONES/BOTON_BASE_G_SELECCIONADO.png');
         this.load.image('botonSinSeleccionar', 'ASSETS/UI/BOTONES/BOTON_BASE_G.png');
-        this.load.image('fondoMenuPrincipal', 'ASSETS/FONDOS/MENU_PRINCIPAL.png');
+
+        // logo
+        this.load.image('logoEmpresa', 'ASSETS/LOGO/logo_empresa.png');
+
+        // audio
+        this.load.audio('sonidoGeneral', 'ASSETS/SONIDO/SONIDO1.mp3');
+        this.load.audio('sonidoClick', 'ASSETS/SONIDO/SonidoBoton.mp3');
     }
 
-    create() {       
+    create() {
+        // música de fondo
+        applyStoredVolume(this);
+        ensureLoopingMusic(this, 'sonidoGeneral', { loop: true });
+
+        // estilo base del texto
         const style = this.game.globals?.defaultTextStyle ?? {
-            fontFamily: "Arial",
-            fontSize: "20px",
-            color: "#ffffff",
-            };
+            fontFamily: 'Arial',
+            fontSize: '20px',
+            color: '#ffffff'
+        };
         
-        // posiciones base para los botones del menú
-        // (así se puede cambiar el tamaño sin problemas)
+        // layout
         const { width, height } = this.scale;
         const centerX = width / 2;
-        const firstButtonY = height / 2 - 60;
-        const buttonSpacing = 70;
-        const mitadDerechaX = centerX + (centerX / 2);
-        const background = this.add.image(0, 0, 'fondoMenuPrincipal')
-        .setOrigin(0)
-        .setDepth(-1);
+        const rightHalfX = centerX + (centerX / 2);
 
+        // fondo ajustado al canvas
+        const background = this.add.image(0, 0, 'fondoMenuPrincipal')
+            .setOrigin(0)
+            .setDepth(-1);
+        background.setDisplaySize(width, height);
         
-        // TODO: cambiar por una imagen?
         // título del juego
-        this.add.text(mitadDerechaX, 100, 'Volley Clash', {
+        this.add.text(rightHalfX, 115, 'Volley Clash', {
             ...style,
-            fontSize: '75px',
+            fontSize: '68px',
             color: '#ffffff'
         }).setOrigin(0.5);
 
-        //// BOTÓN JUGAR ////
-        const playButton = this.add
-            .sprite(mitadDerechaX, firstButtonY, 'botonSinSeleccionar')
-            .setScale(2)
-            .setInteractive({ useHandCursor: true });
+        //// BOTONES ////
+        const firstButtonY = height / 2 - 63;
+        const buttonSpacing = 70;
+        const buttonTextStyle = { ...style, fontSize: '28px', color: '#000000' };
 
-        const playText = this.add.text(0, 0, 'Jugar', {
-            ...style,
-            fontSize: '20px',
-            color: '#000000'
-        });
-        Phaser.Display.Align.In.Center(playText, playButton);
-
-        playButton.on('pointerover', () => {
-            playButton.setTexture('botonSeleccionado');
-        });
-        playButton.on('pointerout', () => {
-            playButton.setTexture('botonSinSeleccionar');
+        // botón Jugar
+        createUIButton(this, {
+            x: rightHalfX,
+            y: firstButtonY,
+            label: 'Jugar',
+            onClick: () => this.scene.start('ModeGame_Scene'),
+            textStyle: buttonTextStyle,
+            clickSoundKey: 'sonidoClick',
         });
 
-        playButton.on('pointerdown', () => {
-            playButton.setTexture('botonSeleccionado');
-        });
-        playButton.on('pointerup', () => {
-            // al soltar el click se pasa a la escena de selección de modo de juego
-            // (local o en red)
-            this.scene.start('ModeGame_Scene');
-        });
-        ////////
-
-        //// BOTÓN RANKING ////
-        const rankingButton = this.add
-            .sprite(mitadDerechaX, firstButtonY + buttonSpacing * 2, 'botonSinSeleccionar')
-            .setScale(2)
-            .setInteractive({ useHandCursor: true });
-
-        const rankingText = this.add.text(0, 0, 'Ranking', {
-            ...style,
-            fontSize: '20px',
-            color: '#000000'
-        });
-        Phaser.Display.Align.In.Center(rankingText, rankingButton);
-
-        rankingButton.on('pointerover', () => {
-            rankingButton.setTexture('botonSeleccionado');
-        });
-        rankingButton.on('pointerout', () => {
-            rankingButton.setTexture('botonSinSeleccionar');
+        // botón Tutorial
+        createUIButton(this, {
+            x: rightHalfX,
+            y: firstButtonY + buttonSpacing,
+            label: 'Tutorial',
+            onClick: () => this.scene.start('Tutorial_Scene', { returnScene: 'Menu_Scene' }),
+            textStyle: buttonTextStyle,
+            clickSoundKey: 'sonidoClick',
         });
 
-        rankingButton.on('pointerdown', () => {
-            rankingButton.setTexture('botonSeleccionado');
-        });
-        rankingButton.on('pointerup', () => {
-            // al soltar el click se pasa a la escena de ranking
-            this.scene.start('Ranking_Scene');
-        });
-
-        ////////
-
-
-        //// BOTÓN CONFIGURACIÓN ////
-        const configButton = this.add
-            .sprite(mitadDerechaX, firstButtonY + buttonSpacing, 'botonSinSeleccionar')
-            .setScale(2)
-            .setInteractive({ useHandCursor: true });
-
-        const configText = this.add.text(0, 0, 'Configuración', {
-            ...style,
-            fontSize: '20px',
-            color: '#000000'
-        });
-        Phaser.Display.Align.In.Center(configText, configButton);
-
-        configButton.on('pointerover', () => {
-            configButton.setTexture('botonSeleccionado');
-        });
-        configButton.on('pointerout', () => {
-            configButton.setTexture('botonSinSeleccionar');
+        // botón Configuración
+        createUIButton(this, {
+            x: rightHalfX,
+            y: firstButtonY + buttonSpacing * 2,
+            label: 'Configuración',
+            onClick: () => this.scene.start('Configuration_Scene'),
+            textStyle: buttonTextStyle,
+            clickSoundKey: 'sonidoClick',
         });
 
-        configButton.on('pointerdown', () => {
-            configButton.setTexture('botonSeleccionado');
-        });
-        configButton.on('pointerup', () => {
-            // se pasa a la escena de configuración
-            this.scene.start('Configuration_Scene');
-        });
-        ////////
-
-        //// BOTÓN CRÉDITOS ////
-        const creditsButton = this.add
-            .sprite(mitadDerechaX, firstButtonY + buttonSpacing * 3, 'botonSinSeleccionar')
-            .setScale(2)
-            .setInteractive({ useHandCursor: true });
-
-        const creditsText = this.add.text(0, 0, 'Créditos', {
-            ...style,
-            fontSize: '20px',
-            color: '#000000'
-        });
-        Phaser.Display.Align.In.Center(creditsText, creditsButton);
-
-        creditsButton.on('pointerover', () => {
-            creditsButton.setTexture('botonSeleccionado');
-        });
-        creditsButton.on('pointerout', () => {
-            creditsButton.setTexture('botonSinSeleccionar');
+        // botón Créditos
+        createUIButton(this, {
+            x: rightHalfX,
+            y: firstButtonY + buttonSpacing * 3,
+            label: 'Créditos',
+            onClick: () => this.scene.start('Credits_Scene'),
+            textStyle: buttonTextStyle,
+            clickSoundKey: 'sonidoClick',
         });
 
-        creditsButton.on('pointerdown', () => {
-            creditsButton.setTexture('botonSeleccionado');
+        // botón de cerrar sesión
+        createUIButton(this, {
+            x: width - 115,
+            y: 40,
+            label: 'Cerrar Sesión',
+            onClick: () => { this.handleLogout() },
+            textStyle: buttonTextStyle,
+            clickSoundKey: 'sonidoClick',
         });
+        /////////
 
-        creditsButton.on('pointerup', () => {
-            // se pasa a la escena de créditos
-            this.scene.start('Credits_Scene');
-        });
-        ////////
+        // logo de la empresa
+        this.add.image(this.scale.width - 20, this.scale.height - 20, 'logoEmpresa')
+            .setScale(0.42)
+            .setOrigin(1, 1);
+
+        /////////
+        // Estado del servidor
+        this.connectionText = this.add.text(20, 20, 'Servidor: ONLINE', { fontSize: '16px', color: '#00ff00' });
         
+        const onUpdateCount = (count) => {
+            if (this.connectionText.active && this.connectionText) {
+                this.connectionText.setText(`Servidor: ONLINE | Usuarios: ${count}`);
+            }
+        };
+
+        this.game.events.on('update_online_count', onUpdateCount);
+
+        this.events.once('shutdown', () => {
+            this.game.events.off('update_online_count', onUpdateCount);
+        });
+    }
+
+    async handleLogout() {
+        const username = this.registry.get('username');
+        
+        try {
+            // Avisar al servidor para que deje libre el puesto de Host
+            await fetch('/api/logout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username })
+            });
+        } catch (e) { console.error("Error en logout"); }
+
+        // Limpiar local
+        sessionStorage.removeItem('voley_username');
+        sessionStorage.removeItem('voley_session_token');
+
+        // Limpiar registry
+        this.registry.destroy();
+
+        // Volver a la pantalla de login
+        this.scene.stop('Connection_Scene');
+        this.scene.start('Logging_Scene');
     }
 }
