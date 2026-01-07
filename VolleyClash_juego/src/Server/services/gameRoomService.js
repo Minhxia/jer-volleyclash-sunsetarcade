@@ -8,19 +8,22 @@ function createGameRoomService(connectionService, getMeta) {
     function startMatch(playerEntriesPublic, playerWss, scenario) {
         const hostIndex = playerEntriesPublic.findIndex(p => p.isHost);
         const hostWs = hostIndex >= 0 ? playerWss[hostIndex] : (playerWss[0] || null);
+        const seed = Date.now().toString();
 
         match = {
             players: playerWss,
             hostWs,
             scenario,
-            rallyId: 0
+            rallyId: 0,
+            seed
         };
 
         // se notifica a ambos jugadores
         for (const ws of playerWss) {
             connectionService.send(ws, 'start_game', {
                 players: playerEntriesPublic,
-                selectedScenario: scenario
+                selectedScenario: scenario,
+                seed
             });
         }
     }
@@ -49,7 +52,10 @@ function createGameRoomService(connectionService, getMeta) {
     function sendToOpponent(ws, type, payload = {}) {
         if (!isInMatch(ws)) return;
         for (const other of match.players) {
-            if (other !== ws) connectionService.send(other, type, payload);
+            if (other !== ws) {
+                connectionService.send(other, type, payload);
+                //console.log("[GAMEROOMSERVICE] Mensaje enviado al oponente.");
+            };
         }
     }
 
@@ -149,6 +155,18 @@ function createGameRoomService(connectionService, getMeta) {
         sendToOpponent(ws, 'remove_powerup', { id: data.id });
     }
 
+    // Controla la sincronización del inventario
+    function handleInventorySync(ws, data) {
+        if (!isInMatch(ws)) return;
+        if (match.hostWs && ws !== match.hostWs) return;
+
+        //  en cliente ya se filtra con !isHostClient()
+        sendToMatch('inv_sync', {
+            p1Inv: data.p1Inv ?? [],
+            p2Inv: data.p2Inv ?? []
+        });
+    }
+
     // Controla la actualización del marcador
     function handleScoreUpdate(ws, scoreData) {
         console.log('[SERVER] update_score recibido', scoreData);
@@ -182,6 +200,7 @@ function createGameRoomService(connectionService, getMeta) {
         handleSpawnPowerUp,
         handleRemovePowerUp,
         handleScoreUpdate,
+        handleInventorySync,
         forwardToOpponent,
         broadcastToMatch
     };

@@ -377,6 +377,11 @@ wss.on('connection', (ws) => {
                 gameRoomService.handleScoreUpdate(ws, data);
                 break;
 
+            case 'inv_sync':
+                console.log("[SERVER] Mando mensaje de inv_sync al oponente...")
+                gameRoomService.forwardToOpponent(ws, 'inv_sync', data);
+                break;
+
             case 'set_finished_sync':
                 gameRoomService.forwardToOpponent(ws, 'set_finished_sync', data);
                 break;
@@ -389,9 +394,19 @@ wss.on('connection', (ws) => {
                 gameRoomService.broadcastToMatch('match_finished', data);
                 break;
 
+            case 'collect_powerup':
+                //gameRoomService.forwardToOpponent(ws, 'collect_powerup', data);
+                //gameRoomService.forwardToHost(ws, 'collect_powerup', data);
+                gameRoomService.broadcastToMatch('collect_powerup', data);
+                break;
+
+            case 'collect_denied':
+                gameRoomService.forwardToOpponent(ws, 'collect_denied', data);
+                break;
+
             case 'spawn_powerup':
                 //gameRoomService.forwardToOpponent(ws, 'spawn_powerup', data);
-                gameRoomService.handleSpawnPowerUp(ws, data); // host-only
+                gameRoomService.handleSpawnPowerUp(ws, data);
                 break;
 
             case 'remove_powerup':

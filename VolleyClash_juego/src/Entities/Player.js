@@ -406,11 +406,24 @@ export class Player {
         return true;
     }
 
-    useNextPowerUp() {
-        if (this.powerUpInventory.length === 0) return;
+    useNextPowerUp(forcedType = null) {
+        if (!Array.isArray(this.powerUpInventory) || this.powerUpInventory.length === 0) return null;
 
-        const type = this.powerUpInventory.shift();
+        let type;
+
+        if (forcedType) {
+            const idx = this.powerUpInventory.indexOf(forcedType);
+            if (idx < 0) return null;
+            type = forcedType;
+            this.powerUpInventory.splice(idx, 1);
+        } else {
+            type = this.powerUpInventory.shift();
+        }
+
         this.activatePowerUp(type);
+        this.scene?.updatePlayerInventoryUI?.(this);
+
+        return type;
     }
 
     // Activa el efecto del power-up

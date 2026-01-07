@@ -320,6 +320,7 @@ export class Lobby_Scene extends Phaser.Scene {
             case 'start_game': {
                 const players = msg?.players ?? this.lobbyPlayers;
                 const selectedScenario = msg?.selectedScenario ?? this.selectedScenario ?? 'Gym';
+                const seed = msg?.seed ?? Date.now().toString();
 
                 const host = players.find(p => p.isHost);
                 const guest = players.find(p => !p.isHost);
@@ -336,7 +337,8 @@ export class Lobby_Scene extends Phaser.Scene {
                     mode: 'online',
                     player1,
                     player2,
-                    selectedScenario
+                    selectedScenario,
+                    seed
                 });
                 break;
             }

@@ -36,6 +36,9 @@ export class GameOnline_Scene extends Phaser.Scene {
         this.isSetEnding = false;
         this.ws = this.registry.get('ws');
         this.myUsername = this.registry.get('username');
+        this.seed = data?.seed ?? Date.now().toString();
+        this.rng = new Phaser.Math.RandomDataGenerator([String(this.seed)]);
+        console.log('[GameOnline] RNG seed:', this.seed);
 
         // console.log('player1:', this.player1);
         // console.log('player2:', this.player2);
@@ -61,6 +64,12 @@ export class GameOnline_Scene extends Phaser.Scene {
         this.powerUpSeq = 0;
         this.powerUpsById = new Map();      // host: id -> PowerUp
         this.powerUpsNetById = new Map();   // no-host: id -> sprite (visual)
+        this.powerUpsNetOverlapsById = new Map();
+        this.powerUpExpiryTimers = new Map();   // para poder cancelar las delayedCalls de desaparición
+
+        this.pendingCollectPowerUps = new Set();
+        this.pendingPowerUpUse = null;
+        this._suppressCollectBroadcast = false;
     }
 
     preload() {
@@ -493,41 +502,165 @@ export class GameOnline_Scene extends Phaser.Scene {
                 break;
 
             case 'spawn_powerup': // coincide con server
-                if (!this.isHostClient()) {
-                    const s = this.add.image(data.x, data.y, data.powerType)
-                        .setDepth(2)
-                        .setScale(1.2);
-                    this.powerUpsNetById.set(data.id, s);
+                if (this.isHostClient()) break;
+
+                const pu = this.physics.add.staticImage(data.x, data.y, data.powerType)
+                    .setDepth(2)
+                    .setScale(1.2);
+
+                if (pu.refreshBody) pu.refreshBody();
+
+                this.powerUpsNetById.set(data.id, pu);
+
+                // jugador local (en este cliente)
+                const localPlayer = (this.player1.name === this.myUsername)
+                    ? this.players.get('player1')
+                    : this.players.get('player2');
+
+                const attachOverlap = (player) => {
+                    if (!player?.sprite) return false;
+                    if (this.powerUpsNetOverlapsById.has(data.id)) return true;
+
+                    const overlap = this.physics.add.overlap(player.sprite, pu, () => {
+                        if (this.pendingCollectPowerUps.has(data.id)) return;
+
+                        this.pendingCollectPowerUps.add(data.id);
+
+                        // se pide al host que recoga el power-up
+                        this.sendMessage({
+                            type: 'collect_powerup',
+                            id: data.id,
+                            playerName: this.myUsername
+                        });
+                    });
+                    this.powerUpsNetOverlapsById.set(data.id, overlap);
+                    return true;
+                };
+
+                if (!attachOverlap(localPlayer)) {
+                    this.time.delayedCall(100, () => {
+                        if (!this.powerUpsNetById.has(data.id)) return;
+                        const retryPlayer = (this.player1.name === this.myUsername)
+                            ? this.players.get('player1')
+                            : this.players.get('player2');
+                        attachOverlap(retryPlayer);
+                    });
                 }
-                // paracaídas: autodestruye a los 6s (el lifetime es 5s)
-                this.time.delayedCall(6000, () => {
-                    const still = this.powerUpsNetById.get(data.id);
-                    if (still) {
-                        still.destroy();
-                        this.powerUpsNetById.delete(data.id);
-                    }
-                });
                 break;
 
             case 'remove_powerup': // coincide con server
+                const expiryTimer = this.powerUpExpiryTimers.get(data.id);
+                if (expiryTimer) expiryTimer.remove(false);
+                this.powerUpExpiryTimers.delete(data.id);
+
                 if (!this.isHostClient()) {
-                    const s = this.powerUpsNetById.get(data.id);
-                    if (s) s.destroy();
+                    // se borran los overlaps y los sprites de los powerups
+                    const pu = this.powerUpsNetById.get(data.id);
+                    const ov = this.powerUpsNetOverlapsById.get(data.id);
+
+                    if (ov) ov.destroy();
+                    if (pu) pu.destroy();
+
+                    this.powerUpsNetOverlapsById.delete(data.id);
                     this.powerUpsNetById.delete(data.id);
+                    this.pendingCollectPowerUps.delete(data.id);
                 }
                 break;
 
+            case 'collect_denied':
+                if (!this.isHostClient()) {
+                    if (data?.id != null) {
+                        const deniedId = data.id;
+                        this.time.delayedCall(300, () => {
+                            this.pendingCollectPowerUps.delete(deniedId);
+                        });
+                    }
+                }
+                break;
+
+            case 'collect_powerup': {
+                if (!this.isHostClient()) break;
+
+                // se valian id y jugador
+                const id = data.id;
+                const who = data.playerName;
+
+                // se intenta almacenar el powerup(p_u)
+                const p_u = this.powerUpsById.get(id);
+                if (!p_u) break; // si ya no existe, sale
+
+                const player = (this.player1.name === who)
+                    ? this.players.get('player1')
+                    : this.players.get('player2');
+
+                if (!player) break;
+
+                // se guarda en el inventario del jugador
+                this._suppressCollectBroadcast = true;
+                const stored = p_u.collect(player);
+                this._suppressCollectBroadcast = false;
+
+                if (stored) {
+                    const expiryTimer = this.powerUpExpiryTimers.get(id);
+                    if (expiryTimer) expiryTimer.remove(false);
+                    this.powerUpExpiryTimers.delete(id);
+                    // se borra si se recoge
+                    this.powerUpsById.delete(id);
+                    // avisa al otro cliente para que lo quite del campo
+                    this.sendMessage({ type: 'remove_powerup', id });
+                    // manda inventarios actualizados
+                    this._sendInventorySync();
+                } else {
+                    // inventario lleno -> permite que el oponente lo intente luego
+                    this.sendMessage({ type: 'collect_denied', id, playerName: who });
+                }
+                break;
+            }
+
+            case 'use_powerup':
             case 'apply_powerup':   // use_powerup en server
-                // primero se determina QUIÉN lo usó
-                const whoUsed = data.playerName;
+                const whoUsed = data.playerName; // primero se determina QUIÉN lo usó
+                const powerType = data.powerType;
 
                 const player = (this.player1.name === whoUsed)
                     ? this.players.get('player1')
                     : this.players.get('player2');
 
-                if (player) {
-                    player.useNextPowerUp();
+                if (!player) break;
+
+                // host
+                if (this.isHostClient()) {
+                    let appliedType = null;
+                    if (powerType) appliedType = player.useNextPowerUp(powerType);
+                    if (!appliedType) appliedType = player.useNextPowerUp();
+
+                    if (!appliedType) {
+                        this._sendInventorySync();
+                        break;
+                    }
+
                     this.updatePlayerInventoryUI(player);
+                    this._sendInventorySync();
+
+                    this.sendMessage({
+                        type: 'use_powerup',
+                        playerName: whoUsed,
+                        powerType: appliedType
+                    });
+                } else {
+                    // no-host
+                    if (this.pendingPowerUpUse && this.pendingPowerUpUse.playerName === whoUsed) {
+                        this.pendingPowerUpUse = null;
+                    }
+
+                    if (powerType) {
+                        const appliedType = player.useNextPowerUp(powerType);
+                        if (!appliedType) {
+                            player.activatePowerUp(powerType);
+                            player.applyPowerUpEffect(powerType);
+                        }
+                        this.updatePlayerInventoryUI(player);
+                    }
                 }
                 break;
 
@@ -540,11 +673,15 @@ export class GameOnline_Scene extends Phaser.Scene {
 
             case 'inv_sync':
                 if (!this.isHostClient()) {
+                    // obtiene los jugadores
                     const p1 = this.players.get('player1');
                     const p2 = this.players.get('player2');
 
+                    // sustituye sus inventarios
                     if (p1) { p1.powerUpInventory = data.p1Inv ?? []; this.updatePlayerInventoryUI(p1); }
                     if (p2) { p2.powerUpInventory = data.p2Inv ?? []; this.updatePlayerInventoryUI(p2); }
+
+                    this.pendingPowerUpUse = null;
                 }
                 break;
 
@@ -590,11 +727,19 @@ export class GameOnline_Scene extends Phaser.Scene {
     }
 
     shutdown() {
+        if (this.powerUpExpiryTimers && this.powerUpExpiryTimers.size > 0) {
+            this.powerUpExpiryTimers.forEach(timer => {
+                if (timer) timer.remove(false);
+            });
+            this.powerUpExpiryTimers.clear();
+        }
+
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
             this.ws.close();
         }
     }
 
+    // Manda un mensaje al servidor
     sendMessage(message) {
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
             this.ws.send(JSON.stringify(message));
@@ -604,32 +749,56 @@ export class GameOnline_Scene extends Phaser.Scene {
     // Genera un nuevo power-up en una posición aleatoria cada cierto tiempo
     schedulePowerUpSpawn() {
         const { minDelayMs, maxDelayMs } = this.powerUpSpawnConfig;
-        const delay = Phaser.Math.Between(minDelayMs, maxDelayMs);
+        const rng = this.rng ?? Phaser.Math.RND;
+        const delay = rng.between(minDelayMs, maxDelayMs);
 
         this.time.delayedCall(delay, () => {
             if (this.powerUps.length < this.maxPowerUps) {
-                const netX = this.red.x;            // mejor que hardcodear 480
+                const netX = this.red.x;
                 const margin = 80;
                 const inner = 25;
 
-                const spawnLeft = Phaser.Math.Between(0, 1) === 0;
+                const spawnLeft = rng.between(0, 1) === 0;
 
                 const xMin = spawnLeft ? margin : (netX + inner);
                 const xMax = spawnLeft ? (netX - inner) : (this.worldWidth - margin);
 
-                const x = Phaser.Math.Between(Math.floor(xMin), Math.floor(xMax));
+                const x = rng.between(Math.floor(xMin), Math.floor(xMax));
 
                 //const x = Phaser.Math.Between(80, this.worldWidth - 80);
-                const y = Phaser.Math.Between(this.worldHeight - 220, this.worldHeight - 120);
+                const y = rng.between(this.worldHeight - 220, this.worldHeight - 120);
 
                 const type = this._getWeightedPowerUpType();
                 if (type) {
                     const id = ++this.powerUpSeq;
-                    const powerUp = new PowerUp(this, x, y, type);
-                    powerUp.id = id;
+                    const powerUp = new PowerUp(this, x, y, type/*id*/);
+                    //powerUp.id = id;
+                    const originalCollect = powerUp.collect.bind(powerUp);
+                    powerUp.collect = (player) => {
+                        const before = Array.isArray(player?.powerUpInventory)
+                            ? player.powerUpInventory.length
+                            : 0;
+                        originalCollect(player);
+                        const after = Array.isArray(player?.powerUpInventory)
+                            ? player.powerUpInventory.length
+                            : 0;
+                        const stored = after > before;
+
+                        if (stored && this.isHostClient() && !this._suppressCollectBroadcast) {
+                            const expiryTimer = this.powerUpExpiryTimers.get(id);
+                            if (expiryTimer) expiryTimer.remove(false);
+                            this.powerUpExpiryTimers.delete(id);
+                            this.powerUpsById.delete(id);
+                            this.sendMessage({ type: 'remove_powerup', id });
+                            this._sendInventorySync();
+                        }
+
+                        return stored;
+                    };
 
                     this.powerUps.push(powerUp);
                     this.powerUpLastSpawnAt[type] = this.time.now;
+                    this.powerUpsById.set(id, powerUp);
 
                     this.sendMessage({
                         type: 'spawn_powerup',
@@ -637,6 +806,22 @@ export class GameOnline_Scene extends Phaser.Scene {
                         x, y,
                         powerType: type
                     });
+
+                    // controla la desaparición del powerup por tiempo (se queda sin recoger)
+                    const lifetimeMs = Number.isFinite(powerUp?.lifetime) ? powerUp.lifetime : 5000;
+                    const expiryTimer = this.time.delayedCall(lifetimeMs, () => {
+                        this.powerUpExpiryTimers.delete(id);
+                        const current = this.powerUpsById.get(id);
+                        if (!current) return;
+                        if (current.isCollected) {
+                            this.powerUpsById.delete(id);
+                            return;
+                        }
+
+                        this.sendMessage({ type: 'remove_powerup', id });
+                        this.powerUpsById.delete(id);
+                    });
+                    this.powerUpExpiryTimers.set(id, expiryTimer);
                 }
             }
 
@@ -665,7 +850,8 @@ export class GameOnline_Scene extends Phaser.Scene {
 
         // se suman todos los pesos, se elige un número aleatorio entre 1 y esa suma
         const total = entries.reduce((sum, [, weight]) => sum + weight, 0);
-        let roll = Phaser.Math.Between(1, total);
+        const rng = this.rng ?? Phaser.Math.RND;
+        let roll = rng.between(1, total);
         // se van restando pesos hasta que el contador cae en un tipo
         for (const [type, weight] of entries) {
             roll -= weight;
@@ -1108,16 +1294,94 @@ export class GameOnline_Scene extends Phaser.Scene {
             });
         }
 
+        /*
         // PowerUps
         if (Phaser.Input.Keyboard.JustDown(mapping.powerKeyObj)) {
-            // por un lado, se aplica localmente para que el jugador vea el efecto
-            player.useNextPowerUp();
-            this.updatePlayerInventoryUI(player);
+            if (this.isHostClient()) {
+                // host: aplica local y lo replica
+                const usedType = player.useNextPowerUp();
+                if (!usedType) return;
 
-            // por otro, se avisa al server para que lo replique el oponente
-            this.sendMessage({
-                type: 'use_powerup', playerName: this.myUsername
-            });
+                console.log('[PowerUp] Host used:', usedType, 'inv:', player.powerUpInventory);
+
+                this.updatePlayerInventoryUI(player);
+
+                this.sendMessage({
+                    type: 'use_powerup',
+                    playerName: this.myUsername,
+                    powerType: usedType
+                });
+
+                this._sendInventorySync();
+            } else {
+                // no-host: pide al host que aplique el siguiente powerup
+                if (this.pendingPowerUpUse) return;
+
+                const requestedType = player.getNextPowerUpType?.();
+                if (!requestedType) return;
+
+                this.pendingPowerUpUse = {
+                    playerName: this.myUsername,
+                    powerType: requestedType
+                };
+
+                this.sendMessage({
+                    type: 'use_powerup',
+                    playerName: this.myUsername,
+                    powerType: requestedType
+                });
+            }
+        }
+        */
+
+        if (Phaser.Input.Keyboard.JustDown(mapping.powerKeyObj)) {
+
+            console.log('[PowerUp] key pressed. isHost?', this.isHostClient(),
+                'player:', player.id,
+                'inv:', player.powerUpInventory);
+
+            if (this.isHostClient()) {
+                const usedType = player.useNextPowerUp();
+                if (!usedType) return;
+
+                console.log('[PowerUp] Host used:', usedType, 'inv:', player.powerUpInventory);
+
+                this.updatePlayerInventoryUI(player);
+
+                this.sendMessage({
+                    type: 'use_powerup',
+                    playerName: this.myUsername,
+                    powerType: usedType
+                });
+
+                this._sendInventorySync();
+            } else {
+                // no-host
+                if (this.pendingPowerUpUse) {
+                    console.log('[PowerUp] blocked: pendingPowerUpUse=', this.pendingPowerUpUse);
+                    return;
+                }
+
+                const requestedType = player.powerUpInventory?.[0];   // ✅ CLAVE
+                if (!requestedType) {
+                    console.log('[PowerUp] no powerups in inventory -> ignore');
+                    return;
+                }
+
+                this.pendingPowerUpUse = {
+                    playerName: this.myUsername,
+                    powerType: requestedType,
+                    t: this.time.now
+                };
+
+                console.log('[PowerUp] requesting use:', requestedType);
+
+                this.sendMessage({
+                    type: 'use_powerup',
+                    playerName: this.myUsername,
+                    powerType: requestedType
+                });
+            }
         }
 
         // se actualiza el estado del jugador local
@@ -1585,10 +1849,12 @@ export class GameOnline_Scene extends Phaser.Scene {
     // Envía la sincronización del inventario de power-ups (solo host)
     _sendInventorySync() {
         if (!this.isHostClient()) return;
+        console.log("[GAMEONLINE] Enviando mensaje de sincronizar inventarios...");
 
         const p1 = this.players.get('player1');
         const p2 = this.players.get('player2');
 
+        console.log("[GAMEONLINE] Enviando mensaje para el server...");
         this.sendMessage({
             type: 'inv_sync',
             p1Inv: p1?.powerUpInventory ?? [],
