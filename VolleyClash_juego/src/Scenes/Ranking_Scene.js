@@ -9,11 +9,8 @@ export class Ranking_Scene extends Phaser.Scene {
   }
 
   preload() {
-    // Fondo + UI (igual que Credits)
     this.load.image("botonVolver", "ASSETS/UI/BOTONES/FLECHA_VOLVER.png");
     this.load.image("fondoMenuPrincipal", "ASSETS/FONDOS/MENU_PRINCIPAL.png");
-
-    // sonido (si lo usáis en createIconButton o queréis añadirlo luego)
     this.load.audio("sonidoClick", "ASSETS/SONIDO/SonidoBoton.mp3");
   }
 
@@ -36,7 +33,7 @@ export class Ranking_Scene extends Phaser.Scene {
     // capa oscura por encima
     this.add.rectangle(0, 0, width, height, 0x000000, 0.5).setOrigin(0).setDepth(-1);
 
-    // tarjeta (similar a Credits)
+    // tarjeta del ranking
     const cardWidth = width * 0.42;
     const cardHeight = height * 0.56;
     const cardX = width * 0.75;
@@ -64,7 +61,7 @@ export class Ranking_Scene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    // texto del ranking (lo actualizo tras el fetch)
+    // texto del ranking (se actualiza tras el fetch)
     this.rankingText = this.add
       .text(cardX, cardY - cardHeight * 0.30, "Cargando...", {
         ...style,
@@ -76,7 +73,7 @@ export class Ranking_Scene extends Phaser.Scene {
       })
       .setOrigin(0.5, 0);
 
-    // botón volver (igual que Credits)
+    // botón volver 
     createIconButton(this, {
       x: width * 0.06,
       y: height * 0.08,
