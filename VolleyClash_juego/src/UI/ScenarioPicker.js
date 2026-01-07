@@ -46,7 +46,7 @@ export default class ScenarioPickerUI {
 
         this.onlyHostText = scene.add.text(
             this.buttonsX,
-            this.buttonsY + this.buttonsSpacingY * this.scenarios.length + 10,
+            this.buttonsY + this.buttonsSpacingY * this.scenarios.length + 5,
             'El host elige el escenario',
             { ...this.style, fontSize: '22px', color: '#444' }
         ).setOrigin(0.5);

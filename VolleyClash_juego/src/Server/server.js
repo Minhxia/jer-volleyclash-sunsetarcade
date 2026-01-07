@@ -322,7 +322,7 @@ wss.on('connection', (ws) => {
         if (m) m.isAlive = true;
     });
 
-    // Manejo de mensajes entrantes
+    // Manejo de mensajes entrantes (cliente -> servidor)
     ws.on('message', (raw) => {
         let data;
         try {
@@ -350,7 +350,6 @@ wss.on('connection', (ws) => {
                 matchmakingService.setScenario(ws, data.selectedScenario);
                 break;
 
-
             case 'player_ready':
                 matchmakingService.setReady(ws, !!data.isReady);
                 break;
@@ -365,8 +364,13 @@ wss.on('connection', (ws) => {
                     x: data.x,
                     y: data.y,
                     vx: data.vx,
-                    vy: data.vy
+                    vy: data.vy,
+                    seq: data.seq
                 });
+                break;
+
+            case 'ball_reset':
+                gameRoomService.handleBallReset(ws, data);
                 break;
 
             case 'update_score':
@@ -385,12 +389,18 @@ wss.on('connection', (ws) => {
                 gameRoomService.broadcastToMatch('match_finished', data);
                 break;
 
-            case 'use_powerup':
-                gameRoomService.forwardToOpponent(ws, 'apply_powerup', data);
+            case 'spawn_powerup':
+                //gameRoomService.forwardToOpponent(ws, 'spawn_powerup', data);
+                gameRoomService.handleSpawnPowerUp(ws, data); // host-only
                 break;
 
-            case 'spawn_powerup':
-                gameRoomService.forwardToOpponent(ws, 'force_spawn_powerup', data);
+            case 'remove_powerup':
+                //gameRoomService.forwardToOpponent(ws, 'remove_powerup', data);
+                gameRoomService.handleRemovePowerUp(ws, data); // host-only
+                break;
+
+            case 'use_powerup':
+                gameRoomService.forwardToOpponent(ws, 'apply_powerup', data);
                 break;
 
             case 'timer_sync':

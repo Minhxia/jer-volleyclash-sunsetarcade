@@ -242,7 +242,7 @@ export class Lobby_Scene extends Phaser.Scene {
         // avisa que ya no está listo
         this._sendWS({ type: 'player_ready', isReady: false });
 
-        // avisa que abandonas el lobby
+        // avisa que abandona el lobby
         this._sendWS({ type: 'leave_lobby' });
 
         // cierra el ws y limpia el registry

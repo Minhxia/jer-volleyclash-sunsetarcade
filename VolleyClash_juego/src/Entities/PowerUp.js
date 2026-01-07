@@ -1,9 +1,10 @@
 import { ApplyPowerUpCommand } from "../Commands/ApplyPowerUpCommand";
 
 export class PowerUp {
-    constructor(scene, x, y, type) {
+    constructor(scene, x, y, type, id = null) {
         this.scene = scene;
         this.type = type;
+        this.id = id;
 
         this.isCollected = false;   // para evitar recoger varias veces
         this._destroyed = false;    // para evitar destruir varias veces
@@ -91,17 +92,25 @@ export class PowerUp {
         if (this._destroyed) return;
         this._destroyed = true;
 
+        // AVISA AL NO-HOST
+        if (this.scene?.isHostClient?.() && this.id != null) {
+            this.scene.sendMessage({
+                type: 'remove_powerup',
+                id: this.id
+            });
+        }
+
         // colliders overlaps
         if (Array.isArray(this._overlaps)) {
             this._overlaps.forEach(c => {
-                try { c.destroy(); } catch {}
+                try { c.destroy(); } catch { }
             });
             this._overlaps = [];
         }
 
         // tween
         if (this.fadeTween) {
-            try { this.fadeTween.stop(); } catch {}
+            try { this.fadeTween.stop(); } catch { }
             this.fadeTween = null;
         }
 
@@ -113,7 +122,7 @@ export class PowerUp {
 
         // sprite
         if (this.sprite) {
-            try { this.sprite.destroy(); } catch {}
+            try { this.sprite.destroy(); } catch { }
             this.sprite = null;
         }
 

@@ -12,7 +12,8 @@ function createGameRoomService(connectionService, getMeta) {
         match = {
             players: playerWss,
             hostWs,
-            scenario
+            scenario,
+            rallyId: 0
         };
 
         // se notifica a ambos jugadores
@@ -51,7 +52,7 @@ function createGameRoomService(connectionService, getMeta) {
             if (other !== ws) connectionService.send(other, type, payload);
         }
     }
-    
+
     // Maneja la desconexión de un jugador
     function handleDisconnect(ws) {
         if (!match || !isInMatch(ws)) return;
@@ -60,8 +61,9 @@ function createGameRoomService(connectionService, getMeta) {
 
         if (opponent.readyState === 1) { // WebSocket.OPEN
             opponent.send(JSON.stringify({
-            type: 'playerDisconnected'
+                type: 'playerDisconnected'
             }));
+            //connectionService.send(opponent, 'playerDisconnected', {});
         }
 
         // Clean up room
@@ -89,18 +91,73 @@ function createGameRoomService(connectionService, getMeta) {
         if (!isInMatch(ws)) return;
         if (match.hostWs && ws !== match.hostWs) return;
 
-        sendToOpponent(ws, 'ball_update', {
+        // usar seq si viene, sino timestamp actual
+        const seq = Number.isFinite(ballData.seq) ? ballData.seq : Date.now();
+
+        const payload = {
+            rallyId: match.rallyId ?? 0,
             x: ballData.x,
             y: ballData.y,
             vx: ballData.vx,
-            vy: ballData.vy
+            vy: ballData.vy,
+            seq
+        };
+
+        // para resync
+        match.lastBallState = payload;
+
+        sendToOpponent(ws, 'ball_update', payload);
+    }
+
+    // Controla el reseteo de la pelota
+    function handleBallReset(ws, data) {
+        if (!isInMatch(ws)) return;
+        if (match.hostWs && ws !== match.hostWs) return;
+
+        match.rallyId = (match.rallyId ?? 0) + 1;
+
+        const seq = Number.isFinite(data.seq) ? data.seq : Date.now();
+
+        sendToMatch('ball_reset', {
+            rallyId: match.rallyId,
+            x: data.x,
+            y: data.y,
+            vx: data.vx,
+            vy: data.vy,
+            reason: data.reason ?? 'point' // 'set_start', 'set_reset', etc.
         });
+    }
+
+    // Controla el spawn de un power-up
+    function handleSpawnPowerUp(ws, data) {
+        if (!isInMatch(ws)) return;
+        if (match.hostWs && ws !== match.hostWs) return;
+
+        sendToOpponent(ws, 'spawn_powerup', {
+            id: data.id,
+            x: data.x,
+            y: data.y,
+            powerType: data.powerType
+        });
+    }
+
+    // Controla la eliminación de un power-up
+    function handleRemovePowerUp(ws, data) {
+        if (!isInMatch(ws)) return;
+        if (match.hostWs && ws !== match.hostWs) return;
+
+        sendToOpponent(ws, 'remove_powerup', { id: data.id });
     }
 
     // Controla la actualización del marcador
     function handleScoreUpdate(ws, scoreData) {
+        console.log('[SERVER] update_score recibido', scoreData);
+
         if (!isInMatch(ws)) return;
-        sendToMatch('score_sync', scoreData);
+        if (match.hostWs && ws !== match.hostWs) return;
+
+        const { type, ...payload } = scoreData; // quita "update_score"
+        sendToMatch('score_sync', payload);
     }
 
     // Reenvía un mensaje al oponente
@@ -121,6 +178,9 @@ function createGameRoomService(connectionService, getMeta) {
         handleDisconnect,
         handlePlayerMove,
         handleBallSync,
+        handleBallReset,
+        handleSpawnPowerUp,
+        handleRemovePowerUp,
         handleScoreUpdate,
         forwardToOpponent,
         broadcastToMatch
