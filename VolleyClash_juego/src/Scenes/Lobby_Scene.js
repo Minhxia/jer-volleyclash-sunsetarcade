@@ -13,6 +13,10 @@ export class Lobby_Scene extends Phaser.Scene {
         this.lobbyPlayers = [];
         this.pendingLobbyUpdate = null;
 
+        this.lobbyErrorBg = null;
+        this.lobbyErrorText = null;
+        this.showingLobbyError = false;
+
         this.ws = null;
     }
 
@@ -271,6 +275,10 @@ export class Lobby_Scene extends Phaser.Scene {
         this.hostCard = null;
         this.guestCard?.destroy();
         this.guestCard = null;
+        this.lobbyErrorBg?.destroy();
+        this.lobbyErrorBg = null;
+        this.lobbyErrorText?.destroy();
+        this.lobbyErrorText = null;
 
         // limpia handlers del ws
         if (this.ws) {
@@ -279,6 +287,59 @@ export class Lobby_Scene extends Phaser.Scene {
             this.ws.onclose = null;
             this.ws.onopen = null;
         }
+    }
+
+    // Cuando el lobby ya está lleno, el jugador recibe una aviso y sale a ModeGame_Scene
+    _showLobbyErrorAndReturn(message) {
+        if (this.showingLobbyError) return;
+        this.showingLobbyError = true;
+
+        const { width, height } = this.scale;
+        const style = this.game.globals?.defaultTextStyle ?? {
+            fontFamily: 'Arial',
+            fontSize: '20px',
+            color: '#000'
+        };
+
+        if (this.btnListo?.button) {
+            this.btnListo.button.disableInteractive();
+            this.btnListo.button.setAlpha(0.6);
+        }
+        if (this.btnVolver?.disableInteractive) {
+            this.btnVolver.disableInteractive();
+            this.btnVolver.setAlpha?.(0.6);
+        }
+
+        this.lobbyErrorBg?.destroy();
+        this.lobbyErrorText?.destroy();
+        this.lobbyErrorText = this.add.text(width / 2, height * 0.5, message, {
+            ...style,
+            fontSize: '26px',
+            color: '#b00000',
+            align: 'center',
+            wordWrap: { width: width * 0.8 }
+        }).setOrigin(0.5);
+        this.lobbyErrorText.setDepth(10);
+
+        const paddingX = 24;
+        const paddingY = 16;
+        this.lobbyErrorBg = this.add.rectangle(
+            this.lobbyErrorText.x,
+            this.lobbyErrorText.y,
+            this.lobbyErrorText.width + paddingX * 2,
+            this.lobbyErrorText.height + paddingY * 2,
+            0xffffff,
+            0.9
+        ).setOrigin(0.5);
+        this.lobbyErrorBg.setDepth(9);
+
+        this.time.delayedCall(2000, () => {
+            if (this.ws) {
+                try { this.ws.close(); } catch { }
+            }
+            this.registry.remove('ws');
+            this.scene.start('ModeGame_Scene');
+        });
     }
 
     // Construye la URL del WebSocket según el protocolo y host actuales
@@ -378,9 +439,15 @@ export class Lobby_Scene extends Phaser.Scene {
             }
 
             // mensajes de error
-            case 'error':
-                console.error('[WS error]', msg.message);
+            case 'error': {
+                const message = msg?.message ?? 'Error en el lobby';
+                console.error('[WS error]', message);
+                const lower = message.toLowerCase();
+                if (lower.includes('lobby lleno') || lower.includes('partida en curso')) {
+                    this._showLobbyErrorAndReturn(`${message}\nVolviendo al menu...`);
+                }
                 break;
+            }
 
             // para depurar
             default:

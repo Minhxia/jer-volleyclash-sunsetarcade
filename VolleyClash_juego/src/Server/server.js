@@ -441,6 +441,9 @@ wss.on('connection', (ws) => {
         const m = getMeta(ws);
         console.log(`[WS] Desconectado: ${m?.id ?? 'unknown'}`);
 
+        // notifica al rival si estaba en partida antes de tocar el lobby
+        gameRoomService.handleDisconnect(ws);
+
         // saca del lobby y notifica abandono
         matchmakingService.leave(ws);
 
@@ -452,7 +455,6 @@ wss.on('connection', (ws) => {
             activePlayers = activePlayers.filter(u => u !== m.username);
             lastSeen.delete(m.username);
         }
-        gameRoomService.handleDisconnect(ws);
         clients.delete(ws);
     });
 

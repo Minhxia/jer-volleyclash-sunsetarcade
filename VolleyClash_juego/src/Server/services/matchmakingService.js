@@ -50,6 +50,11 @@ function createMatchmakingService(connectionService, gameRoomService, getMeta) {
             return;
         }
 
+        if (gameRoomService?.isMatchActive?.()) {
+            connectionService.send(ws, 'error', { message: 'Partida en curso' });
+            return;
+        }
+
         // se actualiza el escenario si llega
         if (selectedScenario) roomScenario = selectedScenario;
 

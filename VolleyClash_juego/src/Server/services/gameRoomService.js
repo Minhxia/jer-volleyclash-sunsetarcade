@@ -35,6 +35,11 @@ function createGameRoomService(connectionService, getMeta) {
         match = null;
     }
 
+    // Comprueba si hay una partida activa
+    function isMatchActive() {
+        return !!match;
+    }
+
     // Comprueba si un ws está en el match actual
     function isInMatch(ws) {
         return !!match && match.players.includes(ws);
@@ -189,6 +194,7 @@ function createGameRoomService(connectionService, getMeta) {
     return {
         startMatch,
         endMatchIfContains,
+        isMatchActive,
 
         handleDisconnect,
         handlePlayerMove,
