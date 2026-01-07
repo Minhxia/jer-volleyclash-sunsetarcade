@@ -112,7 +112,7 @@ export class Logging_Scene extends Phaser.Scene {
             y: height * 0.73,
             label: 'Entrar',
             onClick: () => this.handleSubmit(),
-            scale: 2,
+            scale: 2.3,
             textureNormal: 'botonSimple',
             textureHover: 'botonSimpleSeleccionado',
             textStyle: {
@@ -127,9 +127,9 @@ export class Logging_Scene extends Phaser.Scene {
         this.deleteBtn = createUIButton(this, {
             x: centerX + 80,
             y: height * 0.73,
-            label: 'Eliminar\ncuenta',
+            label: 'Eliminar\nCuenta',
             onClick: () => this.handleDeleteUser(),
-            scale: 2,
+            scale: 2.3,
             textureNormal: 'botonSimple',
             textureHover: 'botonSimpleSeleccionado',
             textStyle: {
@@ -159,7 +159,7 @@ export class Logging_Scene extends Phaser.Scene {
         const fontFamily = style?.fontFamily ?? 'Arial';
 
         const dom = this.add.dom(x, y).createFromHTML(`
-            <input type="${type}" placeholder="${placeholder}" 
+            <input type="${type}" placeholder="${placeholder}" maxlength="10"
             style="width:180px; padding:8px; font-size:${fontSize}; font-family:${fontFamily}; 
             border-radius:12px; border: 6px solid #FFAA00; text-align:center; outline:none;" />
         `);
@@ -168,6 +168,12 @@ export class Logging_Scene extends Phaser.Scene {
 
         inputEl.addEventListener('focus', () => this.input.keyboard.enabled = false);
         inputEl.addEventListener('blur', () => this.input.keyboard.enabled = true);
+
+        if (!isPassword) {
+            inputEl.addEventListener('input', () => {
+                inputEl.value = inputEl.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]/g, '');
+            });
+        }
 
         return inputEl;
     }
@@ -212,6 +218,18 @@ export class Logging_Scene extends Phaser.Scene {
 
         if (passwordValue.length < 3) {
             alert("Contraseña demasiado corta");
+            return;
+        }
+
+        const soloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/;
+
+        if (!soloLetras.test(usernameValue)) {
+            alert("El usuario solo puede contener letras (Sin números ni símbolos)");
+            return;
+        }
+
+        if (usernameValue.length > 10) {
+            alert("El usuario no puede superar los 10 caracteres");
             return;
         }
 
