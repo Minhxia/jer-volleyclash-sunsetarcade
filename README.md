@@ -38,7 +38,7 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
 3. [Aspectos Técnicos](#3-aspectos-técnicos)  
  3.1 [Lenguajes y Frameworks](#31-lenguajes-y-frameworks)  
  3.2 [Arquitectura Cliente-Servidor](#32-arquitectura-cliente-servidor)  
- 3.3 [Control de Versiones y Gestión](#33-control-de-versiones-y-gestión)
+ 3.3 [Control de Versiones y Gestión](#33-control-de-versiones-y-gestión)  
  3.4 [API REST](#34-api-rest)  
  3.5 [Comunicación en Tiempo Real – WebSockets](#35-comunicación-en-tiempo-real--websockets)
    
@@ -199,22 +199,64 @@ La API REST está desarrollada en **Node.js**, utilizando **Express**, y se comu
 
 ## 3.5 Comunicación en Tiempo Real – WebSockets
 
-Para garantizar una experiencia multijugador fluida y competitiva, *Volley Clash* utiliza **WebSockets** para la comunicación en tiempo real durante las partidas.
+Para la sincronización de las partidas en tiempo real, **Volley Clash** utiliza **WebSockets** mediante la librería `ws` en Node.js. Esta tecnología permite una comunicación bidireccional persistente entre el servidor y los clientes durante toda la partida, garantizando baja latencia y coherencia en el estado del juego.
 
-### Uso de WebSockets en el juego
-Los WebSockets se emplean exclusivamente durante el transcurso de una partida, permitiendo:
-- Sincronización de la **posición de los jugadores**.
-- Envío del estado de la **pelota** (posición y velocidad).
-- Activación y efectos de los **power-ups**.
-- Actualización instantánea del **marcador**, sets y tiempo restante.
-- Gestión del estado de la partida (saque, rally, punto, fin de set).
+El servidor WebSocket se inicializa sobre el mismo servidor HTTP que la API REST y actúa como **autoridad del juego**, validando y reenviando los eventos críticos entre los jugadores.
 
-### Ventajas del uso de WebSockets
-- Comunicación **bidireccional** y persistente.
-- **Baja latencia**, esencial para un juego competitivo.
-- Reducción de peticiones HTTP repetidas.
+### Gestión de Conexiones
 
-El servidor actúa como **autoridad del juego**, validando las acciones recibidas de los clientes y enviando el estado actualizado a ambos jugadores para evitar desincronizaciones o comportamientos no deseados.
+Cada conexión WebSocket mantiene una estructura de metadatos asociada con la siguiente información:
+
+- **ID único de conexión**
+- **Nombre de usuario**
+- **Personaje seleccionado**
+- **Rol de host**
+- **Estado de conexión (keep-alive)**
+
+El servidor mantiene un registro activo de clientes conectados y elimina automáticamente aquellas conexiones inactivas mediante un sistema de **ping/pong** periódico.
+
+### Sistema de Lobby y Matchmaking
+
+A través de WebSockets se gestiona todo el flujo previo a la partida:
+
+- Entrada de jugadores al **lobby** (`join_lobby`)
+- Selección de **escenario**
+- Confirmación de **estado listo** de cada jugador
+- Asignación de roles y emparejamiento automático
+
+Cuando ambos jugadores están preparados, el servidor crea una **sala de juego** y comienza la sincronización de la partida.
+
+### Sincronización In-Game
+
+Durante la partida, los WebSockets se utilizan para enviar y recibir eventos en tiempo real, entre ellos:
+
+- **Movimiento de jugadores** (`player_move`)
+- **Sincronización de la pelota** (`ball_sync`)
+- **Actualización de puntuación** (`update_score`)
+- **Sincronización del temporizador** (`timer_sync`)
+- **Finalización de sets y partida**
+- **Gestión del punto de oro**
+- **Uso y aplicación de power-ups**
+- **Generación forzada de power-ups**
+
+Los mensajes siguen un formato JSON y contienen siempre un campo `type` que identifica la acción a realizar.
+
+### Gestión de Power-Ups
+
+Cuando un jugador activa un *power-up*, el servidor reenvía el evento al oponente correspondiente, garantizando que ambos clientes apliquen el mismo efecto de forma sincronizada.  
+Del mismo modo, la aparición de *power-ups* en la pista puede ser forzada y sincronizada entre ambos jugadores.
+
+### Desconexiones y Control de Estado
+
+El servidor detecta y gestiona correctamente:
+
+- Desconexiones voluntarias
+- Desconexiones por inactividad
+- Errores de red inesperados
+
+En caso de desconexión, el jugador es eliminado del lobby o de la partida activa, se limpian sus datos de conexión y se notifica al oponente si es necesario.
+
+Este sistema asegura la estabilidad de las partidas y evita estados inconsistentes o bloqueos en el flujo de juego.
 
 ---
 
@@ -347,12 +389,12 @@ Se han realizado distintas interfaces para ofrecer al usuario una experiencia **
 Para ello, se han creado las siguientes pantallas: **menú inicial**, **configuración**, **créditos**, **modo de juego**, **personalización de personaje**, **selección de escenario**, **pausa**, **pantalla de juego** y **fin de partida**.
 
 #### Menú inicial
-En esta interfaz, el jugador podrá **comenzar una partida**, acceder a la **pantalla de configuración** o a los **créditos** del juego.  
+En esta interfaz, el jugador podrá **comenzar una partida**, acceder a la **pantalla de configuración**, al **tutorial** o a los **créditos** del juego. Además de cerrar sesión para volver a la pantalla de **logging**.  
 
 ![Menú principal](VolleyClash_juego/public/ASSETS/INTERFACES/Pantalla_de_inicio.png)
 
 #### Configuración
-En esta pantalla, el jugador puede **cambiar el volumen del sonido** del juego y **ver los controles** de la partida.  
+En esta pantalla, el jugador puede **cambiar el volumen del sonido o la música** del juego.  
 
 <img src="VolleyClash_juego/public/ASSETS/INTERFACES/Configuracion_inicial.png" width="960" height="540" alt="Pantalla de configuración">
 
@@ -362,16 +404,26 @@ En esta interfaz se incluirán **únicamente los miembros del equipo**, con la o
 ![Pantalla de créditos](VolleyClash_juego/public/ASSETS/INTERFACES/Creditos.png)
 
 #### Modo de juego
-En esta pantalla se presentan dos botones para elegir entre los modos de **juego local o en red**, según prefiera el jugador.  
+En esta pantalla se presentan dos botones para elegir entre los modos de **juego local o en red**, según prefiera el jugador. Además se muestra el estado del servidor y el número de jugadores conectados actualmente.  
 
 ![Pantalla de modo de juego](VolleyClash_juego/public/ASSETS/INTERFACES/Modo_de_juego.png)
 
-#### Personalizar personaje del jugador
+#### Tutorial
+En esta pantalla se presentan dos botones para moverse entre las diferentes páginas del tutorial.  
+
+![Pantalla de modo de juego](VolleyClash_juego/public/ASSETS/INTERFACES/Modo_de_juego.png)
+
+#### Personalizar personaje del jugador (Local)
 En esta interfaz, el jugador podrá **elegir su nombre y el personaje** que desee utilizar.  
 
-<img src="VolleyClash_juego/public/ASSETS/INTERFACES/Seleccion_de_personaje.png" width="960" height="540" alt="Pantalla de selección de personaje">
+<img src="VolleyClash_juego/public/ASSETS/INTERFACES/Seleccion_de_personaje.png" width="960" height="540" alt="Pantalla de selección de personaje (Local)">
 
-#### Selección de escenario
+#### Personalizar personaje del jugador (Online)
+En esta interfaz, el jugador podrá **elegir el personaje** que desee utilizar.  
+
+<img src="VolleyClash_juego/public/ASSETS/INTERFACES/Seleccion_de_personajeOnline.png" width="960" height="540" alt="Pantalla de selección de personaje (Online)">
+
+#### Selección de escenario (Local)
 En esta pantalla, el jugador podrá **elegir el escenario** en el que desea jugar la partida.  
 
 ![Pantalla de selección de escenario](VolleyClash_juego/public/ASSETS/INTERFACES/Seleccion_de_escenario.png)
@@ -380,6 +432,16 @@ En esta pantalla, el jugador podrá **elegir el escenario** en el que desea juga
 En esta pantalla, el jugador podrá **volver al menú o reaunudar** la partida.  
 
 ![Pantalla de selección de escenario](VolleyClash_juego/public/ASSETS/INTERFACES/Pausa.png)
+
+#### Lobby
+En esta pantalla, el jugador podrá **seleccionar el escenario** si es **admin** o marcar su estado como listo para comenzar la partida.  
+
+![Pantalla de selección de escenario](VolleyClash_juego/public/ASSETS/INTERFACES/Lobby.png)
+
+#### Logging
+En esta pantalla, el jugador podrá **registrarse**, **eliminar su cuenta** o **iniciar sesión**.  
+
+![Pantalla de selección de escenario](VolleyClash_juego/public/ASSETS/INTERFACES/Logging.png)
 
 #### Pantalla de juego
 En la pantalla de juego se pueden encontrar los siguientes elementos:
@@ -391,10 +453,10 @@ En la pantalla de juego se pueden encontrar los siguientes elementos:
 ![Pantalla de juego](VolleyClash_juego/public/ASSETS/INTERFACES/Partida.png)  
 
 #### Fin de partida
-En esta interfaz aparecerá el **nombre del jugador ganador**.  
+En esta interfaz aparecerá el **nombre del jugador ganador** y una animación de su **personaje seleccionado**.  
 Además, habrá un botón para **volver al menú inicial**.
 
-![Pantalla de fin de juego](VolleyClash_juego/public/ASSETS/INTERFACES/Fin_de_partida.jpg)  
+![Pantalla de fin de juego](VolleyClash_juego/public/ASSETS/INTERFACES/Fin_de_partida.png)  
 
 
 ### 5.5.2 Diagrama de Estados
