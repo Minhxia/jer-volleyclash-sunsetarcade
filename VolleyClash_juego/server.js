@@ -239,10 +239,17 @@ app.put('/api/game/finish', (req, res) => {
 app.get('/api/topPlayers', (req, res) => {
     const users = readUsers();
 
+
     // Ordenamos de mayor a menor por partidasGanadas
     const topPlayers = users
-        .sort((a, b) => b.partidasGanadas - a.partidasGanadas)
-        .slice(0, 5); // Tomamos solo los 5 primeros
+        .sort((a, b) => (b.partidasGanadas || 0) - (a.partidasGanadas || 0))
+        .slice(0, 5) // Tomamos solo los 5 primeros
+        .map(u => ({ // Devolvemos solo los campos necesarios
+            username: u.username,
+            partidasGanadas: (u.partidasGanadas || 0),
+            partidaJugadas: (u.partidaJugadas || 0),
+            partidasPerdidas: (u.partidasPerdidas || 0)
+        }));
 
     res.json({ topPlayers });
 });
