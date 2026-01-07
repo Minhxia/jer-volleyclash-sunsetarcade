@@ -38,7 +38,7 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
 3. [Aspectos Técnicos](#3-aspectos-técnicos)  
  3.1 [Lenguajes y Frameworks](#31-lenguajes-y-frameworks)  
  3.2 [Arquitectura Cliente-Servidor](#32-arquitectura-cliente-servidor)  
- 3.3 [Control de Versiones y Gestión](#33-control-de-versiones-y-gestión)
+ 3.3 [Control de Versiones y Gestión](#33-control-de-versiones-y-gestión)  
  3.4 [API REST](#34-api-rest)  
  3.5 [Comunicación en Tiempo Real – WebSockets](#35-comunicación-en-tiempo-real--websockets)
    
@@ -347,12 +347,12 @@ Se han realizado distintas interfaces para ofrecer al usuario una experiencia **
 Para ello, se han creado las siguientes pantallas: **menú inicial**, **configuración**, **créditos**, **modo de juego**, **personalización de personaje**, **selección de escenario**, **pausa**, **pantalla de juego** y **fin de partida**.
 
 #### Menú inicial
-En esta interfaz, el jugador podrá **comenzar una partida**, acceder a la **pantalla de configuración** o a los **créditos** del juego.  
+En esta interfaz, el jugador podrá **comenzar una partida**, acceder a la **pantalla de configuración**, al **tutorial** o a los **créditos** del juego. Además de cerrar sesión para volver a la pantalla de **logging**.  
 
 ![Menú principal](VolleyClash_juego/public/ASSETS/INTERFACES/Pantalla_de_inicio.png)
 
 #### Configuración
-En esta pantalla, el jugador puede **cambiar el volumen del sonido** del juego y **ver los controles** de la partida.  
+En esta pantalla, el jugador puede **cambiar el volumen del sonido o la música** del juego.  
 
 <img src="VolleyClash_juego/public/ASSETS/INTERFACES/Configuracion_inicial.png" width="960" height="540" alt="Pantalla de configuración">
 
@@ -362,16 +362,26 @@ En esta interfaz se incluirán **únicamente los miembros del equipo**, con la o
 ![Pantalla de créditos](VolleyClash_juego/public/ASSETS/INTERFACES/Creditos.png)
 
 #### Modo de juego
-En esta pantalla se presentan dos botones para elegir entre los modos de **juego local o en red**, según prefiera el jugador.  
+En esta pantalla se presentan dos botones para elegir entre los modos de **juego local o en red**, según prefiera el jugador. Además se muestra el estado del servidor y el número de jugadores conectados actualmente.  
 
 ![Pantalla de modo de juego](VolleyClash_juego/public/ASSETS/INTERFACES/Modo_de_juego.png)
 
-#### Personalizar personaje del jugador
+#### Tutorial
+En esta pantalla se presentan dos botones para moverse entre las diferentes páginas del tutorial.  
+
+![Pantalla de modo de juego](VolleyClash_juego/public/ASSETS/INTERFACES/Modo_de_juego.png)
+
+#### Personalizar personaje del jugador (Local)
 En esta interfaz, el jugador podrá **elegir su nombre y el personaje** que desee utilizar.  
 
-<img src="VolleyClash_juego/public/ASSETS/INTERFACES/Seleccion_de_personaje.png" width="960" height="540" alt="Pantalla de selección de personaje">
+<img src="VolleyClash_juego/public/ASSETS/INTERFACES/Seleccion_de_personaje.png" width="960" height="540" alt="Pantalla de selección de personaje (Local)">
 
-#### Selección de escenario
+#### Personalizar personaje del jugador (Online)
+En esta interfaz, el jugador podrá **elegir el personaje** que desee utilizar.  
+
+<img src="VolleyClash_juego/public/ASSETS/INTERFACES/Seleccion_de_personajeOnline.png" width="960" height="540" alt="Pantalla de selección de personaje (Online)">
+
+#### Selección de escenario (Local)
 En esta pantalla, el jugador podrá **elegir el escenario** en el que desea jugar la partida.  
 
 ![Pantalla de selección de escenario](VolleyClash_juego/public/ASSETS/INTERFACES/Seleccion_de_escenario.png)
@@ -380,6 +390,16 @@ En esta pantalla, el jugador podrá **elegir el escenario** en el que desea juga
 En esta pantalla, el jugador podrá **volver al menú o reaunudar** la partida.  
 
 ![Pantalla de selección de escenario](VolleyClash_juego/public/ASSETS/INTERFACES/Pausa.png)
+
+#### Lobby
+En esta pantalla, el jugador podrá **seleccionar el escenario** si es **admin** o marcar su estado como listo para comenzar la partida.  
+
+![Pantalla de selección de escenario](VolleyClash_juego/public/ASSETS/INTERFACES/Lobby.png)
+
+#### Logging
+En esta pantalla, el jugador podrá **registrarse**, **eliminar su cuenta** o **iniciar sesión**.  
+
+![Pantalla de selección de escenario](VolleyClash_juego/public/ASSETS/INTERFACES/Logging.png)
 
 #### Pantalla de juego
 En la pantalla de juego se pueden encontrar los siguientes elementos:
@@ -391,7 +411,7 @@ En la pantalla de juego se pueden encontrar los siguientes elementos:
 ![Pantalla de juego](VolleyClash_juego/public/ASSETS/INTERFACES/Partida.png)  
 
 #### Fin de partida
-En esta interfaz aparecerá el **nombre del jugador ganador**.  
+En esta interfaz aparecerá el **nombre del jugador ganador** y una animación de su **personaje seleccionado**.  
 Además, habrá un botón para **volver al menú inicial**.
 
 ![Pantalla de fin de juego](VolleyClash_juego/public/ASSETS/INTERFACES/Fin_de_partida.jpg)  
