@@ -20,8 +20,8 @@ const USERS_FILE = path.join(__dirname, 'users.json');
 
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname, 'dist')));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../../dist')));
+app.use(express.static(path.join(__dirname, '../../public')));
 
 // Lectura y escritura en la base de datos
 const readUsers = () => {
@@ -481,6 +481,9 @@ const interval = setInterval(() => {
 
 wss.on('close', () => clearInterval(interval));
 
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../dist/index.html'));
+});
 
 // Si no se indica host, por defecto es 0.0.0.0
 // https://nodejs.org/api/net.html#serverlistenport-host-backlog-callback

@@ -2,16 +2,16 @@
   {
     "username": "Antonio",
     "password": "Antonio",
-    "partidaJugadas": 13,
-    "partidasGanadas": 4,
-    "partidasPerdidas": 9
+    "partidaJugadas": 19,
+    "partidasGanadas": 8,
+    "partidasPerdidas": 11
   },
   {
     "username": "Marco",
     "password": "Marco",
-    "partidaJugadas": 15,
-    "partidasGanadas": 10,
-    "partidasPerdidas": 5
+    "partidaJugadas": 21,
+    "partidasGanadas": 14,
+    "partidasPerdidas": 7
   },
   {
     "username": "Prueba",
@@ -21,7 +21,7 @@
     "partidasPerdidas": 0
   },
   {
-    "username": "sara",
+    "username": "Sara",
     "password": "1234",
     "partidaJugadas": 9,
     "partidasGanadas": 7,

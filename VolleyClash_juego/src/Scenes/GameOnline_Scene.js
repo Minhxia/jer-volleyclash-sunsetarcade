@@ -148,6 +148,9 @@ export class GameOnline_Scene extends Phaser.Scene {
         this.worldHeight = height;
         const style = this.game.globals.defaultTextStyle;
 
+        this.events.off('rallyConcluded');
+        this.events.off('resume');
+
         // se definen los efectos de sonido
         this.sfx = {
             whistle: 'sfx_silbato',
@@ -718,23 +721,32 @@ export class GameOnline_Scene extends Phaser.Scene {
     }
 
     handleDisconnection() {
+        if (this.gameEnded) return;
         this.gameEnded = true;
-        // detiene el cronómetro y las físicas
+
+        // Detiene el cronómetro y las físicas
         if (this.timerEvent) this.timerEvent.paused = true;
         this.physics.world.pause();
+        this._stopBallSync();
 
         // feedback visual
         const abandonText = `El oponente ha abandonado.`;
         console.log(abandonText);
 
-        this.add.text(400, 250, abandonText, {
-            fontSize: '48px',
-            color: '#ff0000'
+        const { width, height } = this.scale;
+
+        this.add.text(width / 2, height / 2, abandonText, {
+            fontSize: '42px',
+            color: '#ff0000',
+            fontStyle: 'bold',
+            align: 'center',
         }).setOrigin(0.5);
 
-        // limpieza y salida
-        this.shutdown();
-        this.scene.start('Menu_Scene');
+        this.time.delayedCall(4000, () => {
+            console.log("Timeout finalizado, ejecutando shutdown y cambio de escena.");
+            this.shutdown();
+            this.scene.start('Menu_Scene');
+        });
     }
 
     shutdown() {
@@ -743,6 +755,11 @@ export class GameOnline_Scene extends Phaser.Scene {
                 if (timer) timer.remove(false);
             });
             this.powerUpExpiryTimers.clear();
+        }
+
+        this.events.removeAllListeners('rallyConcluded');
+        if (this.timerEvent) {
+            this.timerEvent.destroy();
         }
 
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
@@ -1408,6 +1425,7 @@ export class GameOnline_Scene extends Phaser.Scene {
 
     // Configura los event listeners de la pelota
     _setupBallEvents() {
+        this.events.removeAllListeners('rallyConcluded');
         this.events.on('rallyConcluded', (data) => {
             if (this.isSetEnding) return;
 
