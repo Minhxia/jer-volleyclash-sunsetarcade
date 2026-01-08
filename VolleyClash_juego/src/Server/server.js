@@ -8,6 +8,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
+const { result } = require('lodash');
 
 const app = express();
 const server = http.createServer(app);
@@ -207,9 +208,9 @@ app.get('/api/users/profile/:username', (req, res) => {
 
 //ACTUALIZAR LAS PARTIDAS DEL USUARIO AL ACABAR PARTIDA
 app.put('/api/game/finish', (req, res) => {
-    const { username, winner } = req.body;
+    const { username, resultado } = req.body;
 
-    if (!username || !winner) {
+    if (!username || !resultado) {
         return res.status(400).json({ error: 'Datos incompletos' });
     }
 
@@ -222,14 +223,14 @@ app.put('/api/game/finish', (req, res) => {
 
     user.partidaJugadas++;
 
-    if (winner === "player1") {
+    if (resultado === "win") {
         user.partidasGanadas++;
         console.log(`${username} ha GANADO la partida`);
-    } else if (winner === "player2") {
+    } else if (resultado === "lose") {
         user.partidasPerdidas++;
         console.log(`${username} ha PERDIDO la partida`);
     } else {
-        return res.status(400).json({ error: 'Winner inválido' });
+        return res.status(400).json({ error: 'Resultado inválido' });
     }
 
     saveUsers(users);

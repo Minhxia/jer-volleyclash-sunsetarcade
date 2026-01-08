@@ -151,6 +151,11 @@ export class EndGame_Scene extends Phaser.Scene {
         const username = this.registry.get('username');
         if (!username) return;
 
+        const winnerName = (winner === "player1") ? this.player1.name : this.player2.name;
+
+        const myResult = (username === winnerName) ? "win" : "lose";
+        console.log(`[Stats] Usuario: ${username}, Resultado local: ${myResult}`);
+
         const baseUrl = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
 
         fetch(`${baseUrl}/api/game/finish`, {
@@ -160,7 +165,7 @@ export class EndGame_Scene extends Phaser.Scene {
             },
             body: JSON.stringify({
                 username: username,
-                winner: winner
+                resultado: myResult
             })
         })
         .then(res => res.json())
