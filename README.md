@@ -9,7 +9,7 @@ El objetivo es derrotar al oponente alcanzando **11 puntos**, teniendo al menos 
 
 **Número de Grupo:** 5   
 **Repositorio de GitHub:** [URL del repositorio](https://github.com/Minhxia/jer-volleyclash-sunsetarcade)  
-**Presentación Fase 3, 4 y 5:** [URL de la presentación](https://www.canva.com/design/DAG9vPPKsKo/-o2fW4u-cMkP8aeihkXtcg/edit?utm_content=DAG9vPPKsKo&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)  
+**Presentación Fase 3 y 4:** [URL de la presentación]([https://www.canva.com/design/DAG9vPPKsKo/-o2fW4u-cMkP8aeihkXtcg/edit?utm_content=DAG9vPPKsKo&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton](https://www.canva.com/design/DAG9vPPKsKo/MVlS1KOIfwbtSu-GVeyqAw/view?utm_content=DAG9vPPKsKo&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h2c811f2d9c))  
 **Equipo de Desarrollo:**
 
 | Nombre | Correo Oficial | Cuenta de GitHub |
@@ -457,6 +457,11 @@ En esta interfaz se incluirán **únicamente los miembros del equipo**, con la o
 
 ![Pantalla de créditos](VolleyClash_juego/public/ASSETS/INTERFACES/Creditos.png)
 
+#### Ranking
+En esta interfaz se pueden ver los **5 mejores jugadores**, ordenados por puntuación.  
+
+![Pantalla de créditos](VolleyClash_juego/public/ASSETS/INTERFACES/Ranking.png)
+
 #### Modo de juego
 En esta pantalla se presentan dos botones para elegir entre los modos de **juego local o en red**, según prefiera el jugador. Además se muestra el estado del servidor y el número de jugadores conectados actualmente.  
 
@@ -465,7 +470,11 @@ En esta pantalla se presentan dos botones para elegir entre los modos de **juego
 #### Tutorial
 En esta pantalla se presentan dos botones para moverse entre las diferentes páginas del tutorial.  
 
-![Pantalla de modo de juego](VolleyClash_juego/public/ASSETS/INTERFACES/Modo_de_juego.png)
+![Pantalla de Tutorial 1](VolleyClash_juego/public/ASSETS/INTERFACES/Tut1.png)
+![Pantalla de Tutorial 2](VolleyClash_juego/public/ASSETS/INTERFACES/Tut2.png)
+![Pantalla de Tutorial 3](VolleyClash_juego/public/ASSETS/INTERFACES/Tut3.png)
+![Pantalla de Tutorial 4](VolleyClash_juego/public/ASSETS/INTERFACES/Tut4.png)
+![Pantalla de Tutorial 5](VolleyClash_juego/public/ASSETS/INTERFACES/Tut5.png)
 
 #### Personalizar personaje del jugador (Local)
 En esta interfaz, el jugador podrá **elegir su nombre y el personaje** que desee utilizar.  
@@ -496,6 +505,11 @@ En esta pantalla, el jugador podrá **seleccionar el escenario** si es **admin**
 En esta pantalla, el jugador podrá **registrarse**, **eliminar su cuenta** o **iniciar sesión**.  
 
 ![Pantalla de selección de escenario](VolleyClash_juego/public/ASSETS/INTERFACES/Logging.png)
+
+#### Conexión Perdida
+En esta pantalla, se avisa al jugador de que el **servidor** no está disponible en ese momento o se ha producido un error de conexión.  
+
+![Pantalla de Conexión Perdida](VolleyClash_juego/public/ASSETS/INTERFACES/ConexionPerdida.png)
 
 #### Pantalla de juego
 En la pantalla de juego se pueden encontrar los siguientes elementos:
